@@ -1,0 +1,5 @@
+/errorlog.txt
+/log.txt
+*.exe
+*.dll
+*.json

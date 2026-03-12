@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SdfGlue": {
+      "commandName": "Project",
+      "workingDirectory": "..\\..\\bin"
+    }
+  }
+}

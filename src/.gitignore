@@ -1,0 +1,8 @@
+.vs/
+packages/
+SdfGlueEditor/bin/
+SdfGlueEditor/obj/
+SdfGlueCore/bin/
+SdfGlueCore/obj/
+SdfGlueUi/bin/
+SdfGlueUi/obj/
