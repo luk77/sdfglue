@@ -18,7 +18,7 @@ namespace SdfGlueCore.Model
     public class DataModel : TreeNode
     {
         public static readonly int      VersionMajor                = 0;
-        public static readonly int      VersionMinor                = 375;
+        public static readonly int      VersionMinor                = 376;
 
         public static readonly bool     MaterialsBlendingEnabled    = true;
         public static readonly bool     UseCameraControllers        = true;

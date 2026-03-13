@@ -234,11 +234,11 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             int vertexDataTexCoordOffset    = 3 * sizeof(float);   // texture coordinates start after position data (3 floats for position)
             int vertexDataTexCoordSize      = 2;                   // 2 floats for texture coordinates
 
-            int vertexLocation = shader_.GetAttribLocation("aPosition");
+            int vertexLocation = shader_.GetAttribLocation("inPosition");
             GL.EnableVertexAttribArray(vertexLocation);
             GL.VertexAttribPointer(vertexLocation, vertexDataPositionSize, VertexAttribPointerType.Float, false, vertexDataSize, vertexDataPositionOffset);
 
-            int texCoordLocation = shader_.GetAttribLocation("aTexCoord");
+            int texCoordLocation = shader_.GetAttribLocation("inUvCoord");
             GL.EnableVertexAttribArray(texCoordLocation);
             GL.VertexAttribPointer(texCoordLocation, vertexDataTexCoordSize, VertexAttribPointerType.Float, false, vertexDataSize, vertexDataTexCoordOffset);
         }
