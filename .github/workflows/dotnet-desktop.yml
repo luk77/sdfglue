@@ -39,6 +39,7 @@
 name: Build SdfGlue (.NET Core Desktop, Windows)
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "main" ]
   pull_request:
