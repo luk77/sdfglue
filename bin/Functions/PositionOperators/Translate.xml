@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef displayName="Translate" functionName="opTranslate">
+<Parameters>
+  <Param type="vec3" displayName="Offset" parameterName="offset" default="0.0;0.0;0.0" speed="0.02"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opTranslate(inout vec3 p, vec3 offset)
+{
+    p -= offset;
+}
+]]>
+</Code>
+</FuncDef>

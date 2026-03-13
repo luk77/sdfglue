@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef displayName="Rounding" functionName="opRounding">
+<Parameters>
+  <Param type="float" displayName="Radius" parameterName="radius" default="0.1" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opRounding(inout float dist, in float radius)
+{
+    dist -= radius;
+}
+]]>
+</Code>
+</FuncDef>

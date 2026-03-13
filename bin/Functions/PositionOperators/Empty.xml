@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef displayName="Empty" functionName="opEmpty">
+<Parameters/>
+<Code>
+<![CDATA[
+void opEmpty(inout SDFG_VEC p)
+{
+}
+]]>
+</Code>
+</FuncDef>

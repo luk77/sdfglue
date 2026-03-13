@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic" displayName="Plane" functionName="sdPlane">
+<Parameters/>
+<Code>
+<![CDATA[
+float sdPlane(in SDFG_VEC p)
+{
+    return p.y;
+}
+]]>
+</Code>
+</FuncDef>

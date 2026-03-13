@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<LayoutData>
+  <DisplayName>Vertical</DisplayName>
+  <ImguiLayoutSettingsTxt>[Window][WindowOverViewport_11111111]
+Pos=0,38
+Size=3840,1945
+Collapsed=0
+
+[Window][Debug##Default]
+Pos=60,60
+Size=400,400
+Collapsed=0
+
+[Window][Preview]
+Pos=865,38
+Size=2591,1815
+Collapsed=0
+DockId=0x0000000B,0
+
+[Window][Object Inspector]
+Pos=0,581
+Size=863,974
+Collapsed=0
+DockId=0x00000001,0
+
+[Window][Playback]
+Pos=0,1704
+Size=3840,279
+Collapsed=0
+DockId=0x0000000A,0
+
+[Window][Project Explorer]
+Pos=0,568
+Size=3840,548
+Collapsed=0
+DockId=0x00000005,0
+
+[Window][Dear ImGui Demo]
+Pos=865,38
+Size=2975,1667
+Collapsed=0
+DockId=0x0000000B,2
+
+[Window][Generated Code]
+Pos=865,38
+Size=2975,1667
+Collapsed=0
+DockId=0x0000000B,1
+
+[Window][Log]
+Pos=865,1707
+Size=2975,296
+Collapsed=0
+DockId=0x00000008,0
+
+[Window][Settings]
+Pos=0,626
+Size=863,1055
+Collapsed=0
+DockId=0x00000001,1
+
+[Window][Diagnostics]
+Pos=865,1707
+Size=2975,296
+Collapsed=0
+DockId=0x00000008,1
+
+[Window][Details]
+Pos=0,1118
+Size=3840,584
+Collapsed=0
+DockId=0x00000006,0
+
+[Window][Preview 1]
+Pos=0,38
+Size=3840,528
+Collapsed=0
+DockId=0x00000003,0
+
+[Window][Code view 1]
+Pos=865,948
+Size=2591,905
+Collapsed=0
+DockId=0x0000000C,0
+
+[Window][Preview 2]
+Pos=2354,38
+Size=1486,958
+Collapsed=0
+
+[Window][Preview 3]
+Pos=864,1001
+Size=1488,982
+Collapsed=0
+
+[Window][Preview 4]
+Pos=2354,38
+Size=1486,1750
+Collapsed=0
+
+[Docking][Data]
+DockSpace       ID=0x08BD597D Window=0x1BBC0F80 Pos=0,38 Size=3840,1945 Split=Y Selected=0xBEB0E3EA
+  DockNode      ID=0x00000009 Parent=0x08BD597D SizeRef=3840,1645 Split=Y
+    DockNode    ID=0x00000003 Parent=0x00000009 SizeRef=3840,509 CentralNode=1 Selected=0xBEB0E3EA
+    DockNode    ID=0x00000004 Parent=0x00000009 SizeRef=3840,1134 Split=Y Selected=0x78A52539
+      DockNode  ID=0x00000005 Parent=0x00000004 SizeRef=3840,548 Selected=0x78A52539
+      DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=3840,584 Selected=0x893C342E
+  DockNode      ID=0x0000000A Parent=0x08BD597D SizeRef=3840,279 Selected=0xEA90F76B
+DockSpace       ID=0x7C6B3D9B Pos=0,38 Size=3840,1965 Split=X Selected=0x382916D5
+  DockNode      ID=0x00000001 Parent=0x7C6B3D9B SizeRef=863,1815 Selected=0x77A0D9DF
+  DockNode      ID=0x00000002 Parent=0x7C6B3D9B SizeRef=2591,1815 Split=Y Selected=0xE706C8D3
+    DockNode    ID=0x00000007 Parent=0x00000002 SizeRef=2975,1667 Split=Y Selected=0x66309AFC
+      DockNode  ID=0x0000000B Parent=0x00000007 SizeRef=2591,908 CentralNode=1 Selected=0x66309AFC
+      DockNode  ID=0x0000000C Parent=0x00000007 SizeRef=2591,905 Selected=0xA707C325
+    DockNode    ID=0x00000008 Parent=0x00000002 SizeRef=2975,296 Selected=0x7FB45FEC
+
+</ImguiLayoutSettingsTxt>
+  <WindowsVisibility>
+    <Visibility Window="Preview 1" Visible="True" />
+    <Visibility Window="Preview 2" Visible="False" />
+    <Visibility Window="Preview 3" Visible="False" />
+    <Visibility Window="Preview 4" Visible="False" />
+    <Visibility Window="Project Explorer" Visible="True" />
+    <Visibility Window="Details" Visible="True" />
+    <Visibility Window="Code view 1" Visible="False" />
+    <Visibility Window="Code view 2" Visible="False" />
+    <Visibility Window="Code view 3" Visible="False" />
+    <Visibility Window="Code view 4" Visible="False" />
+    <Visibility Window="Log" Visible="False" />
+    <Visibility Window="Settings" Visible="False" />
+    <Visibility Window="Diagnostics" Visible="False" />
+    <Visibility Window="Playback" Visible="True" />
+  </WindowsVisibility>
+</LayoutData>

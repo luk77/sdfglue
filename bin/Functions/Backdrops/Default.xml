@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef displayName="Default" functionName="backdropDefault">
+<Parameters>
+  <Param type="vec3"    displayName="Background color"       parameterName="bgColor"    default="0.6;0.7;0.9"       speed="0.01" editor="color"/>
+</Parameters>
+<Code>
+<![CDATA[
+vec3 backdropDefault(in vec3 dir, in vec3 bgColor)
+{
+    return bgColor;
+    //return renderer_fogColor;
+}
+]]>
+</Code>
+</FuncDef>
