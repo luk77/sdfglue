@@ -44,6 +44,12 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  # To avoid warning: 
+  # Node.js 20 actions are deprecated. The following actions are running on Node.js 20 
+  # and may not work as expected
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  
 jobs:
 
   build:
@@ -88,6 +94,18 @@ jobs:
         }
       shell: pwsh
 
+    # CACHE NUGET
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: nuget-${{ runner.os }}-${{ hashFiles('src/**/*.csproj') }}
+        restore-keys: |
+          nuget-${{ runner.os }}-
+
+    - name: Restore
+      run: dotnet restore src/SdfGlue.sln
+  
     - name: Publish
       run: dotnet publish src/SdfGlueEditor/SdfGlueEditor.csproj -c Release -r win-x64 -p:DebugType=none -p:DebugSymbols=false -o bin
 
