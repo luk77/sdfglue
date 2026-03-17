@@ -92,8 +92,7 @@ namespace SdfGlueEditor
             codeGenerator_      = new ShaderCodeGenerator();
             uiMgr_              = new UiManager(this, this.ClientSize.X, this.ClientSize.Y);
 
-
-            FileSystemWatcherUtils.Initialize(".", "*.xml");
+            FileSystemWatcherUtils.Initialize(".", new string[] {"*.xml", "*.glsl", "*.vert", "*.frag", "*.shader"});
         }
 
         private string GetSdfGlueVersion()

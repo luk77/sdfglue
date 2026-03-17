@@ -13,38 +13,47 @@ mat2 cameraOpDefault_Rot(float a)
 
 void cameraOpDefault(inout vec3 ro, inout vec3 rd, in vec2 fragCoord)
 {
-    // out
-    vec3 pos = vec3(0.0);
-    vec3 ray = vec3(0.0);
-    
-    // in
+    // TODO: optimise...
+
+    // input
     vec2 rotation       = vec2(cameraRotationPitch, cameraRotationYaw);
     float distance      = cameraDistanceToTarget;
     float zoom          = cameraZoom;
     
-    vec2 c = cos(rotation);
-    vec4 s;
-    s.xy   = sin(rotation);
-    s.zw = -s.xy;
-
     // ray in view space
-    ray.xy = fragCoord.xy - iResolution.xy*.5;
+    vec3 ray = vec3(0.0);
+    ray.xy = fragCoord.xy - iResolution.xy * 0.5;
     ray.z = iResolution.y*zoom;
     
     // roll rotation
-    //ray.xy *= cameraOpDefault_Rot(cameraRotationRoll);
     ray.xy = SDFG_MUL(cameraOpDefault_Rot(cameraRotationRoll), ray.xy);
     
-    ray = normalize(ray);
-    
-    // rotate ray
-    ray.yz = ray.yz*c.xx + ray.zy*s.zx;
-    ray.xz = ray.xz*c.yy + ray.zx*s.yw;
-    
-    // position camera
-    pos = cameraTargetPosition - distance*vec3(c.x*s.y,s.z,c.x*c.y);
+    // pitch rotation
+    ray.yz = SDFG_MUL(cameraOpDefault_Rot(cameraRotationPitch), ray.yz);
 
-    ro = pos;
+    // yaw rotation
+    ray.xz = SDFG_MUL(cameraOpDefault_Rot(-cameraRotationYaw), ray.xz);
+
+    ray = normalize(ray);
+
+    // calculate offset (from camera pos to target)
+    vec3 offset = vec3(0.0, 0.0, 1.0);
+    
+    // roll rotation
+    offset.xy = SDFG_MUL(cameraOpDefault_Rot(cameraRotationRoll), offset.xy);
+
+    // pitch rotation
+    offset.yz = SDFG_MUL(cameraOpDefault_Rot(cameraRotationPitch), offset.yz);
+
+    // yaw rotation
+    offset.xz = SDFG_MUL(cameraOpDefault_Rot(-cameraRotationYaw), offset.xz);
+    
+    offset = normalize(offset);
+
+    // camera position (ray origin)
+    ro = cameraTargetPosition - distance * offset;
+
+    // camera dir (ray dir)
     rd = ray;
 }
 

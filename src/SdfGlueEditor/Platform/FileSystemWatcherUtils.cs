@@ -3,6 +3,8 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
+using System.Collections.ObjectModel;
+
 namespace SdfGlueEditor.Platform
 {
     internal static class FileSystemWatcherUtils
@@ -15,7 +17,12 @@ namespace SdfGlueEditor.Platform
         // We want only one event per frame
         public static bool ChangeDetected = false;
 
-        public static void Initialize(string pathToFolder, string filter)
+        //public static void Initialize(string pathToFolder, string filter)
+        //{
+        //    Initialize(pathToFolder, new string[] { filter } );
+        //}
+
+        public static void Initialize(string pathToFolder, string[] filters)
         {
             if (watcher_ != null)
             {
@@ -40,7 +47,10 @@ namespace SdfGlueEditor.Platform
             watcher_.Renamed += OnRenamed;
             watcher_.Error += OnError;
 
-            watcher_.Filter = filter;
+            //watcher_.Filter = filter;
+            foreach (var filter in filters)
+                watcher_.Filters.Add(filter);
+
             watcher_.IncludeSubdirectories = true;
             watcher_.EnableRaisingEvents = true;
 
