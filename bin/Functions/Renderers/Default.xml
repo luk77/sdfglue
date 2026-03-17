@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef displayName="Default" functionName="Default">
+<CompilationParameters>
+    <Param type="int" displayName="Use fog"                     parameterName="USE_FOG"                     default="1"/>
+    <Param type="int" displayName="Use point light 1"           parameterName="USE_POINT_LIGHT_1"           default="0"/>
+    <Param type="int" displayName="Use point light 2"           parameterName="USE_POINT_LIGHT_2"           default="0"/>
+    <Param type="int" displayName="Use directional light 1"     parameterName="USE_DIR_LIGHT_1"             default="1"/>
+    <Param type="int" displayName="Use directional light 2"     parameterName="USE_DIR_LIGHT_2"             default="1"/>
+    <Param type="int" displayName="Use rim light"               parameterName="USE_RIM_LIGHT"               default="1"/>
+    <Param type="int" displayName="Use materials cell-variations" parameterName="USE_MATERIAL_CELL_VARIATIONS" default="1"/>
+    <Param type="int" displayName="Use shadows"                 parameterName="USE_SHADOWS"                 default="1"/>
+    <Param type="int" displayName="Use reflections"             parameterName="USE_REFLECTIONS"             default="0"/>
+    <Param type="int" displayName="Use fresnel"                 parameterName="USE_FRESNEL"                 default="0"/>
+    <Param type="int" displayName="Use tone mapping"            parameterName="USE_TONE_MAPPING"            default="1"/>
+    <Param type="int" displayName="Use vignette"                parameterName="USE_VIGNETTE"                default="1"/>
+    <Param type="int" displayName="Use Blinn-Phong"             parameterName="USE_BLINN_PHONG"             default="0"/>
+    <Param type="int" displayName="Prevent back side lighting"  parameterName="PREVENT_BACK_LIGHTING"       default="1"/>
+    <Param type="int" displayName="Use dithering"               parameterName="USE_DITHERING"               default="1"/>
+    <Param type="int" displayName="Use outline"                 parameterName="USE_OUTLINE"                 default="0"/>
+    <Param type="int" displayName="Use tempotal camera blur"    parameterName="TEMPORAL_CAMERA_BLUR"        default="0"/>
+    <Param type="int" displayName="Use camera safe area"        parameterName="USE_CAMERA_SAFE_AREA"        default="0"/>
+    <Param type="int" displayName="Output depth as alpha"       parameterName="DEPTH_AS_ALPHA"              default="0"/>
+    <Param type="int" displayName="Reflect background color"    parameterName="REFLECT_BG_COLOR"            default="0"/>
+    <Param type="int" displayName="DEBUG: Show normals"         parameterName="DEBUG_NORMALS"               default="0"/>
+    <Param type="int" displayName="DEBUG: Show depth"           parameterName="DEBUG_DEPTH"                 default="0"/>
+    <Param type="int" displayName="DEBUG: Show shadows"         parameterName="DEBUG_SHADOWS"               default="0"/>
+</CompilationParameters>
+<Parameters>
+  <Param type="float"   displayName="Fog density"               parameterName="fogDensity"                  default="1.0"               speed="0.01"/>
+  <Param type="vec3"    displayName="Ambient light color"       parameterName="ambientLight_color"          default="0.1;0.1;0.1"       speed="0.01" editor="color"/>
+  <Param type="vec3"    displayName="Point light 1 position"    parameterName="pointLight1_pos"             default="3.0;5.0;-3.0"       speed="0.01"/>
+  <Param type="float"   displayName="Point light 1 intensity"   parameterName="pointLight1_intensity"       default="1.3"               speed="0.01"/>
+  <Param type="vec3"    displayName="Point light 1 color"       parameterName="pointLight1_color"           default="1.0;0.9;0.8"       speed="0.01" editor="color"/>
+  <Param type="vec3"    displayName="Point light 2 position"    parameterName="pointLight2_pos"             default="-1.0;7.0;-3.0"      speed="0.01"/>
+  <Param type="float"   displayName="Point light 2 intensity"   parameterName="pointLight2_intensity"       default="1.3"               speed="0.01"/>
+  <Param type="vec3"    displayName="Point light 2 color"       parameterName="pointLight2_color"           default="0.6;0.7;1.0"       speed="0.01" editor="color"/>
+  <Param type="float"   displayName="Dir. light 1 pitch"        parameterName="dirLight1_pitch"             default="20.0"              speed="0.01" editInDegrees="true"/>
+  <Param type="float"   displayName="Dir. light 1 yaw"          parameterName="dirLight1_yaw"               default="130.0"             speed="0.01" editInDegrees="true"/>
+  <Param type="float"   displayName="Dir. light 1 intensity"    parameterName="dirLight1_intensity"         default="1.3"               speed="0.01"/>
+  <Param type="vec3"    displayName="Dir. light 1 color"        parameterName="dirLight1_color"             default="1.0;0.9;0.8"       speed="0.01" editor="color"/>
+  <Param type="float"   displayName="Dir. light 2 pitch"        parameterName="dirLight2_pitch"             default="40.0"              speed="0.01" editInDegrees="true"/>
+  <Param type="float"   displayName="Dir. light 2 yaw"          parameterName="dirLight2_yaw"               default="70.0"              speed="0.01" editInDegrees="true"/>
+  <Param type="float"   displayName="Dir. light 2 intensity"    parameterName="dirLight2_intensity"         default="1.3"               speed="0.01"/>
+  <Param type="vec3"    displayName="Dir. light 2 color"        parameterName="dirLight2_color"             default="0.6;0.7;1.0"       speed="0.01" editor="color"/>
+  <Param type="float"   displayName="Contrast multiplier"       parameterName="contrastMul"                 default="0.9"           speed="0.01"/>
+  <Param type="float"   displayName="Contrast power"            parameterName="contrastPow"                 default="1.3"           speed="0.01"/>
+  <Param type="float"   displayName="Vignette power"            parameterName="vignettePow"                 default="0.4"           speed="0.01"/>
+  <Param type="vec3"    displayName="Outline color"             parameterName="outlineColor"                default="0.0;0.0;0.0"   speed="0.01" editor="color"/>
+  <Param type="float"   displayName="Outline width"             parameterName="outlineWidth"                default="0.1"           speed="0.01"/>
+  <Param type="float"   displayName="Shadow sharpness"          parameterName="shadowSharpness"             default="2.0"           speed="0.01"/>
+  <Param type="float"   displayName="Shadow ray nudge"          parameterName="shadowRayNudge"              default="0.1"           speed="0.001" min="0.0" max="1.0"/>
+  <Param type="float"   displayName="Back side smoothness"      parameterName="backSideSmoothness"          default="0.6"           speed="0.01" min="0.0" max="1.0"/>
+  <Param type="float"   displayName="Camera safe area radius"   parameterName="cameraSafeAreaRadius"        default="4.0"           speed="0.01"/>
+  <Param type="float"   displayName="Camera safe area smoothness"   parameterName="cameraSafeAreaSmoothness" default="0.1"          speed="0.01"/>
+</Parameters>
+<MaterialDefinition>
+  <Param type="vec3"    displayName="Ambient color"             parameterName="colorAmbient"                default="0.2;0.2;0.2"       speed="0.01" editor="color"/>
+  <Param type="vec3"    displayName="Diffuse color"             parameterName="colorDiffuse"                default="0.5;0.5;0.5"       speed="0.01" editor="color"/>
+  <Param type="vec3"    displayName="Specular color"            parameterName="colorSpecular"               default="0.1;0.1;0.1"       speed="0.01" editor="color"/>
+  <Param type="float"   displayName="Specular strength"         parameterName="specularStrength"            default="1.0"               speed="0.01"/>
+  <Param type="vec3"    displayName="Rim color"                 parameterName="colorRim"                    default="1.0;1.0;1.0"       speed="0.01" editor="color"/>
+  <Param type="float"   displayName="Shininess"                 parameterName="shininess"                   default="10.0"              speed="0.01"/>
+  <Param type="float"   displayName="Rim strength"              parameterName="rimStrength"                 default="0.0"               speed="0.01"/>
+  <Param type="float"   displayName="Rim width"                 parameterName="rimWidth"                    default="0.5"               speed="0.01"/>
+  <Param type="float"   displayName="Reflectance"               parameterName="reflectance"                 default="0.0"               speed="0.01"/>
+  <Param type="float"   displayName="Fresnel"                   parameterName="fresnel"                     default="0.0"               speed="0.01"/>
+  <Param type="float"   displayName="Cell variation diffuse"    parameterName="cellVarDiffuse"              default="0.0"               speed="0.01"/>
+</MaterialDefinition>
+<Includes>
+  <Include path="Compatibility.glsl"     />
+  <Include path="MathConstants.glsl"     />
+  <Include path="GlobalVariables.glsl"   />
+  <Include path="ColorInterpolation.glsl"/>
+  <Include path="ModEx.glsl"             />
+  <Include path="Dithering.glsl"         />
+  <Include path="BasicRaymarching.glsl"  />
+</Includes>
+<Code>
+<![CDATA[
+
+//-------------------------------------------------------------------------------
+#define PI                      3.14159265
+#define MX_ID                   (mat3(1.0))
+//-------------------------------------------------------------------------------
+#define REFLECTION_COUNT 			2
+#define MIRROR_MAX_DIST				50.0
+
+
+//-------------------------------------------------------------------------------
+// Safe area
+//-------------------------------------------------------------------------------
+#if USE_CAMERA_SAFE_AREA
+vec3 g_cameraPos;// = vec3(0.0);
+
+float cameraSafeArea_sdSphere(vec3 p, float radius)
+{
+    return length(p) - radius;
+}
+
+float cameraSafeArea_opSmoothSubtraction(float d1, float d2, float k)
+{
+    float h = clamp( 0.5 - 0.5*(d2+d1)/k, 0.0, 1.0 );
+    return mix( d2, -d1, h ) + k*h*(1.0-h);
+}
+
+#endif //USE_CAMERA_SAFE_AREA
+//-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+
+float getDist(vec3 p)
+{
+    // 3d/4d
+    SDFG_VEC pp = SDFG_VEC(0.0);
+    pp.xyz = p;
+
+    float d = gen_getDist(pp);
+    
+#if USE_CAMERA_SAFE_AREA
+    float dSafeArea = cameraSafeArea_sdSphere(p - g_cameraPos, renderer_cameraSafeAreaRadius);
+    d = cameraSafeArea_opSmoothSubtraction(dSafeArea, d, renderer_cameraSafeAreaSmoothness);
+#endif
+
+    return d;
+}
+
+MaterialDesc getMaterial(SDFG_VEC p)
+{
+    MaterialDesc matDesc = gen_getMaterial(p);
+    
+#if USE_CAMERA_SAFE_AREA
+    MaterialDesc m0;
+    Material material = m0.material;
+
+    m0.distance    = cameraSafeArea_sdSphere(p - g_cameraPos, renderer_cameraSafeAreaRadius);
+    m0.materialId  = 0;
+    m0.cellIndex   = 0;
+    m0.material.colorAmbient = vec3(0.3, 0.2, 0.5);
+    //m0.material.colorDiffuse = vec3(1.0, 1.0, 1.0);
+    m0.material.colorSpecular = vec3(0.04, 0.01, 0.01);
+    m0.material.shininess = 1.0;
+    m0 = opSmoothSubtractionMat(m0, matDesc, renderer_cameraSafeAreaSmoothness);
+    
+    return m0;
+#else
+    return matDesc;
+#endif
+}
+
+//-------------------------------------------------------------------------------
+vec3 getNormal(vec3 p)
+{
+    float d = getDist(p);
+    
+    vec2 e = vec2(0.001, 0.0);
+    
+    vec3 n = d - vec3(getDist(p - e.xyy),
+                      getDist(p - e.yxy),
+                      getDist(p - e.yyx));
+    
+    return normalize(n);
+}
+
+//-------------------------------------------------------------------------------
+// https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
+// Fitted curve's HLSL source code (free to use under public domain CC0 or MIT license)
+//-------------------------------------------------------------------------------
+vec3 tonemapACES(const vec3 x)
+{
+    // Narkowicz 2015, "ACES Filmic Tone Mapping Curve"
+    const float a = 2.51;
+    const float b = 0.03;
+    const float c = 2.43;
+    const float d = 0.59;
+    const float e = 0.14;
+    //return SDFG_SATURATE((x*(a*x+b))/(x*(c*x+d)+e));
+    return (x*(a*x+b))/(x*(c*x+d)+e);
+}
+
+vec3 gammaCompressSRGB(const vec3 linearColor)
+{
+    // more accurate version
+    //vec3 cutoff = step(vec3(0.0031308), linearColor);
+    //vec3 lower = linearColor * 12.92;
+    //vec3 higher = 1.055 * pow(linearColor, vec3(1.0 / 2.4)) - 0.055;
+    //return mix(lower, higher, cutoff);
+    
+    const float invGamma = 1.0 / 2.2;
+    return pow(linearColor, vec3(invGamma));
+}
+
+vec3 calculateLightDir(float pitch, float yaw)
+{
+    vec3 dir = vec3(1.0, 0.0, 0.0);
+    
+    //float sinX = sin(-rotation.x);
+    //float cosX = cos(-rotation.x);
+
+    float sinY = sin(-yaw);
+    float cosY = cos(-yaw);
+
+    float sinZ = sin(-pitch);
+    float cosZ = cos(-pitch);
+
+    //mat3 rX = mat3(1,0,0, 0,cosX,-sinX, 0,sinX,cosX);
+    mat3 rY = mat3(cosY,0,sinY, 0,1,0, -sinY,0,cosY);
+    mat3 rZ = mat3(cosZ,-sinZ,0, sinZ,cosZ,0, 0,0,1);
+
+//    mat3 rot = rY * rZ;
+    mat3 rot = rZ * rY;
+
+    //dir *= rot;
+    dir = SDFG_MUL(rot, dir);
+    
+    
+    dir = -dir;
+    
+    return normalize(dir);
+}
+
+vec3 applyFog(in vec3 color, in float distance, in vec3 fogColor, in float fogDensity)
+{
+    // linear fog
+    //float distMin = 7.0;
+    //float distMax = 42.0;
+    //float f = (distance - distMin) / (distMax - distMin);
+    ////float f = (distMax - distance) / (distMax - distMin);
+    //f = max(min(f, 1.0), 0.0);
+    //float fogAmount = mix(0.0, 1.0, f);
+
+    // exp1 (useless)
+    //float fogAmount = 1.0 - exp2(-fogDensity * 0.0001 * distance);
+
+    // exp2 (realistic)
+    //float fogAmount = 1.0 - exp2(-fogDensity * 0.0001 * distance * distance);
+
+    // exp3 (oryginal)
+    float fogAmount = 1.0 - exp2(-fogDensity * 0.0001 * distance * distance * distance);
+
+    // map to color
+    return mix(color, fogColor, fogAmount);
+}
+
+//-------------------------------------------------------------------------------
+// shade (Phong / Blinn-Phong)
+//-------------------------------------------------------------------------------
+vec3 applySingleLightBlinnPhong(
+    in vec3 ro,                 // camera position
+    in vec3 p,                  // fragment position
+    in vec3 normal,             // surface normal
+    in vec3 lightDir,           // direction TO light
+    in vec3 colorDiffuse,
+    in vec3 colorSpecular,
+    in float shininess
+)
+{
+    vec3 N = normal;                // assumed to be normalized
+    vec3 L = lightDir;              // assumed to be normalized
+    vec3 V = normalize(ro - p);     // view direction
+
+    // Diffuse (Lambert)
+    float dotLN = max(dot(N, L), 0.0);
+    vec3 diffuse = dotLN * colorDiffuse;
+
+#if USE_SHADOWS
+    // shadowRayNudge - Offset to avoid self-shadowing artifacts (shadow acne), depends on scene scale
+    float shadow = shadowMarch(p + N * renderer_shadowRayNudge, lightDir, renderer_shadowSharpness);
+
+    #if DEBUG_SHADOWS
+    return vec3(shadow);
+    #endif //DEBUG_SHADOWS
+
+    diffuse *= shadow;
+#endif //USE_SHADOWS
+
+    // Specular
+    float specularValue = 0.0;
+
+#if USE_BLINN_PHONG
+    // Blinn-Phong: halfway vector
+    vec3 H = normalize(L + V);
+    float dotHN = max(dot(N, H), 0.0);
+    // Scale shininess (by 4.0) to approximate Phong exponent 
+    // (Blinn-Phong tends to be broader)
+    specularValue = pow(dotHN, shininess * 4.0);
+#else
+    // Classic Phong: reflection vector
+    vec3 R = reflect(-L, N);
+    float dotRV = max(dot(V, R), 0.0);
+    specularValue = pow(dotRV, shininess);
+#endif
+
+#if PREVENT_BACK_LIGHTING
+    // Prevents lighting from appearing 
+    // on the back side of the surface
+    specularValue *= smoothstep(0.0, renderer_backSideSmoothness, dotLN);
+#endif // PREVENT_BACK_LIGHTING
+
+    vec3 specular = specularValue * colorSpecular;
+
+    return diffuse + specular;
+}
+
+vec3 shadeBlinnPhong(vec3 ro, vec3 p, vec3 normal)
+{
+    vec3 finalColor = vec3(0.0);
+
+    Material material = gen_getMaterial(p).material;
+
+    finalColor += renderer_ambientLight_color * material.colorAmbient;
+
+#if USE_POINT_LIGHT_1
+    vec3 pointLight1Dir     = normalize(renderer_pointLight1_pos - p);    
+    vec3 pointLight1Color   = renderer_pointLight1_intensity * renderer_pointLight1_color;
+    finalColor += applySingleLightBlinnPhong(ro, p, normal, pointLight1Dir, 
+                pointLight1Color * material.colorDiffuse,
+                pointLight1Color * material.colorSpecular * material.specularStrength,
+                material.shininess);
+#endif //USE_POINT_LIGHT_1
+    
+#if USE_POINT_LIGHT_2
+    vec3 pointLight2Dir     = normalize(renderer_pointLight2_pos - p);
+    vec3 pointLight2Color   = renderer_pointLight2_intensity * renderer_pointLight2_color;
+    finalColor += applySingleLightBlinnPhong(ro, p, normal, pointLight2Dir, 
+                pointLight2Color * material.colorDiffuse,
+                pointLight2Color * material.colorSpecular * material.specularStrength,
+                material.shininess);
+#endif //USE_POINT_LIGHT_2
+
+#if USE_DIR_LIGHT_1
+    vec3 dirLight1Dir   = calculateLightDir(renderer_dirLight1_pitch, renderer_dirLight1_yaw);    
+    vec3 dirLight1Color = renderer_dirLight1_intensity * renderer_dirLight1_color;
+    finalColor += applySingleLightBlinnPhong(ro, p, normal, dirLight1Dir, 
+                dirLight1Color * material.colorDiffuse,
+                dirLight1Color * material.colorSpecular * material.specularStrength,
+                material.shininess);
+#endif
+
+#if USE_DIR_LIGHT_2
+    vec3 dirLight2Dir       = calculateLightDir(renderer_dirLight2_pitch, renderer_dirLight2_yaw);    
+    vec3 dirLight2Color     = renderer_dirLight2_intensity * renderer_dirLight2_color;
+    finalColor += applySingleLightBlinnPhong(ro, p, normal, dirLight2Dir, 
+                dirLight2Color * material.colorDiffuse,
+                dirLight2Color * material.colorSpecular * material.specularStrength,
+                material.shininess);
+#endif
+
+#if USE_RIM_LIGHT
+    vec3 viewDir = normalize( ro - p);
+    float vDotN = dot(normal, viewDir);
+    float rim = smoothstep(1.0 - material.rimWidth, 1.0, 1.0 - vDotN);
+    finalColor += rim * material.rimStrength * material.colorRim;
+#endif
+
+#if USE_ENV_LIGHT
+    vec3 env = sdfg_getBackdropColor(normal);
+    finalColor += env * material.envMix;
+#endif
+
+    return finalColor;
+}
+
+
+//-------------------------------------------------------------------------------
+// shade
+//-------------------------------------------------------------------------------
+vec3 shade(vec3 ro, vec3 rd, vec3 p, vec3 normal, MaterialDesc matDesc, vec3 fogColor, float dist)
+{
+#if DEBUG_NORMALS
+    // debug - normals
+    return normal;
+#endif
+
+#if USE_PBR
+        vec3 col = shadePBR(ro, p, normal);
+#else
+        vec3 col = shadeBlinnPhong(ro, p, normal);
+#endif        
+
+#if USE_FOG
+    col = applyFog(col, dist, fogColor, renderer_fogDensity);
+#endif
+
+    // debug - materials
+    //col = 0.1 * vec3(matDesc.materialId);
+        
+    // debug - rim
+    //col = vec3(rim);
+    
+    return col;
+    
+}
+
+//-------------------------------------------------------------------------------
+// main
+//-------------------------------------------------------------------------------
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy)/iResolution.y;
+    g_uv = uv;
+
+    vec3 col = vec3(0);
+    
+    // camera (polar-style)
+    vec3 ro = vec3(0.0);
+    vec3 rd = vec3(0.0);
+    sdfg_setupCamera(ro, rd, fragCoord);
+
+#if USE_CAMERA_SAFE_AREA
+    g_cameraPos = ro;
+#endif
+
+#if TEMPORAL_CAMERA_BLUR
+    float texelSize = 1.0 / iResolution.x;
+    ro.x += 1.25 * texelSize * sin(1000.0 * iTime * 3.379);
+    ro.y += 1.25 * texelSize * sin(1000.0 * iTime * 2.123);
+    ro.z += 1.25 * texelSize * sin(1000.0 * iTime * 1.765);
+#endif
+
+    // distance to the scene
+#if USE_OUTLINE
+    float outline = 0.0;
+    float outlineWidth = 0.01 * renderer_outlineWidth;
+    float d = rayMarchWithOutline(ro, rd, MIN_DIST, MAX_DIST, outlineWidth, outline);
+#else
+    float d = rayMarch(ro, rd, MIN_DIST, MAX_DIST);
+#endif
+
+    vec3 fogColor = sdfg_getBackdropColor(rd);
+
+    // nice trick - add screen-space gradient to fog color
+    // TODO: move to backdrop function
+    //fogColor.x -= 0.7 * uv.y;
+    
+    if (d <= 0.01f)
+    {
+        // to jest kolor gdy kamera jest w obiekcie
+        col = fogColor;
+    }
+    else if ( d >= MAX_DIST)
+    {
+        // to zapobiega artefaktom w odbiciach (obszar bez odbicia poza MAX_DIST)
+        col = fogColor;
+    }
+#if USE_OUTLINE
+    else if (outline > 0.5)
+    {
+        col = renderer_outlineColor;
+    }
+#endif
+    else
+    {
+        vec3 p = ro + rd * d;
+
+        vec3 normal = getNormal(p);
+
+        // 3d/4d
+        SDFG_VEC uniPos = SDFG_VEC(0.0);
+        uniPos.xyz = p;
+
+        MaterialDesc matDesc = getMaterial(uniPos);
+
+        col = shade(ro, rd, p, normal, matDesc, fogColor, d);
+        
+#if USE_REFLECTIONS
+        float refMult = 1.0;
+
+        vec3 hitp = p;
+
+        MaterialDesc refMat = matDesc;
+        
+        // We need to accumulate distance, to properly calculate fog in reflections
+        float accumDist = d;
+        
+        for (int i = 0; i < REFLECTION_COUNT; i++)
+        {
+#if USE_FRESNEL
+            float cosTheta = max(dot(-rd, normal), 0.0);
+            float fresnel = refMat.material.reflectance * pow(1.0 - cosTheta, refMat.material.fresnel);
+            refMult *= fresnel;            
+#else
+            refMult *= refMat.material.reflectance;
+#endif        
+            if (refMult < 0.01)
+                break;
+
+            rd = reflect(rd, normal);
+            float res2 = rayMarch(hitp, rd, 0.01, MIRROR_MAX_DIST);
+            vec3 refHitp = hitp + rd * res2;
+            
+            // bugfix! - we need to update these variables as well
+            ro = refHitp;
+            p = refHitp;
+
+            accumDist += res2;
+
+            // 3d/4d
+            SDFG_VEC uniRefHitp = SDFG_VEC(0.0);
+            uniRefHitp.xyz = p;
+            
+            refMat = getMaterial(uniRefHitp);
+
+            vec3 refNormal = getNormal(refHitp);
+
+            // Needs to recalculate fogColor after rd change
+            // Well... this leads to visible bugs when reflections 
+            // are combined with strong fog and backdrop.
+            // Objects with reflections and backdrop does not disappear completly.
+            // So I left it as an option...
+#if REFLECT_BG_COLOR
+            fogColor = sdfg_getBackdropColor(rd); 
+#endif //REFLECT_BG_COLOR
+            
+            vec3 newShadeColor = shade(ro, rd, refHitp, refNormal, refMat, fogColor, accumDist);
+            
+            if (accumDist >= MAX_DIST)
+            {
+                newShadeColor = fogColor;
+                col = col * (1.0 - refMult) + refMult * newShadeColor;
+                break;  // to zapobiega artefaktom w odbiciach (obszar w "lustrze" poza MAX_DIST)
+            }
+
+            col = col * (1.0 - refMult) + refMult * newShadeColor;
+
+            hitp = refHitp;
+            normal = refNormal;
+        }
+#endif //USE_REFLECTIONS        
+    }
+
+#if USE_DITHERING
+    for(int i=0; i<DITHERING_STEPS; i++)
+        col = applyDither(col, fragCoord, vec2(float(i)*1337.1337, float(i*i)*1.1337));
+#endif
+
+    // contrast
+    col *= renderer_contrastMul;
+    col = pow(col, vec3(renderer_contrastPow));
+    
+#if USE_TONE_MAPPING
+    // tone mapping
+    col = tonemapACES(col);
+#endif
+    
+    // gamma compression
+    col = gammaCompressSRGB(col);
+
+#if USE_VIGNETTE
+    // vignette
+    col *= 1.0 - dot(uv,uv)*renderer_vignettePow;
+#endif
+    
+#if DEBUG_DEPTH
+    col = vec3(d / (MAX_DIST));
+#endif    
+
+    // output to screen
+#if DEPTH_AS_ALPHA
+    // output depth as alpha
+    fragColor = vec4(col,(d / (MAX_DIST)));    
+#else    
+    fragColor = vec4(col,1.0);
+#endif
+}
+
+
+]]>
+</Code>
+</FuncDef>
