@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic" displayName="Sphere" functionName="sdSphere">
+<Parameters>
+  <Param type="float" displayName="Radius" parameterName="radius" default="0.5" speed="0.01"/>
+</Parameters>
+<References>https://iquilezles.org/articles/distfunctions/</References>
+<Code>
+<![CDATA[
+float sdSphere(in SDFG_VEC p, in float radius)
+{
+    return length(p.xyz) - radius;
+}
+]]>
+</Code>
+</FuncDef>

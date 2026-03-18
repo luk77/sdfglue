@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic" displayName="Emptiness" functionName="sdEmptiness">
+<Parameters/>
+<Code>
+<![CDATA[
+float sdEmptiness(in SDFG_VEC p)
+{
+    return MAX_DIST;
+}
+]]>
+</Code>
+</FuncDef>

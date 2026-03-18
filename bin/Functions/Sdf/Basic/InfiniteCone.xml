@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic" displayName="Infinite Cone" functionName="sdInfiniteCone">
+<Parameters>
+  <Param type="float" displayName="Angle" parameterName="angle" default="45.0" min="0.0" max="180.0" speed="0.5" editInDegrees="true"/>
+</Parameters>
+<References>https://iquilezles.org/articles/distfunctions/</References>
+<Code>
+<![CDATA[
+// Infinite Cone - exact
+float sdInfiniteCone(in SDFG_VEC p, in float angle)
+{
+    vec2 c = vec2(sin(angle), cos(angle));
+    vec2 q = vec2( length(p.xz), -p.y );
+    float d = length(q-c*max(dot(q,c), 0.0));
+    return d * ((q.x*c.y-q.y*c.x<0.0)?-1.0:1.0);}
+]]>
+</Code>
+</FuncDef>

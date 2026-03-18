@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic" displayName="Infinite Half Capsule" functionName="sdInfiniteHalfCapsule">
+<Parameters>
+  <Param type="float" displayName="Radius" 			parameterName="radius" default="0.5" speed="0.01"/>
+</Parameters>
+<References>https://iquilezles.org/articles/distfunctions/</References>
+<Code>
+<![CDATA[
+// License: MIT
+// (Luk)
+float sdInfiniteHalfCapsule(in SDFG_VEC p, in float radius)
+{
+    p.y -= min(p.y, 0);
+    return length(p.xyz) - radius;
+}
+]]>
+</Code>
+</FuncDef>

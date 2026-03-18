@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic" displayName="Capsule" functionName="sdCapsule">
+<Parameters>
+  <Param type="float" displayName="Radius" 			parameterName="radius" default="0.5" speed="0.01"/>
+  <Param type="float" displayName="Height (half)" 	parameterName="height" default="0.5" speed="0.01"/>
+</Parameters>
+<References>https://iquilezles.org/articles/distfunctions/</References>
+<Code>
+<![CDATA[
+float sdCapsule(in SDFG_VEC p, in float radius, in float height)
+{
+    p.y -= clamp(p.y, -height, height);
+    return length(p.xyz) - radius;
+}
+]]>
+</Code>
+</FuncDef>

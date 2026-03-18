@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic" displayName="Cone" functionName="sdCone">
+<Parameters>
+  <Param type="float" displayName="Height" parameterName="height" default="0.5" speed="0.01"/>
+  <Param type="float" displayName="Angle" parameterName="angle" default="45.0" min="0.0" max="180.0" speed="0.5" editInDegrees="true"/>
+</Parameters>
+<References>https://iquilezles.org/articles/distfunctions/</References>
+<Code>
+<![CDATA[
+// Cone - exact
+float sdCone(in SDFG_VEC p, in float height, in float angle)
+{
+    // c is the sin/cos of the angle, h is height
+    // Alternatively pass q instead of (c,h),
+    // which is the point at the base in 2D
+    vec2 c = vec2(sin(angle), cos(angle));
+
+    vec2 q = height*vec2(c.x/c.y,-1.0);
+
+    vec2 w = vec2( length(p.xz), p.y );
+    vec2 a = w - q*clamp( dot(w,q)/dot(q,q), 0.0, 1.0 );
+    vec2 b = w - q*vec2( clamp( w.x/q.x, 0.0, 1.0 ), 1.0 );
+    float k = sign( q.y );
+    float d = min(dot( a, a ),dot(b, b));
+    float s = max( k*(w.x*q.y-w.y*q.x),k*(w.y-q.y)  );
+    return sqrt(d)*sign(s);
+}
+]]>
+</Code>
+</FuncDef>

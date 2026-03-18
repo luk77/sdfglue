@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic" displayName="Torus" functionName="sdTorus">
+<Parameters>
+  <Param type="float" displayName="Radius A (inner)" parameterName="radiusInner" default="0.5" speed="0.01"/>
+  <Param type="float" displayName="Radius B" parameterName="radius" default="0.1" speed="0.01"/>
+</Parameters>
+<References>https://iquilezles.org/articles/distfunctions/, https://www.shadertoy.com/view/tl23RK</References>
+<Code>
+<![CDATA[
+float sdTorus(in SDFG_VEC p, in float radiusInner, in float radius)
+{
+    vec2 q = vec2(length(p.xz) - radiusInner, p.y);
+    return length(q) - radius;
+}
+]]>
+</Code>
+</FuncDef>

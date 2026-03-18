@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic" displayName="Point" functionName="sdPoint">
+<Parameters/>
+<Code>
+<![CDATA[
+float sdPoint(in SDFG_VEC p)
+{
+    return length(p);
+}
+]]>
+</Code>
+</FuncDef>

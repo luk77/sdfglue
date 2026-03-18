@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic" displayName="Cone (bound)" functionName="sdConeBound">
+<Parameters>
+  <Param type="float" displayName="Height" parameterName="height" default="0.5" speed="0.01"/>
+  <Param type="float" displayName="Angle" parameterName="angle" default="45.0" min="0.0" max="180.0" speed="0.5" editInDegrees="true"/>
+</Parameters>
+<References>https://iquilezles.org/articles/distfunctions/</References>
+<Code>
+<![CDATA[
+// Cone - bound (approximation, not exact)
+float sdConeBound(in SDFG_VEC p, in float height, in float angle)
+{
+    // To keep the same patameters ranges as sdCone (exact)
+    angle = 0.5 * PI - angle;
+
+    vec2 c = vec2(sin(angle), cos(angle));
+    
+    float q = length(p.xz);
+    return max(dot(c.xy,vec2(q,p.y)),-height-p.y);
+}
+]]>
+</Code>
+</FuncDef>
