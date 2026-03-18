@@ -61,6 +61,8 @@ To run the application directly from Visual Studio:
 
 
 # Credits
+**SdfGlue** created and maintained by [Łukasz Lesicki](https://github.com/luk77)
+
 This project was made possible thanks to several amazing tools, libraries, and communities:
 - **Dear ImGui** — for providing an excellent immediate-mode GUI framework
 - **OpenTK** — for OpenGL bindings
