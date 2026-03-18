@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic 2d" displayName="Segment" functionName="sdSegment">
+<Parameters>
+  <Param type="vec2" displayName="Position A" parameterName="posA" default="0.0;0.0" speed="0.01"/>
+  <Param type="vec2" displayName="Position B" parameterName="posB" default="1.0;0.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// License: MIT
+// https://www.shadertoy.com/view/3tdSDj
+float sdSegment(in SDFG_VEC p, in vec2 a, in vec2 b)
+{
+    vec2 ba = b-a;
+    vec2 pa = p.xz-a;
+    float h =clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
+    return length(pa-h*ba);
+}
+]]>
+</Code>
+</FuncDef>

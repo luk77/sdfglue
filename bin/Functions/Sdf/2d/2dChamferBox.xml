@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic 2d" displayName="ChamferBox" functionName="sdChamferBox">
+<Parameters>
+  <Param type="vec2" displayName="Dimensions (half)" parameterName="dim2" default="0.5;0.5" speed="0.01"/>
+  <Param type="float" displayName="chamfer" parameterName="chamfer" default="0.0" speed="0.01" min="0.0" max="1.0"/>
+</Parameters>
+<Code>
+<![CDATA[
+// License: MIT
+// https://www.shadertoy.com/view/3fc3zs
+float sdChamferBox(in SDFG_VEC p, in vec2 dim2, in float chamfer)
+{
+    p.xz = abs(p.xz) - dim2;
+
+    p.xz = (p.z>p.x) ? p.zx : p.xz;
+    p.z += chamfer;
+    
+    const float k = 1.0-sqrt(2.0);
+    if( p.z<0.0 && p.z+p.x*k<0.0 )
+        return p.x;
+    
+    if( p.x<p.z )
+        return (p.x+p.z)*sqrt(0.5);    
+    
+    return length(p.xz);
+}
+
+]]>
+</Code>
+</FuncDef>

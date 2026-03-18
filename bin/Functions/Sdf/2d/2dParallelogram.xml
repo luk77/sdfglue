@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic 2d" displayName="Parallelogram" functionName="sdParallelogram">
+<Parameters>
+  <Param type="float" displayName="Dimension X"     parameterName="dimX"    default="0.5" speed="0.01"/>
+  <Param type="float" displayName="Dimension Z"     parameterName="dimZ"    default="0.5" speed="0.01"/>
+  <Param type="float" displayName="Skew"            parameterName="skew"    default="0.5" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// License: MIT
+// https://www.shadertoy.com/view/7dlGRf
+
+float sdParallelogram(in SDFG_VEC p, in float dimX, in float dimZ, in float skew)
+{
+    vec2  e  = vec2(skew,dimZ);
+    float e2 = skew*skew + dimZ*dimZ;
+
+    p = (p.z<0.0)?-p:p;
+    // horizontal edge
+    vec2  w = p.xz - e; w.x -= clamp(w.x,-dimX,dimX);
+    vec2  d = vec2(dot(w,w), -w.y);
+    // vertical edge
+    float s = p.x*e.y - p.z*e.x;
+    p = (s<0.0)?-p:p;
+    vec2  v = p.xz - vec2(dimX,0); v -= e*clamp(dot(v,e)/e2,-1.0,1.0);
+    d = min( d, vec2(dot(v,v), dimX*dimZ-abs(s)));
+    return sqrt(d.x)*sign(-d.y);
+}
+
+]]>
+</Code>
+</FuncDef>

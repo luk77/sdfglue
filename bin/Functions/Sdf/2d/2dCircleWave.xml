@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic 2d" displayName="Circle Wave" functionName="sdCircleWave">
+<Parameters>
+  <Param type="float" displayName="Radius" parameterName="radius" default="1.0" speed="0.01"/>
+  <Param type="float" displayName="Arc param" parameterName="arcAngle" default="1.0" speed="0.001" min="0.0" max="1.0"/>
+</Parameters>
+<Code>
+<![CDATA[
+// License: MIT
+// https://www.shadertoy.com/view/stGyzt
+float sdCircleWave(in SDFG_VEC p, in float radius, in float arcAngle)
+{
+    vec2 p2d = p.xz;
+
+    arcAngle = 3.1415927*5.0/6.0 * max(arcAngle,0.0001);
+    vec2 co = radius*vec2(sin(arcAngle),cos(arcAngle));
+
+    p2d.x = abs(mod(p2d.x,co.x*4.0)-co.x*2.0);
+
+    vec2 p1 = p2d;
+    vec2 p2 = vec2(abs(p2d.x-2.0*co.x),-p2d.y+2.0*co.y);
+    float d1 = ((co.y*p1.x>co.x*p1.y) ? length(p1-co) : abs(length(p1)-radius));
+    float d2 = ((co.y*p2.x>co.x*p2.y) ? length(p2-co) : abs(length(p2)-radius));
+    
+    return min( d1, d2); 
+}
+
+]]>
+</Code>
+</FuncDef>

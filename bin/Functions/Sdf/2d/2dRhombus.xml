@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic 2d" displayName="Rhombus" functionName="sdRhombus">
+<Parameters>
+  <Param type="vec2" displayName="Dimensions (half)" parameterName="dim2" default="0.5;0.5" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// License: MIT
+// https://www.shadertoy.com/view/XdXcRB
+float sdRhombus(in SDFG_VEC p, in vec2 dim2) 
+{
+    vec2 p2d = p.xz;
+
+    dim2.y = -dim2.y;
+    p2d = abs(p2d);
+    float h = clamp( (dot(dim2,p2d)+dim2.y*dim2.y)/dot(dim2,dim2), 0.0, 1.0 );
+    p2d -= dim2*vec2(h,h-1.0);
+    return length(p2d)*sign(p2d.x);
+}
+]]>
+</Code>
+</FuncDef>

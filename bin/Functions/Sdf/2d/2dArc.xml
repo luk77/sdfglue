@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic 2d" displayName="Arc" functionName="sdArc">
+<Parameters>
+  <Param type="float" displayName="Radius A (inner)" parameterName="radiusA" default="1.0" speed="0.01"/>
+  <Param type="float" displayName="Radius B" parameterName="radiusB" default="0.1" speed="0.01"/>
+  <Param type="float" displayName="Angle" parameterName="angle" default="90.0" min="0.0" max="180.0" speed="0.5" editInDegrees="true"/>
+</Parameters>
+<Code>
+<![CDATA[
+// License: MIT
+// https://www.shadertoy.com/view/wl23RK
+float sdArc(in SDFG_VEC p, in float radiusA, in float radiusB, in float angle)
+{
+    vec2  sc = vec2(sin(angle),cos(angle));
+    
+    p.x = abs(p.x);
+    return ((sc.y*p.x>sc.x*p.z) ? length(p.xz - sc*radiusA) : 
+                                  abs(length(p.xz)-radiusA)) - radiusB;
+}
+]]>
+</Code>
+</FuncDef>

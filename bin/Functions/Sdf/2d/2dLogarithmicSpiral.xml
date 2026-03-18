@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic 2d" displayName="Logarithmic spiral" functionName="sdLogarithmicSpiral">
+<Parameters>
+  <Param type="float" displayName="Radius"              parameterName="radius"          default="1.0"   speed="0.01"/>
+  <Param type="float" displayName="Num. of rotations"   parameterName="numOfRotations"  default="10.0"  speed="0.01"/>
+  <Param type="float" displayName="Thickness"           parameterName="thickness"       default="0.01"  speed="0.001"/>
+</Parameters>
+<Code>
+<![CDATA[
+
+// License: MIT
+// https://www.shadertoy.com/view/fslyWN
+
+// w is the width / distance from center to tip
+// k is the number of rotations
+float sdLogarithmicSpiral(in SDFG_VEC pos, in float w, in float k, in float thickness)
+{
+    vec2 p = pos.xz;
+
+    // body
+    const float kTau = 6.283185307;
+    float r = length(p);
+    float a = atan(p.y,p.x);
+    float n = floor( 0.5/w + (log2(r/w)*k-a)/kTau );
+    float ra = w*exp2((a+kTau*(min(n+0.0,0.0)-0.5))/k);
+    float rb = w*exp2((a+kTau*(min(n+1.0,0.0)-0.5))/k);
+    float d = min( abs(r-ra), abs(r-rb) );
+
+    // tip
+    float s = min( d, length(p+vec2(w,0.0)) );
+    
+    return s - thickness;
+}
+]]>
+</Code>
+</FuncDef>

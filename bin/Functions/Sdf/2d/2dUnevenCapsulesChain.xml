@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic 2d (compound)" displayName="Uneven Capsules Chain" functionName="sdUnevenCapsulesChain">
+<Parameters>
+  <Param type="vec3"  displayName="Branch params 1" parameterName="params1"     default="0.5;1.0;0.0"   speed="0.01"/>
+  <Param type="vec3"  displayName="Branch params 2" parameterName="params2"     default="0.3;0.9;0.6"   speed="0.01"/>
+  <Param type="vec3"  displayName="Branch params 3" parameterName="params3"     default="0.2;0.7;-0.8"  speed="0.01"/>
+  <Param type="vec3"  displayName="Branch params 4" parameterName="params4"     default="0.1;0.5;0.5"   speed="0.01"/>
+  <Param type="float" displayName="Final radius"    parameterName="finalRadius" default="0.05"          speed="0.01"/>
+  <Param type="float" displayName="Smoothness"      parameterName="smoothness"  default="0.1"           speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// License: MIT
+// https://www.shadertoy.com/view/4lcBWn ("height" parametrization)
+float sdUnevenCapsulesChain_sdUnevenCapsule(in SDFG_VEC p, in float radiusA, in float radiusB, in float h)
+{
+    vec2 q = p.xz;
+
+	q.x = abs(q.x);
+
+    float b = (radiusA - radiusB) / h;
+    vec2  c = vec2(sqrt(1.0-b*b),b);
+    float k = c.x*q.y - c.y*q.x; // = cro(c,q);
+    float m = dot(c,q);
+    float n = dot(q,q);
+    
+         if( k < 0.0   ) return sqrt(n)               - radiusA;
+    else if( k > c.x*h ) return sqrt(n+h*h-2.0*h*q.y) - radiusB;
+                         return m                     - radiusA;
+}
+
+// Helper functions
+float sdUnevenCapsulesChain_opSmoothUnion(float d1, float d2, float k)
+{
+    float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0.0, 1.0 );
+    return mix( d2, d1, h ) - k*h*(1.0-h);
+}
+
+void sdUnevenCapsulesChain_rotate2d(in out vec2 p, float rotation)
+{
+    float sinY = sin(-rotation);
+    float cosY = cos(-rotation);
+    mat2 rY = mat2(cosY,sinY,-sinY,cosY);
+    p *= rY;
+}
+
+// Uneven capsules chain parametrization by luk77 
+void sdUnevenCapsulesChain_calcSegment(in out SDFG_VEC p, in out float finalDistance, in float radius1, in float radius2, in float height, in float rotation, in float smoothness)
+{
+    // rotation
+    sdUnevenCapsulesChain_rotate2d(p.xz, rotation);
+
+    float d = sdUnevenCapsulesChain_sdUnevenCapsule(p, radius1, radius2, height);
+
+    // offset
+    p.z -= height;
+    
+    //finalDistance = min(finalDistance, d);
+    
+    finalDistance = sdUnevenCapsulesChain_opSmoothUnion(finalDistance, d, smoothness);
+}
+
+float sdUnevenCapsulesChain(in SDFG_VEC p, in vec3 params1, in vec3 params2, in vec3 params3, in vec3 params4, in float finalRadius, in float smoothness)
+{
+    // Params:
+    // x - radius
+    // y - height
+    // z - rotation angle
+
+    float finalDistance = 100000.0;
+    sdUnevenCapsulesChain_calcSegment(p, finalDistance, params1.x, params2.x    , params1.y, params1.z, smoothness);
+    sdUnevenCapsulesChain_calcSegment(p, finalDistance, params2.x, params3.x    , params2.y, params2.z, smoothness);
+    sdUnevenCapsulesChain_calcSegment(p, finalDistance, params3.x, params4.x    , params3.y, params3.z, smoothness);
+    sdUnevenCapsulesChain_calcSegment(p, finalDistance, params4.x, finalRadius  , params4.y, params4.z, smoothness);
+    
+    return finalDistance;
+}
+]]>
+</Code>
+</FuncDef>

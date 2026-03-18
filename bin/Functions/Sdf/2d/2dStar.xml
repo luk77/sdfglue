@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic 2d" displayName="Star" functionName="sdStar">
+<Parameters>
+  <Param type="float" displayName="Radius" parameterName="radius" default="0.5" speed="0.01"/>
+  <Param type="float" displayName="Indentation" parameterName="angleParam" default="1.0" speed="0.01"/>
+  <Param type="int" displayName="Num of corner vertices" parameterName="corners" default="5" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// License: MIT
+//https://www.shadertoy.com/view/3tSGDy
+float sdStar(in SDFG_VEC p, in float radius, in float angleParam, in int corners)
+{
+    float m = 2.0 + abs(angleParam);
+
+    // next 4 lines can be precomputed for a given shape
+    float an = 3.141593/float(corners);
+    float en = 3.141593/m;  // m is between 2 and n (corners)
+    vec2  acs = vec2(cos(an),sin(an));
+    vec2  ecs = vec2(cos(en),sin(en)); // ecs=vec2(0,1) for regular polygon
+
+    float bn = mod(atan(p.x,p.z),2.0*an) - an;
+    p.xz = length(p.xz)*vec2(cos(bn),abs(sin(bn)));
+    p.xz -= radius * acs;
+    p.xz += ecs*clamp( -dot(p.xz,ecs), 0.0, radius * acs.y/ecs.y);
+    return length(p.xz)*sign(p.x);
+}
+]]>
+</Code>
+</FuncDef>

@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic 2d" displayName="Hyperbolic Cross" functionName="sdHyperbolicCross">
+<Parameters>
+  <Param type="float" displayName="K" parameterName="paramK" default="0.5" min="0.001" max="0.999" speed="0.001"/>
+</Parameters>
+<Code>
+<![CDATA[
+// License: MIT
+// https://www.shadertoy.com/view/Nt3yDH
+
+// k in (0,1) range
+float sdHyperbolicCross(in SDFG_VEC pos, in float k)
+{
+    vec2 p = pos.xz;
+
+    // scale
+    float s = 1.0/k - k;
+    p = p*s;
+    // symmetry
+    p = abs(p);
+    p = (p.x>p.y) ? p.yx : p.xy;
+    // offset
+    p += k;
+    
+    // solve quartic (for details see https://www.shadertoy.com/view/ftcyW8)
+    float x2 = p.x*p.x/16.0;
+    float y2 = p.y*p.y/16.0;
+    float r = (p.x*p.y-4.0)/12.0;
+    float q = y2-x2;
+    float h = q*q-r*r*r;
+    float u;
+    if( h<0.0 )
+    {
+        float m = sqrt(r);
+        u = m*cos( acos(q/(r*m) )/3.0 );
+    }
+    else
+    {
+        float m = pow(sqrt(h)+q,1.0/3.0);
+        u = (m+r/m)/2.0;
+    }
+    float w = sqrt(u+x2);
+    float x = p.x/4.0-w+sqrt(2.0*x2-u+(p.y-x2*p.x*2.0)/w/4.0);
+    
+    // clamp arm
+    x = max(x,k);
+    
+    // compute distance to closest point
+    float d = length( p-vec2(x,1.0/x) ) / s;
+
+    // sign
+    return p.x*p.y < 1.0 ? -d : d;
+}
+
+]]>
+</Code>
+</FuncDef>

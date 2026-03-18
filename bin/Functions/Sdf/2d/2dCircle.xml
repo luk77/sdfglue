@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic 2d" displayName="Circle" functionName="sdCircle">
+<Parameters>
+  <Param type="float" displayName="Radius" parameterName="radius" default="0.5" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// License: MIT
+// https://www.shadertoy.com/view/3ltSW2
+float sdCircle(in SDFG_VEC p, in float radius)
+{
+    return length(p.xz) - radius;
+}
+]]>
+</Code>
+</FuncDef>
