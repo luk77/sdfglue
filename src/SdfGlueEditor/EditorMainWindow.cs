@@ -1074,7 +1074,8 @@ namespace SdfGlueEditor
         private void LoadRandomProject(string rootPath, string searchPattern)
         {
             string[] files = Directory.GetFiles(rootPath, searchPattern, SearchOption.AllDirectories);
-
+            if (files.Length == 0)
+                return;
 
             int rndIndex = rndDemoMode_.Next(files.Length);
             string path = files[rndIndex];

@@ -11,6 +11,9 @@ namespace SdfGlueUi.Ui.Components
     {
         public static string Build(string rootPath, string searchPattern)
         {
+            if (!Directory.Exists(rootPath))
+                return string.Empty;
+
             string[] files = Directory.GetFiles(rootPath, searchPattern, SearchOption.AllDirectories);
 
             foreach (string path in files)
@@ -34,7 +37,7 @@ namespace SdfGlueUi.Ui.Components
             }
 
             //return selectedDefinition;
-            return null;
+            return string.Empty;
         }
     }
 }

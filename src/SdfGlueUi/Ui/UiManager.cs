@@ -235,14 +235,17 @@ namespace SdfGlueUi.Ui
                     if (ImGui.MenuItem("Save image as", "CTRL+I"))                      { ActionsExecutor.OnSaveImage(); }
                     if (ImGui.MenuItem("Export image sequence", ""))                    { ActionsExecutor.OnExportAnimation(); }
                     ImGui.Separator();
-                    if (ImGui.BeginMenu("Examples"))
+                    if (Directory.Exists("Examples"))
                     {
-                        string exampleToOpen = MenuFileTree.Build("Examples", "*.xml");
-                        if (!String.IsNullOrEmpty(exampleToOpen))
+                        if (ImGui.BeginMenu("Examples"))
                         {
-                            ActionsExecutor.OnOpenProject(exampleToOpen);
+                            string exampleToOpen = MenuFileTree.Build("Examples", "*.xml");
+                            if (!String.IsNullOrEmpty(exampleToOpen))
+                            {
+                                ActionsExecutor.OnOpenProject(exampleToOpen);
+                            }
+                            ImGui.EndMenu();
                         }
-                        ImGui.EndMenu();
                     }
 
                     ImGui.Separator();
