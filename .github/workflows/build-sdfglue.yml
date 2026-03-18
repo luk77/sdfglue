@@ -75,6 +75,24 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Extract base version
+      id: version
+      shell: pwsh
+      run: |
+        [xml]$xml = Get-Content "Directory.Build.props"
+        $baseVersion = $xml.Project.PropertyGroup.Version
+
+        echo "base=$baseVersion" >> $env:GITHUB_OUTPUT
+    
+    - name: Compose full version
+      id: fullversion
+      shell: pwsh
+      run: |
+        $version = "${{ steps.version.outputs.base }}.${{ github.run_number }}"
+        echo "version=$version" >> $env:GITHUB_OUTPUT
+
+
+
     # Install the .NET Core workload
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
@@ -108,15 +126,25 @@ jobs:
       run: dotnet restore src/SdfGlue.sln
   
     - name: Publish
-      run: dotnet publish src/SdfGlueEditor/SdfGlueEditor.csproj -c Release -r win-x64 -p:DebugType=none -p:DebugSymbols=false -o bin
+      run: dotnet publish src/SdfGlueEditor/SdfGlueEditor.csproj `
+        -c Release `
+        -r win-x64 `
+        -p:DebugType=none `
+        -p:DebugSymbols=false `
+        -p:Version=${{ steps.fullversion.outputs.version }} `
+        -p:FileVersion=${{ steps.fullversion.outputs.version }}
+        -o bin
+
+    - name: Create ZIP
+      shell: pwsh
+      run: |
+        Compress-Archive -Path bin\* -DestinationPath SdfGlue-${{ steps.fullversion.outputs.version }}.zip
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: SdfGlue-build
-        path: bin
-
-
+        name: SdfGlue-${{ steps.fullversion.outputs.version }}
+        path: SdfGlue-${{ steps.fullversion.outputs.version }}.zip
 
 
     # Execute all unit tests in the solution
