@@ -16,19 +16,20 @@ The project is heavily inspired by **Shadertoy** and the work of its community. 
 
 ### Editor Features
 - camera controls similar to popular 3D tools (e.g. Blender, Unity)
-- rich library of SDF primitives
 - real-time parameter editing with live preview
-- operators for combining and transforming objects
 - easy integration of custom SDF functions
 - GLSL code generation preview
-- material blending
+- adjustable preview resolution
+- customizable layout
 - debugging tools (normals, iteration count, SDF visualization)
 
 ### SDF Modeling Features
+- rich library of SDF primitives
 - hierarchical scene structure
 - collection of basic primitives and experimental shapes (e.g. gyroids, fractals)
+- operators for combining and transforming objects
 - boolean and smooth blending operators
-- domain repetition support
+- material blending
 
 
 # Gallery
