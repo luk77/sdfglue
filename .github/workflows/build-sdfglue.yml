@@ -135,10 +135,10 @@ jobs:
         -p:FileVersion=${{ steps.fullversion.outputs.version }}
         -o bin
 
-    - name: Create ZIP
-      shell: pwsh
-      run: |
-        Compress-Archive -Path bin\* -DestinationPath SdfGlue-${{ steps.fullversion.outputs.version }}.zip
+    #- name: Create ZIP
+    #  shell: pwsh
+    #  run: |
+    #    Compress-Archive -Path bin\* -DestinationPath SdfGlue-${{ steps.fullversion.outputs.version }}.zip
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
