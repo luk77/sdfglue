@@ -5,6 +5,8 @@
 </Parameters>
 <Code>
 <![CDATA[
+// License: MIT
+// https://www.shadertoy.com/view/Xds3zN
 float sdRectangle(in SDFG_VEC p, in vec2 dim2)
 {
     vec2 d = abs(p.xz) - dim2;

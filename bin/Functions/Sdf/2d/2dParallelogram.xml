@@ -9,7 +9,6 @@
 <![CDATA[
 // License: MIT
 // https://www.shadertoy.com/view/7dlGRf
-
 float sdParallelogram(in SDFG_VEC p, in float dimX, in float dimZ, in float skew)
 {
     vec2  e  = vec2(skew,dimZ);
