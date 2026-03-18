@@ -79,7 +79,7 @@ jobs:
       id: version
       shell: pwsh
       run: |
-        [xml]$xml = Get-Content "Directory.Build.props"
+        [xml]$xml = Get-Content "src\Directory.Build.props"
         $baseVersion = $xml.Project.PropertyGroup.Version
 
         echo "base=$baseVersion" >> $env:GITHUB_OUTPUT
