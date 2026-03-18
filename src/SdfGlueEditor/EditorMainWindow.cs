@@ -102,7 +102,8 @@ namespace SdfGlueEditor
             debugVersion = true;
 #endif
 
-            return String.Format("SDF Glue v.{0}.{1}{2}", DataModel.VersionMajor, DataModel.VersionMinor, debugVersion ? " (debug)" : "");
+            //return String.Format("SDF Glue v.{0}.{1}{2}", DataModel.VersionMajor, DataModel.VersionMinor, debugVersion ? " (debug)" : "");
+            return String.Format("SDF Glue v.{0} {1}", DataModel.GetAppVersion(), debugVersion ? " (debug)" : "");
         }
 
         private void RefreshWindowTitle()

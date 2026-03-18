@@ -10,6 +10,7 @@ using SdfGlueCore.Model.DataNodes.Signals;
 using SdfGlueCore.Model.Entities;
 using SdfGlueCore.Utils;
 using System.Numerics;
+using System.Reflection;
 using System.Text;
 using System.Xml;
 
@@ -17,8 +18,8 @@ namespace SdfGlueCore.Model
 {
     public class DataModel : TreeNode
     {
-        public static readonly int      VersionMajor                = 0;
-        public static readonly int      VersionMinor                = 378;
+        //public static readonly int      VersionMajor                = 0;
+        //public static readonly int      VersionMinor                = 378;
 
         public static readonly bool     MaterialsBlendingEnabled    = true;
         public static readonly bool     UseCameraControllers        = true;
@@ -119,6 +120,19 @@ namespace SdfGlueCore.Model
         //        return rp.LastGenCodeUnity;
         //    }
         //}
+
+        public static string GetAppVersion()
+        {
+            //return Assembly
+            //.GetEntryAssembly()?
+            //.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            //?.InformationalVersion
+            //?? "unknown";
+
+            String version = Assembly.GetExecutingAssembly()?.GetName().Version?.ToString() ?? "";
+
+            return version;
+        }
 
         public DataModel() : base(NodeIdDataModel, "Project")
         {
@@ -372,8 +386,9 @@ namespace SdfGlueCore.Model
             XmlNode nodeData = xmlDoc.CreateElement("Data");
             xmlDoc.AppendChild(nodeData);
 
-            XmlUtils.AddNodeInt(xmlDoc, nodeData, "VersionMajor", VersionMajor);
-            XmlUtils.AddNodeInt(xmlDoc, nodeData, "VersionMinor", VersionMinor);
+            //XmlUtils.AddNodeInt(xmlDoc, nodeData, "VersionMajor", VersionMajor);
+            //XmlUtils.AddNodeInt(xmlDoc, nodeData, "VersionMinor", VersionMinor);
+            XmlUtils.AddNodeString(xmlDoc, nodeData, "Version", GetAppVersion());
 
             XmlUtils.AddNodeInt(xmlDoc, nodeData, "NextAvailableId"             , NextAvailableId               );
             XmlUtils.AddNodeInt(xmlDoc, nodeData, "NextAvailableMaterialId"     , NextAvailableMaterialId       );
