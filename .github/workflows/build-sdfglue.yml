@@ -144,9 +144,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: SdfGlue-${{ steps.fullversion.outputs.version }}
-        path: SdfGlue-${{ steps.fullversion.outputs.version }}.zip
+        path: bin
 
-
+    
     # Execute all unit tests in the solution
     #- name: Execute unit tests
     #  run: dotnet test
