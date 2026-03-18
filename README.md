@@ -37,11 +37,11 @@ TODO...
 
 # Requirements
 - **Operating System**: Windows (tested on Windows 11)
-- **.NET / Runtime**: .NET (compatible with Visual Studio 2022 build environment)
+- **.NET:** .NET 8.0 SDK (Windows-only)  
 - **Graphics API**: OpenGL 3.3 or higher
 - **GPU**: A graphics card with OpenGL 3.3 support (integrated GPUs may work, but were not extensively tested)
 
-⚠️ Note: The application has not been thoroughly tested across different hardware configurations. If you encounter compatibility issues, they are most likely related to GPU drivers or incomplete OpenGL support.
+*Note: The application has not been thoroughly tested across different hardware configurations. If you encounter compatibility issues, they are most likely related to GPU drivers or incomplete OpenGL support.*
 
 
 # Building from source
@@ -51,13 +51,13 @@ Simply clone the repository, open the solution (```src/SdfGlue.sln```) in Visual
 
 The project has several dependencies (mainly **Dear ImGui** and **OpenTK**) which should be automatically restored via NuGet during the build process.
 
-The application also requires additional configuration files (primarily XML and GLSL files) located in the bin directory. After building, the generated .exe and .dll files should be copied into this directory.
+The application also requires additional configuration files (primarily XML and GLSL files) located in the ```bin\\``` directory. After building, the generated .exe and .dll files should be copied into this directory.
 
 To automate the build and file copying process, you can use the provided script: ```src\publish.cmd```
 
 To run the application directly from Visual Studio:
-- set **SdfGlueEditor** as the Startup Project
-- set the Working Directory for the **SdfGlueEditor** project to the bin/ folder
+- set **SdfGlueEditor** as the *Startup Project*
+- set the *Working Directory* for the **SdfGlueEditor** project to the ```bin/``` folder
 
 
 # Credits
