@@ -154,7 +154,7 @@ jobs:
     - name: Create ZIP (for "latest" release)
       shell: pwsh
       run: |
-        Compress-Archive -Path bin -DestinationPath SdfGlue-latest.zip
+        Compress-Archive -Path bin\* -DestinationPath SdfGlue-latest.zip
 
     - name: Upload to "latest" release
       uses: softprops/action-gh-release@v2
