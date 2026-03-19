@@ -18,16 +18,15 @@ The project is heavily inspired by **Shadertoy** and the work of its community. 
 ### Editor Features
 - camera controls similar to popular 3D tools (e.g. Blender, Unity)
 - real-time parameter editing with live preview
-- easy integration of custom SDF functions
-- GLSL code generation preview
 - adjustable preview resolution
 - customizable layout
+- easy integration of custom SDF functions
+- GLSL code generation preview
 - debugging tools (normals, iteration count, SDF visualization)
 
 ### SDF Modeling Features
 - rich library of SDF primitives
 - hierarchical scene structure
-- collection of basic primitives and experimental shapes (e.g. gyroids, fractals)
 - operators for combining and transforming objects
 - boolean and smooth blending operators
 - material blending
@@ -70,12 +69,6 @@ This project was made possible thanks to several amazing tools, libraries, and c
 - **OpenTK** — for OpenGL bindings
 - **Shadertoy** — for inspiration and as a reference platform for SDF and raymarching techniques
 - **Inigo Quilez (iq)** — for pioneering work on SDFs, raymarching, and countless invaluable articles and examples (https://iquilezles.org/)
-
-Additional inspiration and references:
-- https://iquilezles.org/articles/
-- https://www.shadertoy.com/
-- various discussions and resources from graphics programming forums and communities
-
 
 # License
 This project is licensed under the **MIT License**. See the [LICENSE.md](LICENSE.md) file for details.
