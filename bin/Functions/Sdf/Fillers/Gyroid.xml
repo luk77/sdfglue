@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Fillers" displayName="Gyroid" functionName="sdGyroid">
+<Parameters>
+  <Param type="float" displayName="Scale" parameterName="scale" default="10.0" speed="0.01"/>
+  <Param type="float" displayName="Phase" parameterName="phase" default="0.5" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+float sdGyroid(vec3 p, float scale, float phase)
+{
+    p *= scale;
+    return dot(sin(p), sin(p.zxy + phase * PI)) / scale;
+}
+]]>
+</Code>
+</FuncDef>
