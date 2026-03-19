@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Animated" displayName="Rounding by UV" functionName="opRoundingByUv">
+<Parameters>
+  <Param type="float" displayName="Radius" parameterName="radius" default="0.1" speed="0.01"/>
+  <Param type="float" displayName="Radius by UV" parameterName="radiusByUv" default="0.1" speed="0.01"/>
+  <Param type="float" displayName="Anim speed X" parameterName="animSpeedX" default="0.43" speed="0.01"/>
+  <Param type="float" displayName="Anim speed Y" parameterName="animSpeedY" default="0.65" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+
+float opRoundingByUv_UvMask1(in vec2 uv, float animSpeedX, float animSpeedY)
+{
+    uv.x += 1.0 * sin(animSpeedX * iTime);
+    uv.y += 1.0 * sin(animSpeedY * iTime);
+
+    //return 1.0 - abs(uv.x);
+    //return 1.0 - length(uv);
+    return clamp(1.2 * pow(1.0 - abs(length(uv)), 2.0), 0.0, 1.0);
+    //return 1.0 - clamp(1.2 * pow(1.0 - abs(length(uv)), 2.0), 0.0, 1.0);
+}
+
+void opRoundingByUv(inout float dist, in float radius, float radiusByUv, float animSpeedX, float animSpeedY)
+{
+    float param01 = opRoundingByUv_UvMask1(g_uv, animSpeedX, animSpeedY);
+    //float param01 = opRoundingByUv_UvMask1(vec2(1.0, 1.0));
+
+    dist -= (radius + radiusByUv * param01);
+}
+]]>
+</Code>
+</FuncDef>

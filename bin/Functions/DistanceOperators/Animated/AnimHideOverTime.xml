@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Animated" displayName="Hide over time" functionName="opHideOverTime">
+<Parameters>
+  <Param type="float" displayName="Period"      parameterName="period"  default="1.0" speed="0.01" min="0.0001" />
+  <Param type="float" displayName="Phase"       parameterName="phase"   default="0.0" speed="0.001" min="0.0" max="1.0"/>
+  <Param type="float" displayName="Fill"        parameterName="fill"    default="0.5" speed="0.001" min="0.0" max="1.0"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opHideOverTime(inout float dist, in float period, in float phase, in float fill)
+{
+    dist = mod(iTime + phase * period, period) / period < fill ? dist : MAX_DIST;
+}
+]]>
+</Code>
+</FuncDef>

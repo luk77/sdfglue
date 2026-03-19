@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef displayName="Onioning (inside)" functionName="opOnioningInside">
+<Parameters>
+  <Param type="float" displayName="Thickness" parameterName="thickness" default="0.1" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opOnioningInside(inout float dist, in float thickness)
+{
+    dist = abs(dist + thickness) - thickness;
+}
+]]>
+</Code>
+</FuncDef>

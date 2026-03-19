@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef displayName="Distance bias" functionName="opDistanceBias">
+<Parameters>
+  <Param type="float" displayName="Multiplier" parameterName="multiplier" default="1.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opDistanceBias(inout float dist, in float multiplier)
+{
+    dist *= multiplier;
+}
+]]>
+</Code>
+</FuncDef>

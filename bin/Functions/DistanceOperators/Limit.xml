@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef displayName="Limit" functionName="opLimit">
+<Parameters>
+  <Param type="float" displayName="Limit" parameterName="limit" default="1.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opLimit(inout float dist, in float limit)
+{
+    dist = min(dist, limit);
+}
+]]>
+</Code>
+</FuncDef>

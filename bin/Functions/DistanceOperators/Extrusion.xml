@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef displayName="Extrusion" functionName="opExtrusion">
+<Parameters>
+  <Param type="vec3" parameterName="{SDFG_CURR_OBJ_POS}"/> <!-- special parameter: injects current object position -->
+  <Param type="float" displayName="Height" parameterName="height" default="0.1" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+
+// License: MIT
+// https://www.shadertoy.com/view/4lyfzw
+void opExtrusion(inout float dist, vec3 p, in float h)
+{
+    vec2 w = vec2( dist, abs(p.y) - h );
+  	dist = min(max(w.x,w.y),0.0) + length(max(w,0.0));
+}
+]]>
+</Code>
+</FuncDef>
