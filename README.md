@@ -1,5 +1,6 @@
 # SdfGlue
 [![Build SdfGlue](https://github.com/luk77/sdfglue/actions/workflows/build-sdfglue.yml/badge.svg)](https://github.com/luk77/sdfglue/actions/workflows/build-sdfglue.yml)
+
 **SdfGlue** is a tool for creating and modeling complex 3D objects using **Signed Distance Fields (SDF)**.
 
 The main motivation behind this project was to build a convenient environment for experimenting with mathematically defined 3D forms. It also serves as a playground for exploring various rendering techniques based on **raymarching (sphere tracing)**.
