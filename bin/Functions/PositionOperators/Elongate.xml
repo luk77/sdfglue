@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef displayName="Elongate" functionName="opElongate">
+<Parameters>
+  <Param type="vec3" displayName="Elongate" parameterName="elongate" default="0.0;0.0;0.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opElongate(inout vec3 p, in vec3 elongate)
+{
+    // TODO: enable this and check/fix all projects
+    // This is not strictly necessary, it is here for better compatibility with shadertoy.
+    // We have to make sure that parameters for clamp are in correct order (min is smaller than max).
+    elongate = abs(elongate);
+    
+    // elongate
+    p -= clamp( p, -elongate, elongate );
+}
+]]>
+</Code>
+</FuncDef>

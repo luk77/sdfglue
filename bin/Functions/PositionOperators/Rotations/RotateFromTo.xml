@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Rotations" displayName="Rotation from-to" functionName="opFromToRotation">
+<Parameters>
+  <Param type="vec3"    displayName="Axis (from)"           parameterName="axisFrom"    default="1.0;1.0;1.0" speed="0.01"/>
+  <Param type="vec3"    displayName="Axis (to)"             parameterName="axisTo"      default="0.0;1.0;0.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opFromToRotation(inout vec3 p, vec3 axisFrom, vec3 axisTo)
+{
+    axisFrom    = normalize(axisFrom);
+    axisTo      = normalize(axisTo);
+
+    vec3    axisCross   = cross(axisFrom, axisTo);
+    float   angleBetween= acos(dot(axisTo, axisFrom));
+
+    axisCross = normalize(axisCross);
+
+    // quaternionFromAxisAngle
+    float halfAngle     = angleBetween * 0.5;
+    float sinHalfAngle  = sin(halfAngle);
+    float cosHalfAngle  = cos(halfAngle);
+    vec4 q = vec4(axisCross, cosHalfAngle);
+    q.xyz *= sinHalfAngle;
+
+    p += 2.0 * cross(q.xyz, cross(q.xyz, p) + q.w * p);
+}
+
+]]>
+</Code>
+</FuncDef>

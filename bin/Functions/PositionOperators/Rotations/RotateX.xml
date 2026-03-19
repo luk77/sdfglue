@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Rotations" displayName="Rotate X" functionName="opRotateX">
+<Parameters>
+  <Param type="float" displayName="Rotation X" parameterName="rotationX" default="0.0" speed="0.1" editInDegrees="true"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opRotateX(inout vec3 p, float rotation)
+{
+    float sinX = sin(-rotation);
+    float cosX = cos(-rotation);
+
+    mat3 rX = mat3(1,0,0, 0,cosX,-sinX, 0,sinX,cosX);
+
+    //p *= rX;
+    p = SDFG_MUL(rX, p);
+}
+]]>
+</Code>
+</FuncDef>

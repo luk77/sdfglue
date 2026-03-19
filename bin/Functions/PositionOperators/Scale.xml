@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Scaling" displayName="Scale" functionName="opScale">
+<Parameters>
+  <Param type="float"  displayName="Scale"     parameterName="fScale" default="1.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opScale(inout vec3 p, float scale)
+{
+    p /= scale;
+}
+]]>
+</Code>
+</FuncDef>

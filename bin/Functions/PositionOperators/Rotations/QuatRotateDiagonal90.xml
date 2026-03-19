@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Rotations" displayName="Rotate 90 deg. around [1,1,1]" functionName="opQuatRotateDiagonal90">
+<Parameters>
+  <Param type="int" displayName="Turns" parameterName="numTurns" default="0" speed="0.01" />
+</Parameters>
+<Code>
+<![CDATA[
+// reference: https://www.geeks3d.com/20141201/how-to-rotate-a-vertex-by-a-quaternion-in-glsl/
+void opQuatRotateDiagonal90(inout vec3 p, int numTurns)
+{
+    vec3 axis = normalize(vec3(1.0));
+
+    float halfAngle     = 2.0 * 0.333333 * PI * numTurns;
+    float sinHalfAngle  = sin(halfAngle);
+    float cosHalfAngle  = cos(halfAngle);
+
+    vec4 q = vec4(axis, cosHalfAngle);
+    q.xyz *= sinHalfAngle;
+
+    p += 2.0 * cross(q.xyz, cross(q.xyz, p) + q.w * p);
+}
+
+]]>
+</Code>
+</FuncDef>

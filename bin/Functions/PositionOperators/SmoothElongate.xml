@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef displayName="Smooth Elongate" functionName="opSmoothElongate">
+<Parameters>
+  <Param type="vec3" displayName="Elongate" parameterName="elongate" default="0.0;0.0;0.0" speed="0.01"/>
+  <Param type="vec3" displayName="Smoothness"  parameterName="smoothness"     default="0.0;0.0;0.0" speed="0.0001"/>
+</Parameters>
+<Code>
+<![CDATA[
+float opSmoothElongate_smax(float d1, float d2, float k)
+{
+    float h = clamp( 0.5 - 0.5*(d2-d1)/k, 0.0, 1.0 );
+    return mix( d2, d1, h ) + k*h*(1.0-h);
+}
+
+float opSmoothElongate_smin(float d1, float d2, float k)
+{
+    float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0.0, 1.0 );
+    return mix( d2, d1, h ) - k*h*(1.0-h);
+}
+
+
+void opSmoothElongate(inout vec3 p, in vec3 elongate, in vec3 smoothness)
+{
+    // TODO: enable this and check/fix all projects
+    // This is not strictly necessary, it is here for better compatibility with shadertoy.
+    // We have to make sure that parameters for clamp are in correct order (min is smaller than max).
+    elongate = abs(elongate);
+    
+    // elongate
+    p.x -= opSmoothElongate_smin(opSmoothElongate_smax( p.x, -elongate.x, smoothness.x), elongate.x, smoothness.x );
+    p.y -= opSmoothElongate_smin(opSmoothElongate_smax( p.y, -elongate.y, smoothness.y), elongate.y, smoothness.y );
+    p.z -= opSmoothElongate_smin(opSmoothElongate_smax( p.z, -elongate.z, smoothness.z), elongate.z, smoothness.z );
+}
+]]>
+</Code>
+</FuncDef>

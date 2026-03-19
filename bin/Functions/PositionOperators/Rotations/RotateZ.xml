@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Rotations" displayName="Rotate Z" functionName="opRotateZ">
+<Parameters>
+  <Param type="float" displayName="Rotation Z" parameterName="rotationZ" default="0.0" speed="0.1" editInDegrees="true"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opRotateZ(inout vec3 p, float rotation)
+{
+    float sinZ = sin(-rotation);
+    float cosZ = cos(-rotation);
+
+    mat3 rZ = mat3(cosZ,-sinZ,0, sinZ,cosZ,0, 0,0,1);
+
+    //p *= rZ;
+    p = SDFG_MUL(rZ, p);
+}
+]]>
+</Code>
+</FuncDef>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Scaling" displayName="Scale XYZ" functionName="opScaleXYZ">
+<Parameters>
+  <Param type="vec3"  displayName="Scale"     parameterName="vScale" default="1.0;1.0;1.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opScaleXYZ(inout vec3 p, vec3 scale)
+{
+    p /= scale;
+}
+]]>
+</Code>
+</FuncDef>
