@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Basic" displayName="Lerp" functionName="opLerp">
+<Parameters/>
+<Code>
+<![CDATA[
+float opLerp(float d1, float d2, float k)
+{
+    return mix(d1,d2,k);
+}
+]]>
+</Code>
+<CodeBlocks>
+    <Code feature="MaterialsBlending">
+<![CDATA[
+MaterialDesc opLerpMat(MaterialDesc d1, MaterialDesc d2, float k) 
+{
+    float h = clamp( 0.5 + 0.5*(d2.distance - d1.distance)/k, 0.0, 1.0 );
+    float d = mix(d1.distance, d2.distance, k);
+    
+    float matId         = ( h < 0.5 ) ? d2.materialId : d1.materialId;
+    float cellIndex     = ( h < 0.5 ) ? d2.cellIndex  : d1.cellIndex;
+    Material matBlended = blendMaterials(d2.material, d1.material, h);
+
+    //MaterialDesc matDesc = MaterialDesc(d, matId, matBlended);
+    MaterialDesc matDesc;
+    matDesc.distance    = d;
+    matDesc.materialId  = matId;
+    matDesc.cellIndex   = cellIndex;
+    matDesc.material    = matBlended;
+
+    return matDesc;
+}
+]]>
+    </Code>
+</CodeBlocks>
+</FuncDef>
