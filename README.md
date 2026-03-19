@@ -11,6 +11,9 @@ The project is heavily inspired by **Shadertoy** and the work of its community. 
 # Build status
 [![Build SdfGlue](https://github.com/luk77/sdfglue/actions/workflows/build-sdfglue.yml/badge.svg)](https://github.com/luk77/sdfglue/actions/workflows/build-sdfglue.yml)
 
+# Downloads
+- [Latest build](https://github.com/luk77/sdfglue/releases/tag/latest)
+- [Stable releases](https://github.com/luk77/sdfglue/releases)
 
 # Features
 
