@@ -45,6 +45,10 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  # required to create and update GitHub releases (latest build)
+  contents: write
+
 env:
   # To avoid warning: 
   # Node.js 20 actions are deprecated. The following actions are running on Node.js 20 
