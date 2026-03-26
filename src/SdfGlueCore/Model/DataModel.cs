@@ -137,7 +137,7 @@ namespace SdfGlueCore.Model
         public DataModel() : base(NodeIdDataModel, "Project")
         {
             ProjSettings        = new ProjectSettings(this);
-            RenderingSysData    = new RenderingData(this);
+            //RenderingSysData    = new RenderingData(this); // this is done in InitDefaultData()
 
             ReloadDefinitions();
 
@@ -202,10 +202,10 @@ namespace SdfGlueCore.Model
             defaultMat1.MaterialProps.SetParameterFloat("shininess"     , 10.0f, true);
 
             MaterialInstance defaultMat2 = AddNewMaterial("Material 2");
-            defaultMat2.MaterialProps.SetParameterVec3("colorDiffuse", new Vector3(0.3f, 1.0f, 0.0f), true);
+            defaultMat2.MaterialProps.SetParameterVec3("colorDiffuse", new Vector3(0.3f, 0.7f, 0.9f), true);
 
             MaterialInstance defaultMat3 = AddNewMaterial("Material 3");
-            defaultMat3.MaterialProps.SetParameterVec3("colorDiffuse", new Vector3(1.0f, 0.9f, 0.2f), true);
+            defaultMat3.MaterialProps.SetParameterVec3("colorDiffuse", new Vector3(0.3f, 1.0f, 0.0f), true);
 
             MaterialInstance defaultMat4 = AddNewMaterial("Material 4");
             defaultMat4.MaterialProps.SetParameterVec3("colorDiffuse", new Vector3(1.0f, 1.0f, 1.0f), true);
@@ -267,7 +267,10 @@ namespace SdfGlueCore.Model
 
             box.FunctionSdf.DefinitionName.Val  = "sdBox";
             box.FunctionSdf.ParametersValues["dim"] = new ExVector3(new System.Numerics.Vector3(0.5f, 0.5f, 0.5f));
-            box.BlendFactor.Val     = 0.6f;
+            box.BlendFactor.Val     = 0.5f;
+
+            box.MaterialId.Val = 2;//"Material 2"
+            box.MaterialBlendFactor.Val = 0.5f;
 
             OperatorEntity? opTranslate = box.PositionOperators.FindOperatorById("opTranslate");
             if (opTranslate != null)

@@ -20,7 +20,6 @@ namespace SdfGlueUi.Ui
         public      bool                    IsFocused               = false;
         public      bool                    IsHovered               = false;
         protected   UiManager               uiMgr_                  = null;
-        //protected   DataModel               model_                  = null;   // nie chcemy przechowywać tej instancji, bo ona sięzmienia przy new/open project
 
         protected delegate void BuildContent();
 
@@ -31,7 +30,6 @@ namespace SdfGlueUi.Ui
         public void SetUiManager(UiManager uiMgr)
         {
             uiMgr_ = uiMgr;
-            //model_ = uiMgr.ActionsExecutor.GetModel();
         }
 
         public DataModel GetModel()

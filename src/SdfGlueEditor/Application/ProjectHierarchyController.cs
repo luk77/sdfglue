@@ -19,20 +19,18 @@ namespace SdfGlueEditor.Application
 {
     public class ProjectHierarchyController
     {
-        private DataModel?              model_                  = null;
         private IRenderingSystem?       renderingSystem_        = null;
         private ShaderCodeGenerator?    codeGenerator_          = null;
 
-        public ProjectHierarchyController(DataModel  model, IRenderingSystem renderingSystem, ShaderCodeGenerator codeGenerator)
+        public ProjectHierarchyController(IRenderingSystem renderingSystem, ShaderCodeGenerator codeGenerator)
         {
-            model_              = model;
             renderingSystem_    = renderingSystem;
             codeGenerator_      = codeGenerator;
         }
 
         private DataModel? GetModel()
         {
-            return model_;
+            return codeGenerator_?.GetModel();
         }
 
 

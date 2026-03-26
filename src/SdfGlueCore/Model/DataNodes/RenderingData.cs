@@ -16,8 +16,13 @@ namespace SdfGlueCore.Model.DataNodes
         // xy = current pixel coords (if LMB is down). zw = click pixel
         public      Vector4                     MouseData                         = new Vector4();
 
+        //private static int debugCounter_ = 0;
+
+        //public RenderingData(DataModel model) : base(DataModel.NodeIdRenderingData, String.Format("Rendering [{0}]", debugCounter_))
         public RenderingData(DataModel model) : base(DataModel.NodeIdRenderingData, "Rendering")
         {
+            //debugCounter_++;
+
             AddChild(new RenderPassData(DataModel.NodeIdRenderingData - 1, "Primary pass", null, true));
 
             //FunctionDefinition rpColorCorrection = model.Renderers.FindDefinitionByName("SecPassTonemapACES");

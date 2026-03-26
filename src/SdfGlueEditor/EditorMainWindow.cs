@@ -158,7 +158,7 @@ namespace SdfGlueEditor
             renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
             GetModel().SetDefaultRenderPass();
 
-            phc_ = new ProjectHierarchyController(GetModel(), renderingSystem_, codeGenerator_);
+            phc_ = new ProjectHierarchyController(renderingSystem_, codeGenerator_);
 
             //uiMgr_.RenderingTextureId = renderingSystem_.GetTextureId();
 
