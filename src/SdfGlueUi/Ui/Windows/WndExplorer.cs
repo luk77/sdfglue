@@ -318,9 +318,9 @@ namespace SdfGlueUi.Ui.Windows
             ImGui.TreePop();
         }
 
-        public override void HandleInput()
+        public override void HandleInput(float deltaTime)
         {
-            base.HandleInput();
+            base.HandleInput(deltaTime);
 
             if (!IsVisible)
                 return;

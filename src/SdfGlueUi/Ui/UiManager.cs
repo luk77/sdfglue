@@ -200,11 +200,11 @@ namespace SdfGlueUi.Ui
             }
         }
 
-        public void HandleInput()
+        public void HandleInput(float deltaTime)
         {
             foreach(UiWindowBase wnd in allWindows_)
             {
-                wnd.HandleInput();
+                wnd.HandleInput(deltaTime);
             }
         }
 

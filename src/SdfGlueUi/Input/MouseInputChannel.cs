@@ -66,6 +66,8 @@ namespace SdfGlueUi.Input
                     float mouseDragDeltaX = input.GetMouseStateX() - mouseDragStartX_;
                     float mouseDragDeltaY = input.GetMouseStateY() - mouseDragStartY_;
                     cameraData.TargetPosition.Val = dragStartCameraTarget_ - dragSpeed * mouseDragDeltaX * cameraData.Right + dragSpeed * mouseDragDeltaY * cameraData.Up;
+                    // reset this value - no smoothing in that case
+                    cameraData.TargetPositionForSmoothing = cameraData.TargetPosition.Val;
                 }
                 else if (channelType_ == ChannelType.Rotation)
                 {
@@ -79,8 +81,11 @@ namespace SdfGlueUi.Input
                     if (config.MouseCameraRotationInvYaw)
                         mouseDragDeltaY *= -1.0f;
 
-                    cameraData.RotationPitch.Val  = dragStartCameraPitch_ + 0.5f * config.MouseCameraRotationSpeedPitch * mouseDragDeltaY;
-                    cameraData.RotationYaw.Val    = dragStartCameraYaw_   + 0.5f * config.MouseCameraRotationSpeedYaw   * mouseDragDeltaX;
+                    //cameraData.RotationPitch.Val  = dragStartCameraPitch_ + 0.5f * config.MouseCameraRotationSpeedPitch * mouseDragDeltaY;
+                    //cameraData.RotationYaw.Val    = dragStartCameraYaw_   + 0.5f * config.MouseCameraRotationSpeedYaw   * mouseDragDeltaX;
+
+                    cameraData.RotationPitchForSmoothing    = dragStartCameraPitch_ + 0.5f * config.MouseCameraRotationSpeedPitch * mouseDragDeltaY;
+                    cameraData.RotationYawForSmoothing      = dragStartCameraYaw_   + 0.5f * config.MouseCameraRotationSpeedYaw   * mouseDragDeltaX;
                 }
             }
 

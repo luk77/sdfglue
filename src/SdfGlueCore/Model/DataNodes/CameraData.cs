@@ -13,12 +13,12 @@ namespace SdfGlueCore.Model.DataNodes
     public class CameraData : TreeNode
     {
         // serializable
-        public  ExVector3                 TargetPosition      = new ExVector3(new Vector3(0.0f));
-        public  ExFloat                   RotationPitch       = new ExFloatSimple(20.0f);
-        public  ExFloat                   RotationYaw         = new ExFloatSimple(0.0f);
-        public  ExFloat                   RotationRoll        = new ExFloatSimple(0.0f);
-        public  ExFloat                   DistanceToTarget    = new ExFloatSimple(5.0f);
-        public  ExFloat                   Zoom                = new ExFloatSimple(1.0f);
+        public  ExVector3               TargetPosition      = new ExVector3(new Vector3(0.0f));
+        public  ExFloat                 RotationPitch       = new ExFloatSimple(20.0f);
+        public  ExFloat                 RotationYaw         = new ExFloatSimple(0.0f);
+        public  ExFloat                 RotationRoll        = new ExFloatSimple(0.0f);
+        public  ExFloat                 DistanceToTarget    = new ExFloatSimple(5.0f);
+        public  ExFloat                 Zoom                = new ExFloatSimple(1.0f);
 
         // calculated
         public  Vector3                 Origin              = new Vector3(0.0f);    // calculated
@@ -26,8 +26,15 @@ namespace SdfGlueCore.Model.DataNodes
         public  Vector3                 Right               = new Vector3(0.0f);    // calculated
         public  Vector3                 Up                  = new Vector3(0.0f);    // calculated
 
+        // helper data for smoothing
+        public  Vector3                 TargetPositionForSmoothing  = new Vector3(0.0f);
+        public  float                   RotationPitchForSmoothing   = 0.0f;
+        public  float                   RotationYawForSmoothing     = 0.0f;
+        public  float                   DistanceToTargetForSmoothing= 0.0f;
+
         public CameraData() : base(DataModel.NodeIdCameraMain, "Camera")
         {
+            ResetSmoothing();
         }
 
 //        internal void RecalculateCamera()
@@ -55,7 +62,46 @@ namespace SdfGlueCore.Model.DataNodes
             XmlUtils.DeserializeFloat   (nodeThis, "DistanceToTarget"   , ref DistanceToTarget  .Val    );
             XmlUtils.DeserializeFloat   (nodeThis, "Zoom"               , ref Zoom              .Val    );
 
+            ResetSmoothing();
+
             return true;
+        }
+
+        internal void ResetSmoothing()
+        {
+            TargetPositionForSmoothing  = TargetPosition.Val;
+            RotationPitchForSmoothing   = RotationPitch.Val;
+            RotationYawForSmoothing     = RotationYaw.Val;
+            DistanceToTargetForSmoothing= DistanceToTarget.Val;
+        }
+
+        public void UpdateSmoothing(float deltaTime, GlobalConfig config)
+        {
+            // Position
+            if ((TargetPosition.Val - TargetPositionForSmoothing).Length() > 0.001f)
+            {
+                TargetPosition.Val  = GMath.Smooth(
+                                                TargetPosition.Val, 
+                                                TargetPositionForSmoothing, 
+                                                config.CameraPosDamping, deltaTime);
+            }
+
+            // Rotation
+            RotationPitch.Val   = GMath.Smooth(
+                                            RotationPitch.Val,
+                                            RotationPitchForSmoothing,
+                                            config.CameraRotDamping, deltaTime);
+
+            RotationYaw.Val     = GMath.Smooth(
+                                            RotationYaw.Val,
+                                            RotationYawForSmoothing,
+                                            config.CameraRotDamping, deltaTime);
+
+            // Distance to target
+            DistanceToTarget.Val    = GMath.Smooth(
+                                            DistanceToTarget.Val,
+                                            DistanceToTargetForSmoothing,
+                                            config.CameraDistDamping, deltaTime);
         }
 
         internal void Serialize(XmlDocument xmlDoc, XmlNode parent)

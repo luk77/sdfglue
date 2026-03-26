@@ -83,7 +83,7 @@ namespace SdfGlueCore.Model
         public  CameraData              CameraDat               = new CameraData();
 
         // Ray marching
-        public int                      MarchingMaxSteps                = 100;
+        public  int                     MarchingMaxSteps                = 100;
         public  float                   MarchingMinDist                 = 0.01f;
         public  float                   MarchingMaxDist                 = 50.0f;
 

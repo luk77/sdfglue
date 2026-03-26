@@ -22,13 +22,14 @@ namespace SdfGlueUi.Ui.Properties
             }
         }
 
-        public static void Build(ref int id, string name, ExVector3 obj, float speed)
+        public static bool Build(ref int id, string name, ExVector3 obj, float speed)
         {
-            Build(ref id, name, ref obj.Val, speed);
+            bool ret = Build(ref id, name, ref obj.Val, speed);
             AddUndoHandler(name, obj);
+            return ret;
         }
 
-        public static void Build(ref int id, string name, ref Vector3 val, float speed)
+        public static bool Build(ref int id, string name, ref Vector3 val, float speed)
         {
             ImGui.PushID(id++);
             ImGui.Text(name);
@@ -36,9 +37,10 @@ namespace SdfGlueUi.Ui.Properties
             ImGui.NextColumn();
             ImGui.SetNextItemWidth(-1);
             ImGui.PushID(id++);
-            ImGui.DragFloat3("##value", ref val, speed);
+            bool ret = ImGui.DragFloat3("##value", ref val, speed);
             ImGui.PopID();
             ImGui.NextColumn();
+            return ret;
         }
     }
 }

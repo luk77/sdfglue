@@ -25,6 +25,10 @@ namespace SdfGlueCore.Model
         public  bool        UseAltRmbForCameraRotation          = false;
         public  float       UiTextScaleFactor                   = 1.0f;
 
+        public  float       CameraPosDamping                    = 7.0f;
+        public  float       CameraRotDamping                    = 10.0f;
+        public  float       CameraDistDamping                   = 7.0f;
+
         public bool         MonitorFileSystemChanges            = true;
 
         //public  bool        UseRenderFrequencyLimit             = true;

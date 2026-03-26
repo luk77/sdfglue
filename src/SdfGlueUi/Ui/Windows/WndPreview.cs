@@ -7,9 +7,11 @@ using ImGuiNET;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.BaseTypes;
 using SdfGlueCore.Model.DataNodes;
+using SdfGlueCore.Utils;
 using SdfGlueUi.Input;
 using SdfGlueUi.Ui.Components;
 using System.Numerics;
+using System.Xml.Linq;
 
 namespace SdfGlueUi.Ui.Windows
 {
@@ -301,9 +303,9 @@ namespace SdfGlueUi.Ui.Windows
             });
         }
 
-        public override void HandleInput()
+        public override void HandleInput(float deltaTime)
         {
-            base.HandleInput();
+            base.HandleInput(deltaTime);
 
             if (!IsVisible)
                 return;
@@ -314,7 +316,9 @@ namespace SdfGlueUi.Ui.Windows
 
             HandleCameraDistanceByMouseWheel();
             HandlePanAndRotationByMouse();
-            HandleMovementByWASD();
+            HandleMovementByWASD(deltaTime);
+
+            GetModel().CameraDat.UpdateSmoothing(deltaTime, GetModel().Config);
 
             StoreMouseDataForShader();
         }
@@ -331,14 +335,27 @@ namespace SdfGlueUi.Ui.Windows
                 bool keyDown = GetModel().Config.UseShiftKeyToZoom ? (input.IsKeyDown(UiKey.LeftShift) || input.IsKeyDown(UiKey.RightShift)) : true;
                 if (keyDown)
                 {
+                    //float distanceToTarget = GetModel().CameraDat.DistanceToTarget.Val;
+                    float distanceToTarget = GetModel().CameraDat.DistanceToTargetForSmoothing;
+
                     float deltaWheel = input.GetWheelPrecise() - lastMouseWheelPos_;
-                    GetModel().CameraDat.DistanceToTarget.Val -= 0.3f * GetModel().Config.MouseWheelSpeed * deltaWheel;
+
+                    float deltaDist = -0.3f * GetModel().Config.MouseWheelSpeed * deltaWheel;
+                    if (Math.Abs(deltaDist) > 0.0001)
+                    {
+                        deltaDist = deltaDist;
+                    }
+
+                    distanceToTarget += deltaDist;
 
                     if (Math.Abs(deltaWheel) > 0.0001)
                         ResetFrameCounterIfNeeded();
 
-                    if (GetModel().CameraDat.DistanceToTarget.Val < GlobalConfig.MinDistanceToTarget)
-                        GetModel().CameraDat.DistanceToTarget.Val = GlobalConfig.MinDistanceToTarget;
+                    if (distanceToTarget < GlobalConfig.MinDistanceToTarget)
+                        distanceToTarget = GlobalConfig.MinDistanceToTarget;
+
+                    //GetModel().CameraDat.DistanceToTarget.Val = distanceToTarget;
+                    GetModel().CameraDat.DistanceToTargetForSmoothing = distanceToTarget;
                 }
             }
             lastMouseWheelPos_ = input.GetWheelPrecise();
@@ -422,7 +439,7 @@ namespace SdfGlueUi.Ui.Windows
             GetModel().RenderingSysData.MouseData = new Vector4(mX, mY, cX, cY);
         }
 
-        private void HandleMovementByWASD()
+        private void HandleMovementByWASD(float deltaTime)
         {
             IUiActionsExecutor input = uiMgr_.ActionsExecutor;
 
@@ -436,10 +453,6 @@ namespace SdfGlueUi.Ui.Windows
 
             if (input.IsDownAnyCtrl())
                 return;
-
-            Vector3 pos = GetModel().CameraDat.TargetPosition.Val;
-
-            float deltaTime = 1f / 60f;     // TODO: prawdziwy deltaTime!!!
 
             float movementSpeed = 5.0f * deltaTime;
 
@@ -459,41 +472,46 @@ namespace SdfGlueUi.Ui.Windows
 
             bool moved = false;
 
+            Vector3 deltaPos = Vector3.Zero;
             if (input.IsKeyDown(UiKey.W))
             {
                 moved = true;
-                pos += forwardXZ * movementSpeed;
+                deltaPos += forwardXZ * movementSpeed;
             }
             if (input.IsKeyDown(UiKey.S))
             {
                 moved = true;
-                pos -= forwardXZ * movementSpeed;
+                deltaPos -= forwardXZ * movementSpeed;
             }
             if (input.IsKeyDown(UiKey.A))
             {
                 moved = true;
-                pos -= rightXZ * movementSpeed;
+                deltaPos -= rightXZ * movementSpeed;
             }
             if (input.IsKeyDown(UiKey.D))
             {
                 moved = true;
-                pos += rightXZ * movementSpeed;
+                deltaPos += rightXZ * movementSpeed;
             }
             if (input.IsKeyDown(UiKey.E))
             {
                 moved = true;
-                pos += Vector3.UnitY * movementSpeed;
+                deltaPos += Vector3.UnitY * movementSpeed;
             }
             if (input.IsKeyDown(UiKey.Q))
             {
                 moved = true;
-                pos -= Vector3.UnitY * movementSpeed;
+                deltaPos -= Vector3.UnitY * movementSpeed;
             }
 
             if (moved)
                 ResetFrameCounterIfNeeded();
 
-            GetModel().CameraDat.TargetPosition.Val = pos;
+            //Vector3 pos = GetModel().CameraDat.TargetPosition.Val;
+            //pos += deltaPos;
+            //GetModel().CameraDat.TargetPosition.Val = pos;
+
+            GetModel().CameraDat.TargetPositionForSmoothing += deltaPos;
         }
 
         private void ResetFrameCounterIfNeeded()

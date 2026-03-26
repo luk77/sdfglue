@@ -96,7 +96,7 @@ namespace SdfGlueUi.Ui
 
         public abstract void Build();
 
-        public virtual void HandleInput()
+        public virtual void HandleInput(float deltaTime)
         {
         }
 

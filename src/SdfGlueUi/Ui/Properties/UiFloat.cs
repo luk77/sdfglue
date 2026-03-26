@@ -104,9 +104,9 @@ namespace SdfGlueUi.Ui.Properties
             AddUndoHandler(name, obj);
         }
 
-        public static void Build(ref int id, string name, ref float val, float speed)
+        public static bool Build(ref int id, string name, ref float val, float speed)
         {
-            Build(ref id, name, ref val, speed, SdfParamLimitsType.None, 0.0f, 0.0f);
+            return Build(ref id, name, ref val, speed, SdfParamLimitsType.None, 0.0f, 0.0f);
         }
 
         //public static void Build(ref int id, string name, ref float val, float speed, float minVal)
@@ -115,13 +115,15 @@ namespace SdfGlueUi.Ui.Properties
         //}
 
         // for camera settings
-        public static void Build(ref int id, string name, ref float val, float speed, float minVal, float maxVal)
+        public static bool Build(ref int id, string name, ref float val, float speed, float minVal, float maxVal)
         {
-            Build(ref id, name, ref val, speed, SdfParamLimitsType.MinMax, minVal, maxVal);
+            return Build(ref id, name, ref val, speed, SdfParamLimitsType.MinMax, minVal, maxVal);
         }
 
-        public static void Build(ref int id, string name, ref float val, float speed, SdfParamLimitsType limitsType, float minVal, float maxVal)
+        public static bool Build(ref int id, string name, ref float val, float speed, SdfParamLimitsType limitsType, float minVal, float maxVal)
         {
+            bool ret = false;
+
             ImGui.PushID(id++);
             ImGui.Text(name);
             ImGui.PopID();
@@ -130,12 +132,14 @@ namespace SdfGlueUi.Ui.Properties
             ImGui.PushID(id++);
             switch(limitsType)
             {
-                case SdfParamLimitsType.None:       ImGui.DragFloat("##value", ref val, speed);                     break;
-                case SdfParamLimitsType.Min:        ImGui.DragFloat("##value", ref val, speed, minVal);             break;
-                case SdfParamLimitsType.MinMax:     ImGui.DragFloat("##value", ref val, speed, minVal, maxVal);     break;
+                case SdfParamLimitsType.None:       ret = ImGui.DragFloat("##value", ref val, speed);                     break;
+                case SdfParamLimitsType.Min:        ret = ImGui.DragFloat("##value", ref val, speed, minVal);             break;
+                case SdfParamLimitsType.MinMax:     ret = ImGui.DragFloat("##value", ref val, speed, minVal, maxVal);     break;
             }
             ImGui.PopID();
             ImGui.NextColumn();
+
+            return ret;
         }
     }
 }

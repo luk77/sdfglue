@@ -16,11 +16,28 @@ namespace SdfGlueUi.Ui.Components
 
             int id = 1;
 
-            UiVector3   .Build(ref id, "Target position"     , ref cameraData.TargetPosition     .Val    , 0.02f);
-            UiFloat     .Build(ref id, "Pitch rotation"      , ref cameraData.RotationPitch      .Val    , 0.1f);
-            UiFloat     .Build(ref id, "Yaw rotation"        , ref cameraData.RotationYaw        .Val    , 0.1f);
+            if (UiVector3.Build(ref id, "Target position"     , ref cameraData.TargetPosition     .Val    , 0.02f))
+            {
+                cameraData.TargetPositionForSmoothing = cameraData.TargetPosition.Val;
+            }
+
+            if (UiFloat.Build(ref id, "Pitch rotation"      , ref cameraData.RotationPitch      .Val    , 0.1f))
+            {
+                cameraData.RotationPitchForSmoothing = cameraData.RotationPitch.Val;
+            }
+
+            if (UiFloat.Build(ref id, "Yaw rotation"        , ref cameraData.RotationYaw        .Val    , 0.1f))
+            {
+                cameraData.RotationYawForSmoothing = cameraData.RotationYaw.Val;
+            }
+
             UiFloat     .Build(ref id, "Roll rotation"       , ref cameraData.RotationRoll       .Val    , 0.1f);
-            UiFloat     .Build(ref id, "Distance to target"  , ref cameraData.DistanceToTarget   .Val    , 0.02f);
+
+            if (UiFloat.Build(ref id, "Distance to target"  , ref cameraData.DistanceToTarget   .Val    , 0.02f))
+            {
+                cameraData.DistanceToTargetForSmoothing = cameraData.DistanceToTarget.Val;
+            }
+
             UiFloat     .Build(ref id, "Zoom"                , ref cameraData.Zoom               .Val    , 0.02f);
 
             // debug

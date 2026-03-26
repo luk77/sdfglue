@@ -38,8 +38,8 @@ namespace SdfGlueEditor
     {
         public static readonly bool     EnableOpenGlDebug           = true;
 
-        public static readonly float    MinDeltaTime            = 0.0f;
-        public static readonly float    MaxDeltaTime            = 0.5f;  // 2 fps'y
+        //public static readonly float    MinDeltaTime            = 0.0f;
+        //public static readonly float    MaxDeltaTime            = 0.5f;  // 2 fps'y
 
         public static readonly float    CameraAnimThreshold     = 0.005f;
 
@@ -55,8 +55,8 @@ namespace SdfGlueEditor
         private ProjectHierarchyController      phc_                    = null;
 
         // Camera focus animation (key [F])
-        private System.Numerics.Vector3     cameraAnimTo_               = new System.Numerics.Vector3(0.0f);
-        private bool                        isAnimatingCamera_          = false;
+        //private System.Numerics.Vector3     cameraAnimTo_               = new System.Numerics.Vector3(0.0f);
+        //private bool                        isAnimatingCamera_          = false;
 
         private Vector2i            currMouseClientPos_         = new Vector2i(0, 0);
         private float               mouseScroll_                = 0.0f;
@@ -204,7 +204,7 @@ namespace SdfGlueEditor
             HandleCameraFocusAnimation(isAppFocused);
             if (isAppFocused)
             {
-                uiMgr_.HandleInput();
+                uiMgr_.HandleInput((float)e.Time);
 
                 UpdateGlobalKeyboardShortcuts();
             }
@@ -717,9 +717,10 @@ namespace SdfGlueEditor
         {
             if (node == null)
                 return;
-
-            cameraAnimTo_ = node.GetPosition();
-            isAnimatingCamera_ = true;
+        
+            //cameraAnimTo_ = node.GetPosition();
+            //isAnimatingCamera_ = true;
+            GetModel().CameraDat.TargetPositionForSmoothing = node.GetPosition();
         }
 
         private void HandleCameraFocusAnimation(bool isAppFocused)
@@ -741,28 +742,28 @@ namespace SdfGlueEditor
                 }
             }
 
-            if (isAnimatingCamera_)
-            {
-                if (IsConditionForAnimatingCamera())
-                {
-                    GetModel().CameraDat.TargetPosition.Val.X = GMath.Lerp(GetModel().CameraDat.TargetPosition.Val.X, cameraAnimTo_.X, 0.2f);
-                    GetModel().CameraDat.TargetPosition.Val.Y = GMath.Lerp(GetModel().CameraDat.TargetPosition.Val.Y, cameraAnimTo_.Y, 0.2f);
-                    GetModel().CameraDat.TargetPosition.Val.Z = GMath.Lerp(GetModel().CameraDat.TargetPosition.Val.Z, cameraAnimTo_.Z, 0.2f);
-
-                    if (!IsConditionForAnimatingCamera())
-                    {
-                        GetModel().CameraDat.TargetPosition.Val = cameraAnimTo_;
-                        isAnimatingCamera_ = false;
-                    }
-                }
-            }
+            //if (isAnimatingCamera_)
+            //{
+            //    if (IsConditionForAnimatingCamera())
+            //    {
+            //        GetModel().CameraDat.TargetPosition.Val.X = GMath.Lerp(GetModel().CameraDat.TargetPosition.Val.X, cameraAnimTo_.X, 0.2f);
+            //        GetModel().CameraDat.TargetPosition.Val.Y = GMath.Lerp(GetModel().CameraDat.TargetPosition.Val.Y, cameraAnimTo_.Y, 0.2f);
+            //        GetModel().CameraDat.TargetPosition.Val.Z = GMath.Lerp(GetModel().CameraDat.TargetPosition.Val.Z, cameraAnimTo_.Z, 0.2f);
+            //
+            //        if (!IsConditionForAnimatingCamera())
+            //        {
+            //            GetModel().CameraDat.TargetPosition.Val = cameraAnimTo_;
+            //            isAnimatingCamera_ = false;
+            //        }
+            //    }
+            //}
         }
 
-        public bool IsConditionForAnimatingCamera()
-        {
-            float distToTarget = (cameraAnimTo_ - GetModel().CameraDat.TargetPosition.Val).Length();
-            return distToTarget > CameraAnimThreshold;
-        }
+        //public bool IsConditionForAnimatingCamera()
+        //{
+        //    float distToTarget = (cameraAnimTo_ - GetModel().CameraDat.TargetPosition.Val).Length();
+        //    return distToTarget > CameraAnimThreshold;
+        //}
 
 // wygląda na to że jest to zbędne
 //        public bool IsKeyDown(Keys key)
@@ -852,7 +853,7 @@ namespace SdfGlueEditor
             fromTargetToOrig = rotYaw * rotPitch * fromTargetToOrig;
 
             cameraData.Origin = cameraData.TargetPosition.Val + MathUtils.ToNumericsVec3(fromTargetToOrig);
-            
+
             cameraData.Forward   = MathUtils.ToNumericsVec3(Vector3.Normalize(-fromTargetToOrig));
             cameraData.Right     = System.Numerics.Vector3.Normalize(System.Numerics.Vector3.Cross(System.Numerics.Vector3.UnitY, cameraData.Forward));
             cameraData.Up        = System.Numerics.Vector3.Normalize(System.Numerics.Vector3.Cross(cameraData.Forward, cameraData.Right));

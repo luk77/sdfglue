@@ -3,6 +3,8 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
+using System.Numerics;
+
 namespace SdfGlueCore.Utils
 {
     public class GMath
@@ -19,6 +21,24 @@ namespace SdfGlueCore.Utils
         public static float Lerp(float a, float b, float weight)
         { 
             return a * (1 - weight) + b * weight; 
+        }
+
+        public static float Smooth(float current, float target, float lambda, float dt)
+        {
+            float t = 1.0f - MathF.Exp(-lambda * dt);
+            return current + (target - current) * t;
+        }
+
+        public static Vector2 Smooth(Vector2 current, Vector2 target, float lambda, float dt)
+        {
+            float t = 1.0f - MathF.Exp(-lambda * dt);
+            return current + (target - current) * t;
+        }
+
+        public static Vector3 Smooth(Vector3 current, Vector3 target, float lambda, float dt)
+        {
+            float t = 1.0f - MathF.Exp(-lambda * dt);
+            return current + (target - current) * t;
         }
     }
 }
