@@ -4,29 +4,22 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using ImGuiNET;
-using SdfGlueUi.Input;
 using SdfGlueCore.Model;
-using System.Numerics;
-using SdfGlueCore.Model.DataNodes;
 using SdfGlueCore.Model.BaseTypes;
+using SdfGlueCore.Model.DataNodes;
+using SdfGlueUi.Input;
 using SdfGlueUi.Ui.Components;
+using System.Numerics;
 
 namespace SdfGlueUi.Ui.Windows
 {
     public class WndPreview : UiWindowBase
     {
-        //public override string Title => "Preview";
-
+        private bool                        prevStateRmb_               = false;
 
         // Camera rotation by mouse
-        private bool                        isDragging_                 = false;
-        private bool                        prevStateRmb_               = false;
-        private bool                        prevStateLmb_               = false;
-        private int                         mouseRmbDragStartX_         = 0;
-        private int                         mouseRmbDragStartY_         = 0;
-        private float                       dragStartCameraPitch_       = 0.0f;
-        private float                       dragStartCameraYaw_         = 0.0f;
-        private System.Numerics.Vector3     dragStartCameraTarget_      = new System.Numerics.Vector3(0.0f);
+        private MouseInputChannel           mouseInputChannelPan_      = new MouseInputChannel(MouseInputChannel.ChannelType.Pan);
+        private MouseInputChannel           mouseInputChannelRotate_   = new MouseInputChannel(MouseInputChannel.ChannelType.Rotation);
 
         // Camera distance by mouse wheel
         private float                       lastMouseWheelPos_          = 0.0f;
@@ -353,63 +346,34 @@ namespace SdfGlueUi.Ui.Windows
 
         private void HandlePanAndRotationByMouse()
         {
-            //MouseState mouseState = Mouse.GetCursorState();
-            //KeyboardState input = currKeyboardState_;
             IUiActionsExecutor input = uiMgr_.ActionsExecutor;
 
-            //bool stateRmb = mouseState.IsButtonDown(MouseButton.Right);
+            if (GetModel().Config.UseAltRmbForCameraRotation)
+            {
+                // "Unity style" camera controller:
+                // RMB      - pan
+                // Alt+RMB  - rotation
+                mouseInputChannelPan_       .Update(input.IsRmbDown(), !input.IsDownAnyAlt(), GetModel().Config, input, GetModel().CameraDat, IsHovered);
+                mouseInputChannelRotate_    .Update(input.IsRmbDown(), input.IsDownAnyAlt(),  GetModel().Config, input, GetModel().CameraDat, IsHovered);
+            }
+            else
+            {
+                // Default controller:
+                // RMB - pan
+                // LMB - rotation
+                mouseInputChannelPan_       .Update(input.IsRmbDown(), true, GetModel().Config, input, GetModel().CameraDat, IsHovered);
+                mouseInputChannelRotate_    .Update(input.IsLmbDown(), true, GetModel().Config, input, GetModel().CameraDat, IsHovered);
+            }
+
             bool stateRmb = input.IsRmbDown();
-            bool stateLmb = input.IsLmbDown();
 
-            if (IsHovered)
-            {
-                if (!prevStateRmb_ && stateRmb)
-                {
-                    // RMB pressed
-                    isDragging_ = true;
-                    mouseRmbDragStartX_         = input.GetMouseStateX();
-                    mouseRmbDragStartY_         = input.GetMouseStateY();
-                    dragStartCameraPitch_       = GetModel().CameraDat.RotationPitch.Val;
-                    dragStartCameraYaw_         = GetModel().CameraDat.RotationYaw.Val;
-                    dragStartCameraTarget_      = GetModel().CameraDat.TargetPosition.Val;
-                }
-            }
-
-            if (prevStateRmb_ && !stateRmb)
-            {
-                // RMB released
-                isDragging_ = false;
-            }
-
-            if (isDragging_)
+            if (mouseInputChannelPan_.IsDragging ||
+                mouseInputChannelRotate_.IsDragging )
             {
                 ResetFrameCounterIfNeeded();
-
-                if (input.IsDownAnyAlt())
-                {
-                    // rotation
-                    float mouseDragDeltaX = input.GetMouseStateX() - mouseRmbDragStartX_;
-                    float mouseDragDeltaY = input.GetMouseStateY() - mouseRmbDragStartY_;
-
-                    if (GetModel().Config.MouseCameraRotationInvPitch)
-                        mouseDragDeltaX *= -1.0f;
-
-                    if (GetModel().Config.MouseCameraRotationInvYaw)
-                        mouseDragDeltaY *= -1.0f;
-
-                    GetModel().CameraDat.RotationPitch.Val  = dragStartCameraPitch_ + 0.5f * GetModel().Config.MouseCameraRotationSpeedPitch * mouseDragDeltaY;
-                    GetModel().CameraDat.RotationYaw.Val    = dragStartCameraYaw_   + 0.5f * GetModel().Config.MouseCameraRotationSpeedYaw   * mouseDragDeltaX;
-                }
-                else
-                {
-                    // pan
-                    float dragSpeed = 0.002f * GetModel().Config.MouseCameraPanSpeed * GetModel().CameraDat.DistanceToTarget.Val;
-                    float mouseDragDeltaX = input.GetMouseStateX() - mouseRmbDragStartX_;
-                    float mouseDragDeltaY = input.GetMouseStateY() - mouseRmbDragStartY_;
-                    GetModel().CameraDat.TargetPosition.Val = dragStartCameraTarget_ - dragSpeed * mouseDragDeltaX * GetModel().CameraDat.Right + dragSpeed * mouseDragDeltaY * GetModel().CameraDat.Up;
-                }
             }
 
+            // Mouse data for shader (Shadertoy compatibility)
             if (stateRmb)
             {
                 mousePosForShader_ = CalculateMousePosForShader();
@@ -423,7 +387,6 @@ namespace SdfGlueUi.Ui.Windows
             }
 
             prevStateRmb_ = stateRmb;
-            prevStateLmb_ = stateLmb;
         }
 
         private Vector2 CalculateMousePosForShader()

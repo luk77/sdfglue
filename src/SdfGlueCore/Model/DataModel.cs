@@ -18,6 +18,7 @@ namespace SdfGlueCore.Model
 {
     public class DataModel : TreeNode
     {
+        // Version management moved to Directory.Build.props file
         //public static readonly int      VersionMajor                = 0;
         //public static readonly int      VersionMinor                = 378;
 

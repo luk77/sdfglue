@@ -22,6 +22,7 @@ namespace SdfGlueCore.Model
         public  bool        MouseWheelInvert                    = false;
         public  float       MouseWheelSpeed                     = 1.0f;
         public  bool        UseShiftKeyToZoom                   = false;
+        public  bool        UseAltRmbForCameraRotation          = false;
         public  float       UiTextScaleFactor                   = 1.0f;
 
         public bool         MonitorFileSystemChanges            = true;
