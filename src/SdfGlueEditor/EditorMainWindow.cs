@@ -54,10 +54,6 @@ namespace SdfGlueEditor
         private IRenderingSystem                renderingSystem_        = null;
         private ProjectHierarchyController      phc_                    = null;
 
-        // Camera focus animation (key [F])
-        //private System.Numerics.Vector3     cameraAnimTo_               = new System.Numerics.Vector3(0.0f);
-        //private bool                        isAnimatingCamera_          = false;
-
         private Vector2i            currMouseClientPos_         = new Vector2i(0, 0);
         private float               mouseScroll_                = 0.0f;
 
@@ -717,10 +713,8 @@ namespace SdfGlueEditor
         {
             if (node == null)
                 return;
-        
-            //cameraAnimTo_ = node.GetPosition();
-            //isAnimatingCamera_ = true;
-            GetModel().CameraDat.TargetPositionForSmoothing = node.GetPosition();
+
+            GetModel().CameraDat.SetTargetPos(node.GetPosition());
         }
 
         private void HandleCameraFocusAnimation(bool isAppFocused)
@@ -741,47 +735,12 @@ namespace SdfGlueEditor
                     }
                 }
             }
-
-            //if (isAnimatingCamera_)
-            //{
-            //    if (IsConditionForAnimatingCamera())
-            //    {
-            //        GetModel().CameraDat.TargetPosition.Val.X = GMath.Lerp(GetModel().CameraDat.TargetPosition.Val.X, cameraAnimTo_.X, 0.2f);
-            //        GetModel().CameraDat.TargetPosition.Val.Y = GMath.Lerp(GetModel().CameraDat.TargetPosition.Val.Y, cameraAnimTo_.Y, 0.2f);
-            //        GetModel().CameraDat.TargetPosition.Val.Z = GMath.Lerp(GetModel().CameraDat.TargetPosition.Val.Z, cameraAnimTo_.Z, 0.2f);
-            //
-            //        if (!IsConditionForAnimatingCamera())
-            //        {
-            //            GetModel().CameraDat.TargetPosition.Val = cameraAnimTo_;
-            //            isAnimatingCamera_ = false;
-            //        }
-            //    }
-            //}
         }
-
-        //public bool IsConditionForAnimatingCamera()
-        //{
-        //    float distToTarget = (cameraAnimTo_ - GetModel().CameraDat.TargetPosition.Val).Length();
-        //    return distToTarget > CameraAnimThreshold;
-        //}
-
-// wygląda na to że jest to zbędne
-//        public bool IsKeyDown(Keys key)
-//        {
-//            return KeyboardState.IsKeyDown(key);
-//        }
-//
-//        public bool IsKeyPressed(Keys key)
-//        {
-////            return !prevKeyboardState_[key] && currKeyboardState_[key];
-//            return !KeyboardState.WasKeyDown(key) && KeyboardState.IsKeyDown(key);
-//        }
 
         public bool IsKeyDown(UiKey uiKey)
         {
             return IsKeyDown(UiKeyToOpenTkKey(uiKey));
         }
-
         public bool IsKeyPressed(UiKey uiKey)
         {
             return IsKeyPressed(UiKeyToOpenTkKey(uiKey));

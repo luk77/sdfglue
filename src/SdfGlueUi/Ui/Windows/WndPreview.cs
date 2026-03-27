@@ -335,27 +335,13 @@ namespace SdfGlueUi.Ui.Windows
                 bool keyDown = GetModel().Config.UseShiftKeyToZoom ? (input.IsKeyDown(UiKey.LeftShift) || input.IsKeyDown(UiKey.RightShift)) : true;
                 if (keyDown)
                 {
-                    //float distanceToTarget = GetModel().CameraDat.DistanceToTarget.Val;
-                    float distanceToTarget = GetModel().CameraDat.DistanceToTargetForSmoothing;
-
                     float deltaWheel = input.GetWheelPrecise() - lastMouseWheelPos_;
-
                     float deltaDist = -0.3f * GetModel().Config.MouseWheelSpeed * deltaWheel;
-                    if (Math.Abs(deltaDist) > 0.0001)
-                    {
-                        deltaDist = deltaDist;
-                    }
-
-                    distanceToTarget += deltaDist;
 
                     if (Math.Abs(deltaWheel) > 0.0001)
                         ResetFrameCounterIfNeeded();
 
-                    if (distanceToTarget < GlobalConfig.MinDistanceToTarget)
-                        distanceToTarget = GlobalConfig.MinDistanceToTarget;
-
-                    //GetModel().CameraDat.DistanceToTarget.Val = distanceToTarget;
-                    GetModel().CameraDat.DistanceToTargetForSmoothing = distanceToTarget;
+                    GetModel().CameraDat.SetDistanceToTargetByDelta(deltaDist);
                 }
             }
             lastMouseWheelPos_ = input.GetWheelPrecise();
@@ -507,11 +493,7 @@ namespace SdfGlueUi.Ui.Windows
             if (moved)
                 ResetFrameCounterIfNeeded();
 
-            //Vector3 pos = GetModel().CameraDat.TargetPosition.Val;
-            //pos += deltaPos;
-            //GetModel().CameraDat.TargetPosition.Val = pos;
-
-            GetModel().CameraDat.TargetPositionForSmoothing += deltaPos;
+            GetModel().CameraDat.SetTargetPosByDelta(deltaPos);
         }
 
         private void ResetFrameCounterIfNeeded()

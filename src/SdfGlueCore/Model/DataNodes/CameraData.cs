@@ -26,6 +26,8 @@ namespace SdfGlueCore.Model.DataNodes
         public  Vector3                 Right               = new Vector3(0.0f);    // calculated
         public  Vector3                 Up                  = new Vector3(0.0f);    // calculated
 
+        public  bool                    UseSmoothing        = true;
+
         // helper data for smoothing
         public  Vector3                 TargetPositionForSmoothing  = new Vector3(0.0f);
         public  float                   RotationPitchForSmoothing   = 0.0f;
@@ -67,6 +69,68 @@ namespace SdfGlueCore.Model.DataNodes
             return true;
         }
 
+        public void SetTargetPos(Vector3 pos)
+        {
+            if (UseSmoothing)
+            {
+                TargetPositionForSmoothing  = pos;
+            }
+            else
+            {
+                TargetPosition.Val          = pos;
+                TargetPositionForSmoothing  = TargetPosition.Val;
+            }
+        }
+
+        public void SetTargetPosByDelta(Vector3 deltaPos)
+        {
+            if (UseSmoothing)
+            {
+                TargetPositionForSmoothing  += deltaPos;
+            }
+            else
+            {
+                TargetPosition.Val          += deltaPos;
+                TargetPositionForSmoothing  = TargetPosition.Val;
+            }
+        }
+
+        public void SetTargetRotation(float yaw, float pitch)
+        {
+            if (UseSmoothing)
+            {
+                RotationPitchForSmoothing   = pitch;
+                RotationYawForSmoothing     = yaw;
+            }
+            else
+            {
+                RotationPitch.Val           = pitch;
+                RotationYaw.Val             = yaw;
+                RotationPitchForSmoothing   = pitch;
+                RotationYawForSmoothing     = yaw;
+            }
+        }
+
+        public void SetDistanceToTargetByDelta(float deltaDistanceToTarget)
+        {
+            float val = UseSmoothing ? DistanceToTargetForSmoothing : DistanceToTarget.Val;
+
+            val += deltaDistanceToTarget;
+
+            if (val < GlobalConfig.MinDistanceToTarget)
+                val = GlobalConfig.MinDistanceToTarget;
+
+            if (UseSmoothing)
+            {
+                DistanceToTargetForSmoothing    = val;
+            }
+            else
+            {
+                DistanceToTarget.Val            = val;
+                DistanceToTargetForSmoothing    = val;
+            }
+        }
+
         internal void ResetSmoothing()
         {
             TargetPositionForSmoothing  = TargetPosition.Val;
@@ -77,14 +141,14 @@ namespace SdfGlueCore.Model.DataNodes
 
         public void UpdateSmoothing(float deltaTime, GlobalConfig config)
         {
+            if (!UseSmoothing)
+                return;
+
             // Position
-            if ((TargetPosition.Val - TargetPositionForSmoothing).Length() > 0.001f)
-            {
-                TargetPosition.Val  = GMath.Smooth(
-                                                TargetPosition.Val, 
-                                                TargetPositionForSmoothing, 
-                                                config.CameraPosDamping, deltaTime);
-            }
+            TargetPosition.Val  = GMath.Smooth(
+                                            TargetPosition.Val,
+                                            TargetPositionForSmoothing,
+                                            config.CameraPosDamping, deltaTime);
 
             // Rotation
             RotationPitch.Val   = GMath.Smooth(

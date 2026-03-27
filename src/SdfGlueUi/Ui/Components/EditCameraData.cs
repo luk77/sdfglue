@@ -3,6 +3,7 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
+using ImGuiNET;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueUi.Ui.Properties;
 
@@ -39,6 +40,10 @@ namespace SdfGlueUi.Ui.Components
             }
 
             UiFloat     .Build(ref id, "Zoom"                , ref cameraData.Zoom               .Val    , 0.02f);
+
+            ImGui.Separator();
+
+            UiBool.Build(ref id, "Use camera smoothing", ref cameraData.UseSmoothing);
 
             // debug
             //UiVector3.Build(ref id, "Origin"                , ref cameraData.Origin   , 0.02f);

@@ -6,6 +6,7 @@
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueUi.Ui;
+using System.Numerics;
 
 namespace SdfGlueUi.Input
 {
@@ -65,9 +66,10 @@ namespace SdfGlueUi.Input
                     float dragSpeed = 0.002f * config.MouseCameraPanSpeed * cameraData.DistanceToTarget.Val;
                     float mouseDragDeltaX = input.GetMouseStateX() - mouseDragStartX_;
                     float mouseDragDeltaY = input.GetMouseStateY() - mouseDragStartY_;
-                    cameraData.TargetPosition.Val = dragStartCameraTarget_ - dragSpeed * mouseDragDeltaX * cameraData.Right + dragSpeed * mouseDragDeltaY * cameraData.Up;
-                    // reset this value - no smoothing in that case
-                    cameraData.TargetPositionForSmoothing = cameraData.TargetPosition.Val;
+
+                    Vector3 destPos = dragStartCameraTarget_ - dragSpeed * mouseDragDeltaX * cameraData.Right + dragSpeed * mouseDragDeltaY * cameraData.Up;
+
+                    cameraData.SetTargetPos(destPos);
                 }
                 else if (channelType_ == ChannelType.Rotation)
                 {
@@ -81,11 +83,10 @@ namespace SdfGlueUi.Input
                     if (config.MouseCameraRotationInvYaw)
                         mouseDragDeltaY *= -1.0f;
 
-                    //cameraData.RotationPitch.Val  = dragStartCameraPitch_ + 0.5f * config.MouseCameraRotationSpeedPitch * mouseDragDeltaY;
-                    //cameraData.RotationYaw.Val    = dragStartCameraYaw_   + 0.5f * config.MouseCameraRotationSpeedYaw   * mouseDragDeltaX;
+                    float targetPitch   = dragStartCameraPitch_ + 0.5f * config.MouseCameraRotationSpeedPitch * mouseDragDeltaY;
+                    float targetYaw     = dragStartCameraYaw_   + 0.5f * config.MouseCameraRotationSpeedYaw   * mouseDragDeltaX;
 
-                    cameraData.RotationPitchForSmoothing    = dragStartCameraPitch_ + 0.5f * config.MouseCameraRotationSpeedPitch * mouseDragDeltaY;
-                    cameraData.RotationYawForSmoothing      = dragStartCameraYaw_   + 0.5f * config.MouseCameraRotationSpeedYaw   * mouseDragDeltaX;
+                    cameraData.SetTargetRotation(targetYaw, targetPitch);
                 }
             }
 
