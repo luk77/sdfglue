@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Animated" displayName="Translate (animated)" functionName="opAnimTranslate">
+<Parameters>
+  <Param type="vec3" displayName="Speed" parameterName="animSpeed" default="0.1;0.0;0.0" speed="0.02"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opAnimTranslate(inout vec3 p, in vec3 animSpeed)
+{
+    p += animSpeed * iTime;
+}
+]]>
+</Code>
+</FuncDef>

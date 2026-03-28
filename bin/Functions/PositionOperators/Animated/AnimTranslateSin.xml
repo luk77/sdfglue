@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Animated" displayName="Translate by sinus (animated)" functionName="opAnimTranslateSin">
+<Parameters>
+  <Param type="vec3" displayName="Amplitude"        parameterName="amp"         default="0.1;0.1;0.1" speed="0.01"/>
+  <Param type="vec3" displayName="Frequency"        parameterName="freq"        default="0.1;0.2;0.3" speed="0.001" />
+  <Param type="vec3" displayName="Phase"            parameterName="phase"       default="0.0;0.0;0.0" speed="0.001"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opAnimTranslateSin(inout vec3 p, in vec3 amp, in vec3 freq, in vec3 phase)
+{
+    p += amp * sin(phase + freq * iTime * 2.0 * PI);
+}
+]]>
+</Code>
+</FuncDef>

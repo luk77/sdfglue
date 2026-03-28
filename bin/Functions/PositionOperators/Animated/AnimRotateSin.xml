@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Animated" displayName="Rotate by sinus (animated)" functionName="opAnimRotateSin">
+<Parameters>
+  <Param type="vec3" displayName="Amplitude"        parameterName="amp"         default="0.1;0.1;0.1" speed="0.01"/>
+  <Param type="vec3" displayName="Frequency"        parameterName="freq"        default="0.1;0.2;0.3" speed="0.001" />
+  <Param type="vec3" displayName="Phase"            parameterName="phase"       default="0.0;0.0;0.0" speed="0.001"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opAnimRotateSin(inout vec3 p, in vec3 amp, in vec3 freq, in vec3 phase)
+{
+    vec3 rotation = amp * sin(phase + freq * iTime * 2.0 * PI);
+
+    float sinX = sin(-rotation.x);
+    float cosX = cos(-rotation.x);
+
+    float sinY = sin(-rotation.y);
+    float cosY = cos(-rotation.y);
+
+    float sinZ = sin(-rotation.z);
+    float cosZ = cos(-rotation.z);
+
+    mat3 rX = mat3(1,0,0, 0,cosX,-sinX, 0,sinX,cosX);
+    mat3 rY = mat3(cosY,0,sinY, 0,1,0, -sinY,0,cosY);
+    mat3 rZ = mat3(cosZ,-sinZ,0, sinZ,cosZ,0, 0,0,1);
+
+    mat3 rot = rY * rX * rZ;
+
+    //p *= rot;
+    p = SDFG_MUL(rot, p);
+}
+]]>
+</Code>
+</FuncDef>

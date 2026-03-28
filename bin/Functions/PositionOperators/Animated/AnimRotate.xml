@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Animated" displayName="Rotate (animated)" functionName="opAnimRotate">
+<Parameters>
+  <Param type="vec3" displayName="Speed"            parameterName="animSpeed"   default="0.25;0.25;0.25" speed="0.001" />
+  <Param type="vec3" displayName="Phase (angle)"    parameterName="animOffset"  default="0.0;0.0;0.0" speed="0.1" editInDegrees="true"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opAnimRotate(inout vec3 p, in vec3 animSpeed, in vec3 animOffset)
+{
+    vec3 rotation = 2.0 * PI * animSpeed * iTime + animOffset;
+
+    float sinX = sin(-rotation.x);
+    float cosX = cos(-rotation.x);
+
+    float sinY = sin(-rotation.y);
+    float cosY = cos(-rotation.y);
+
+    float sinZ = sin(-rotation.z);
+    float cosZ = cos(-rotation.z);
+
+    mat3 rX = mat3(1,0,0, 0,cosX,-sinX, 0,sinX,cosX);
+    mat3 rY = mat3(cosY,0,sinY, 0,1,0, -sinY,0,cosY);
+    mat3 rZ = mat3(cosZ,-sinZ,0, sinZ,cosZ,0, 0,0,1);
+
+    mat3 rot = rY * rX * rZ;
+
+    //p *= rot;
+    p = SDFG_MUL(rot, p);
+}
+]]>
+</Code>
+</FuncDef>
