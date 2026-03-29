@@ -82,9 +82,7 @@ jobs:
       run: dotnet restore src/SdfGlue.sln
 
     - name: Publish
-      shell: pwsh
-      run: |
-        dotnet publish src/SdfGlueEditor/SdfGlueEditor.csproj `
+      run: dotnet publish src/SdfGlueEditor/SdfGlueEditor.csproj `
         -c Release `
         -r win-x64 `
         -p:DebugType=none `
