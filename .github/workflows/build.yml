@@ -55,10 +55,7 @@ jobs:
       shell: pwsh
       run: |
         $version = "${{ steps.version.outputs.base }}.${{ github.run_number }}"
-        $isTag = "${{ startsWith(github.ref, 'refs/tags/release-') }}"
-
         echo "version=$version" >> $env:GITHUB_OUTPUT
-        echo "isTag=$isTag" >> $env:GITHUB_OUTPUT
 
 
     # Install the .NET Core workload
@@ -139,7 +136,8 @@ jobs:
     # tagged release
     - name: Create tagged release
       #if: inputs.upload_release == true
-      if: steps.fullversion.outputs.isTag == true
+      #if: steps.fullversion.outputs.isTag == true
+      if: startsWith(github.ref, 'refs/tags/release-')
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ github.ref_name }}
