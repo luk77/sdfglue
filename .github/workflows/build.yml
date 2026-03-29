@@ -104,7 +104,7 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         tag_name: latest
-        name: Latest build
+        name: Latest development build
         body: |
           Development build
           Version: ${{ steps.fullversion.outputs.version }}
