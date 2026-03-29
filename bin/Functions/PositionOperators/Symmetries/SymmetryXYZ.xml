@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Symmetries" displayName="Symmetry XYZ" functionName="opSymmetryXYZ">
+<Parameters>
+  <Param type="float" displayName="Offset X" parameterName="offsetX" default="0.0" speed="0.01"/>
+  <Param type="float" displayName="Offset Y" parameterName="offsetY" default="0.0" speed="0.01"/>
+  <Param type="float" displayName="Offset Z" parameterName="offsetZ" default="0.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opSymmetryXYZ(inout vec3 p, float offsetX, float offsetY, float offsetZ)
+{
+    p = abs(p) - vec3(offsetX, offsetY, offsetZ);
+}
+]]>
+</Code>
+</FuncDef>

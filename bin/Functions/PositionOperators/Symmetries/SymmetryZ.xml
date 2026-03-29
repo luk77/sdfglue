@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Symmetries" displayName="Symmetry Z" functionName="opSymmetryZ">
+<Parameters>
+  <Param type="float" displayName="Offset Z" parameterName="offsetZ" default="0.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opSymmetryZ(inout vec3 p, float offset)
+{
+    p.z = abs(p.z) - offset;
+}
+]]>
+</Code>
+</FuncDef>

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Symmetries" displayName="Smooth Symmetry X" functionName="opSmoothSymmetryX">
+<Parameters>
+  <Param type="float" displayName="Offset X"    parameterName="offsetX"         default="0.0" speed="0.01"/>
+  <Param type="float" displayName="Smoothness"  parameterName="smoothnessX"     default="0.0" speed="0.0001"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opSmoothSymmetryX(inout vec3 p, float offset, float smoothnessX)
+{
+    //p.x = abs(p.x) - offset;
+    p.x = sqrt(p.x*p.x + smoothnessX) - offset;
+}
+]]>
+</Code>
+</FuncDef>
