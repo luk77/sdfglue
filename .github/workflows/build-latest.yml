@@ -5,6 +5,10 @@ on:
   push:
     branches: [ "main" ]
 
+permissions:
+  # required to create and update GitHub releases (latest build)
+  contents: write
+
 jobs:
   build:
     uses: ./.github/workflows/build.yml
