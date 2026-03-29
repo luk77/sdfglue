@@ -1,19 +1,25 @@
-name: Build (reusable)
+name: Build SdfGlue (latest/release)
+
+#on:
+#  workflow_call:
+#    inputs:
+#      upload_latest:
+#        required: false
+#        type: boolean
+#        default: false
+#      upload_release:
+#        required: false
+#        type: boolean
+#        default: false
+#      tag_name:
+#        required: false
+#        type: string
 
 on:
-  workflow_call:
-    inputs:
-      upload_latest:
-        required: false
-        type: boolean
-        default: false
-      upload_release:
-        required: false
-        type: boolean
-        default: false
-      tag_name:
-        required: false
-        type: string
+  push:
+    branches: [ "main" ]
+    tags:
+      - "release-*"
 
 permissions:
   # required to create and update GitHub releases (latest build)
@@ -48,13 +54,11 @@ jobs:
       id: fullversion
       shell: pwsh
       run: |
-        if ("${{ inputs.upload_release }}" -eq "true") {
-          $version = "${{ steps.version.outputs.base }}"
-        } else {
-          $version = "${{ steps.version.outputs.base }}.${{ github.run_number }}"
-        }
+        $version = "${{ steps.version.outputs.base }}.${{ github.run_number }}"
+        $isTag = "${{ startsWith(github.ref, 'refs/tags/release-') }}"
 
         echo "version=$version" >> $env:GITHUB_OUTPUT
+        echo "isTag=$isTag" >> $env:GITHUB_OUTPUT
 
 
     # Install the .NET Core workload
@@ -86,14 +90,16 @@ jobs:
       run: dotnet restore src/SdfGlue.sln
 
     - name: Publish
-      run: dotnet publish src/SdfGlueEditor/SdfGlueEditor.csproj `
-        -c Release `
-        -r win-x64 `
-        -p:DebugType=none `
-        -p:DebugSymbols=false `
-        -p:Version=${{ steps.fullversion.outputs.version }} `
-        -p:FileVersion=${{ steps.fullversion.outputs.version }}
-        -o bin
+      shell: pwsh
+      run: |
+        dotnet publish src/SdfGlueEditor/SdfGlueEditor.csproj `
+          -c Release `
+          -r win-x64 `
+          -p:DebugType=none `
+          -p:DebugSymbols=false `
+          -p:Version=${{ steps.fullversion.outputs.version }} `
+          -p:FileVersion=${{ steps.fullversion.outputs.version }} `
+          -o bin
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
@@ -115,7 +121,7 @@ jobs:
 
     # latest (dev build)
     - name: Upload to "latest" release
-      if: inputs.upload_latest == true
+      #if: inputs.upload_latest == true
       uses: softprops/action-gh-release@v2
       with:
         tag_name: latest
@@ -132,10 +138,11 @@ jobs:
 
     # tagged release
     - name: Create tagged release
-      if: inputs.upload_release == true
+      #if: inputs.upload_release == true
+      if steps.fullversion.outputs.isTag == true
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ inputs.tag_name }}
+        tag_name: ${{ github.ref_name }}
         name: SdfGlue ${{ steps.fullversion.outputs.version }}
         body: |
           Release build

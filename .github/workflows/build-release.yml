@@ -1,9 +1,9 @@
 name: Build SdfGlue (release)
 
-on:
-  push:
-    tags:
-      - 'release-*'
+#on:
+#  push:
+#    tags:
+#      - 'release-*'
 
 permissions:
   # required to create and update GitHub releases (latest build)
