@@ -139,7 +139,7 @@ jobs:
     # tagged release
     - name: Create tagged release
       #if: inputs.upload_release == true
-      if steps.fullversion.outputs.isTag == true
+      if: steps.fullversion.outputs.isTag == true
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ github.ref_name }}
