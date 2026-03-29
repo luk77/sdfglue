@@ -1,5 +1,5 @@
 # SdfGlue
-[![Build SdfGlue (latest)](https://github.com/luk77/sdfglue/actions/workflows/build-latest.yml/badge.svg)](https://github.com/luk77/sdfglue/actions/workflows/build-latest.yml)
+[![Build SdfGlue (latest)](https://github.com/luk77/sdfglue/actions/workflows/build.yml/badge.svg)](https://github.com/luk77/sdfglue/actions/workflows/build.yml)
 
 **SdfGlue** is a tool for creating and modeling complex 3D objects using **Signed Distance Fields (SDF)**.
 

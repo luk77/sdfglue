@@ -1,20 +1,5 @@
 name: Build SdfGlue (latest/release)
 
-#on:
-#  workflow_call:
-#    inputs:
-#      upload_latest:
-#        required: false
-#        type: boolean
-#        default: false
-#      upload_release:
-#        required: false
-#        type: boolean
-#        default: false
-#      tag_name:
-#        required: false
-#        type: string
-
 on:
   push:
     branches: [ "main" ]
@@ -105,20 +90,17 @@ jobs:
         path: bin
 
     - name: Create ZIP (for "latest" release)
-      #if: inputs.upload_latest == true
       shell: pwsh
       run: |
         Compress-Archive -Path bin\* -DestinationPath SdfGlue-latest.zip
 
     - name: Create ZIP (for tagged release)
-      #if: inputs.upload_release == true
       shell: pwsh
       run: |
         Compress-Archive -Path bin\* -DestinationPath SdfGlue-${{ steps.fullversion.outputs.version }}.zip
 
     # latest (dev build)
     - name: Upload to "latest" release
-      #if: inputs.upload_latest == true
       uses: softprops/action-gh-release@v2
       with:
         tag_name: latest
@@ -135,8 +117,7 @@ jobs:
 
     # tagged release
     - name: Create tagged release
-      #if: inputs.upload_release == true
-      #if: steps.fullversion.outputs.isTag == true
+      # check for tag
       if: startsWith(github.ref, 'refs/tags/release-')
       uses: softprops/action-gh-release@v2
       with:
