@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Repetitions" displayName="Smooth Infinite Repeat XYZ" functionName="opSmoothInfRepeatXYZ" exportsCellIndex="true">
+<Parameters>
+  <Param type="float" displayName="Spacing X" parameterName="spacingX" default="1.0" speed="0.01"/>
+  <Param type="float" displayName="Spacing Y" parameterName="spacingY" default="1.0" speed="0.01"/>
+  <Param type="float" displayName="Spacing Z" parameterName="spacingZ" default="1.0" speed="0.01"/>
+  <Param type="float" displayName="Smoothness X" parameterName="smoothnessX"  default="0.0" speed="0.001"/>
+  <Param type="float" displayName="Smoothness Y" parameterName="smoothnessY"  default="0.0" speed="0.001"/>
+  <Param type="float" displayName="Smoothness Z" parameterName="smoothnessZ"  default="0.0" speed="0.001"/>
+</Parameters>
+<Code>
+<![CDATA[
+float opSmoothInfRepeatXYZ(inout vec3 p, float spacingX, float spacingY, float spacingZ, float smoothnessX, float smoothnessY, float smoothnessZ)
+{
+    vec3 spacing = vec3(spacingX, spacingY, spacingZ);
+    vec3 smoothness = vec3(smoothnessX, smoothnessY, smoothnessZ);
+    vec3 halfsize = spacing*0.5;
+    vec3 c = floor((p + halfsize)/spacing);
+    float cellIndex = c.x + c.y + c.z + PI * sin(c.x * c.y * c.z);
+    p = modEx(p + halfsize, spacing, smoothness) - halfsize;
+
+    return cellIndex;
+}
+]]>
+</Code>
+</FuncDef>

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Repetitions" displayName="Infinite Repeat XYZ" functionName="opInfRepeatXYZ" exportsCellIndex="true">
+<Parameters>
+  <Param type="float" displayName="Spacing X" parameterName="spacingX" default="1.0" speed="0.01"/>
+  <Param type="float" displayName="Spacing Y" parameterName="spacingY" default="1.0" speed="0.01"/>
+  <Param type="float" displayName="Spacing Z" parameterName="spacingZ" default="1.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+float opInfRepeatXYZ(inout vec3 p, float spacingX, float spacingY, float spacingZ)
+{
+    vec3 spacing = vec3(spacingX, spacingY, spacingZ);
+    vec3 halfsize = spacing*0.5;
+    vec3 c = floor((p + halfsize)/spacing);
+    float cellIndex = c.x + c.y + c.z + PI * sin(c.x * c.y * c.z);
+    p = mod(p + halfsize, spacing) - halfsize;
+
+    return cellIndex;
+}
+]]>
+</Code>
+</FuncDef>

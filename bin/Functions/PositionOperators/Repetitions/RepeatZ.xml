@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Repetitions" displayName="Infinite Repeat Z" functionName="opInfRepeatZ" exportsCellIndex="true">
+<Parameters>
+  <Param type="float" displayName="Spacing Z" parameterName="spacingZ" default="1.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+float opInfRepeatZ(inout vec3 p, float spacing)
+{
+    float halfsize = spacing*0.5;
+    float cellIndex = floor((p.z + halfsize)/spacing);
+    p.z = mod(p.z + halfsize, spacing) - halfsize;
+
+    return cellIndex;
+}
+]]>
+</Code>
+</FuncDef>

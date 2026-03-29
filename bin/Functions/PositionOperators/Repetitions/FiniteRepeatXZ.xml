@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Repetitions" displayName="Finite Repeat XZ" functionName="opFiniteRepeatXZ" exportsCellIndex="true">
+<Parameters>
+  <Param type="float" displayName="Spacing X" parameterName="spacingX" default="1.0" speed="0.01"/>
+  <Param type="float" displayName="Spacing Z" parameterName="spacingZ" default="1.0" speed="0.01"/>
+  <Param type="int" displayName="Repetitions X" parameterName="repX" default="1" speed="0.1" min="0"/>
+  <Param type="int" displayName="Repetitions Z" parameterName="repZ" default="1" speed="0.1" min="0"/>
+</Parameters>
+<References>https://www.shadertoy.com/view/3syGzz</References>
+<Code>
+<![CDATA[
+float opFiniteRepeatXZ(inout vec3 p, float spacingX, float spacingZ, int repX, int repZ)
+{
+    vec2 spacing        = vec2(spacingX, spacingZ);
+    vec2 repetitions    = vec2(repX, repZ);
+    
+    // cell index
+    vec2 halfsize = spacing*0.5;
+    vec2 c = floor((p.xz + halfsize)/spacing);
+    float cellIndex = c.x + c.y + PI * sin(c.x * c.y);
+    
+    //p.xz = min(p.xz, p.xz - spacing * clamp(round(p.xz / spacing), -repetitions, repetitions));
+    p.xz = p.xz - spacing * clamp(round(p.xz / spacing), vec2(0.0), repetitions);
+    
+    return cellIndex;
+}
+]]>
+</Code>
+</FuncDef>

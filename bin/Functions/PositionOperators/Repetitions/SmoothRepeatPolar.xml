@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Repetitions" displayName="Smooth Polar Repeat" functionName="opSmoothPolarRepeat" exportsCellIndex="true">
+<Parameters>
+  <Param type="float" displayName="Repetitions"         parameterName="repetitions" default="1.0" speed="0.01"/>
+  <Param type="float" displayName="Offset from center"  parameterName="offsetX"     default="0.0" speed="0.01"/>
+  <Param type="float" displayName="Angle offset"        parameterName="offsetAngle" default="0.0" speed="0.01"/>
+  <Param type="float" displayName="Smoothness"          parameterName="smoothness"  default="0.0" speed="0.001"/>
+</Parameters>
+<References>https://mercury.sexy/</References>
+<Code>
+<![CDATA[
+// From: HG_SDF (License: MIT)
+// https://mercury.sexy/
+// Repeat around the origin by a fixed angle.
+// For easier use, num of repetitions is use to specify the angle.
+float opSmoothPolarRepeat(inout vec3 p, in float repetitions, in float offsetX, in float offsetAngle, in float smoothness)
+{
+    vec2 p2 = p.xz;
+
+    float angle = 2.0*PI/repetitions;
+    float a = atan(p2.y, p2.x) + angle/2. + offsetAngle;
+    float r = length(p2);
+    float c = floor(a/angle);
+    a = modEx(a,angle, smoothness) - angle/2.;
+    p2 = vec2(cos(a), sin(a))*r;
+    // For an odd number of repetitions, fix cell index of the cell in -x direction
+    // (cell index would be e.g. -5 and 5 in the two halves of the cell):
+    if (abs(c) >= (repetitions/2.0)) 
+        c = abs(c);
+        
+    p.xz = p2;
+
+    p.x -= offsetX;
+
+    return c;
+}
+]]>
+</Code>
+</FuncDef>

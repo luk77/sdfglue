@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Repetitions" displayName="Finite Repeat XYZ (centered)" functionName="opFiniteRepeatCenteredXYZ" exportsCellIndex="true">
+<Parameters>
+  <Param type="float" displayName="Spacing X" parameterName="spacingX" default="1.0" speed="0.01"/>
+  <Param type="float" displayName="Spacing Y" parameterName="spacingY" default="1.0" speed="0.01"/>
+  <Param type="float" displayName="Spacing Z" parameterName="spacingZ" default="1.0" speed="0.01"/>
+  <Param type="int" displayName="Repetitions X" parameterName="repX" default="1" speed="0.1" min="0"/>
+  <Param type="int" displayName="Repetitions Y" parameterName="repY" default="1" speed="0.1" min="0"/>
+  <Param type="int" displayName="Repetitions Z" parameterName="repZ" default="1" speed="0.1" min="0"/>
+</Parameters>
+<References>https://www.shadertoy.com/view/3syGzz</References>
+<Code>
+<![CDATA[
+float opFiniteRepeatCenteredXYZ(inout vec3 p, float spacingX, float spacingY, float spacingZ, int repX, int repY, int repZ)
+{
+    vec3 spacing        = vec3(spacingX, spacingY, spacingZ);
+    vec3 repetitions    = vec3(repX, repY, repZ);
+
+    // centering
+    p += 0.5 * repetitions * spacing;
+
+    // cell index
+    vec3 halfsize = spacing*0.5;
+    vec3 evenCorrection = vec3(1.0);//floor(1.0 + mod(repetitions, 2.0));
+    vec3 c = floor((p + evenCorrection * halfsize)/spacing);
+    
+    float cellIndex = c.x + c.y + PI * sin(c.x * c.y) + PI * sin(0.88 + c.x * c.y * c.z);
+
+    p = p - spacing * clamp(round(p / spacing), vec3(0.0), repetitions);
+    
+    return cellIndex;
+}
+]]>
+</Code>
+</FuncDef>

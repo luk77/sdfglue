@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Repetitions" displayName="Finite Repeat X (centered)" functionName="opFiniteRepeatCenteredX" exportsCellIndex="true">
+<Parameters>
+  <Param type="float" displayName="Spacing X" parameterName="spacingX" default="1.0" speed="0.01"/>
+  <Param type="int" displayName="Repetitions X" parameterName="repX" default="1" speed="0.1" min="0"/>
+</Parameters>
+<References>https://www.shadertoy.com/view/3syGzz</References>
+<Code>
+<![CDATA[
+float opFiniteRepeatCenteredX(inout vec3 p, float spacing, int repetitions)
+{
+    // centering
+    p.x += 0.5 * repetitions * spacing;
+
+    float cellIndex = floor((p.x + spacing*0.5)/spacing);
+    
+    p.x = p.x - spacing * clamp(round(p.x / spacing), 0.0, repetitions);
+
+    return cellIndex;
+}
+]]>
+</Code>
+</FuncDef>
