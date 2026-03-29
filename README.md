@@ -9,6 +9,14 @@ A key feature of SdfGlue is its **open and extensible architecture**. The system
 
 The project is heavily inspired by **Shadertoy** and the work of its community. SdfGlue is largely compatible with Shadertoy — generated code can be exported and reused within that platform.
 
+### About the project status
+
+**SdfGlue** is currently a hobby project developed and maintained by a single person. As such, you may encounter some rough edges while using it.
+
+- Minor bugs may occur — if you run into any issues, feel free to report them in the Issues section.
+- Some features are experimental and not yet fully functional (e.g. 4D raymarching, shader export to Unity).
+- There is currently no formal documentation. While the core functionality should be relatively intuitive, some areas would benefit from more detailed explanations. Documentation (written or video) is planned for the future.
+
 # Downloads
 - [Latest build](https://github.com/luk77/sdfglue/releases/tag/latest)
 - [All releases](https://github.com/luk77/sdfglue/releases)
@@ -62,13 +70,16 @@ To run the application directly from Visual Studio:
 
 
 # Credits
-**SdfGlue** created and maintained by [Łukasz Lesicki](https://github.com/luk77)
+**SdfGlue** is created and maintained by [Łukasz Lesicki](https://github.com/luk77).
 
-This project was made possible thanks to several amazing tools, libraries, and communities:
-- **Dear ImGui** — for providing an excellent immediate-mode GUI framework
-- **OpenTK** — for OpenGL bindings
-- **Shadertoy** — for inspiration and as a reference platform for SDF and raymarching techniques
-- **Inigo Quilez (iq)** — for pioneering work on SDFs, raymarching, and countless invaluable articles and examples (https://iquilezles.org/)
+Special thanks to the following tools, resources, and communities:
+- **[Dear ImGui](https://github.com/ocornut/imgui)** — immediate-mode GUI framework  
+- **[OpenTK](https://opentk.net/)** — OpenGL bindings for .NET  
+- **[ImGui.NET OpenTK Sample](https://github.com/NogginBops/ImGui.NET_OpenTK_Sample)** — reference for ImGui + OpenTK integration  
+- **[Shadertoy](https://www.shadertoy.com/)** — inspiration and reference platform for SDF and raymarching  
+- **[Inigo Quilez (iq)](https://iquilezles.org/)** — foundational work on SDFs and raymarching  
+- **[LearnOpenGL](https://learnopengl.com/)** — OpenGL tutorials and rendering knowledge base  
+
 
 # License
 This project is licensed under the **MIT License**. See the [LICENSE.md](LICENSE.md) file for details.
