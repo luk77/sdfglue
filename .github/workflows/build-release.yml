@@ -1,0 +1,14 @@
+name: Build SdfGlue (release)
+
+on:
+  push:
+    tags:
+      - 'release-*'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+    with:
+      upload_latest: true
+      upload_release: true
+      tag_name: ${{ github.ref_name }}

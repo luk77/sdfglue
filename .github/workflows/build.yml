@@ -1,0 +1,143 @@
+name: Build (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      upload_latest:
+        required: false
+        type: boolean
+        default: false
+      upload_release:
+        required: false
+        type: boolean
+        default: false
+      tag_name:
+        required: false
+        type: string
+
+permissions:
+  # required to create and update GitHub releases (latest build)
+  contents: write
+
+env:
+  # To avoid warning: 
+  # Node.js 20 actions are deprecated. The following actions are running on Node.js 20 
+  # and may not work as expected
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Extract base version
+      id: version
+      shell: pwsh
+      run: |
+        [xml]$xml = Get-Content "src\Directory.Build.props"
+        $baseVersion = $xml.Project.PropertyGroup.Version
+
+        echo "base=$baseVersion" >> $env:GITHUB_OUTPUT
+    
+    - name: Compose full version
+      id: fullversion
+      shell: pwsh
+      run: |
+        $version = "${{ steps.version.outputs.base }}.${{ github.run_number }}"
+        echo "version=$version" >> $env:GITHUB_OUTPUT
+
+
+
+    # Install the .NET Core workload
+    - name: Install .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Clean output
+      run: |
+        if (Test-Path bin) {
+          Remove-Item bin\*.dll -ErrorAction SilentlyContinue
+          Remove-Item bin\*.exe -ErrorAction SilentlyContinue
+          Remove-Item bin\SdfGlue.deps.json -ErrorAction SilentlyContinue
+          Remove-Item bin\SdfGlue.runtimeconfig.json -ErrorAction SilentlyContinue
+        }
+      shell: pwsh
+
+    # Cache NuGet
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          nuget-${{ runner.os }}-
+
+    - name: Restore
+      run: dotnet restore src/SdfGlue.sln
+
+    - name: Publish
+      shell: pwsh
+      run: |
+        dotnet publish src/SdfGlueEditor/SdfGlueEditor.csproj `
+        -c Release `
+        -r win-x64 `
+        -p:DebugType=none `
+        -p:DebugSymbols=false `
+        -p:Version=${{ steps.fullversion.outputs.version }} `
+        -p:FileVersion=${{ steps.fullversion.outputs.version }}
+        -o bin
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: SdfGlue-${{ steps.fullversion.outputs.version }}
+        path: bin
+
+    - name: Create ZIP (for "latest" release)
+      shell: pwsh
+      run: |
+        Compress-Archive -Path bin\* -DestinationPath SdfGlue-latest.zip
+
+    - name: Create ZIP (for tagged release)
+      shell: pwsh
+      run: |
+        Compress-Archive -Path bin\* -DestinationPath SdfGlue-${{ steps.fullversion.outputs.version }}.zip
+
+    # latest (dev build)
+    - name: Upload to "latest" release
+      if: inputs.upload_latest == true
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: latest
+        name: Latest build
+        body: |
+          Development build
+          Version: ${{ steps.fullversion.outputs.version }}
+          Commit: ${{ github.sha }}
+        files: SdfGlue-latest.zip
+        prerelease: true
+        make_latest: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # tagged release
+    - name: Create tagged release
+      if: inputs.upload_release == true
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ inputs.tag_name }}
+        name: SdfGlue ${{ steps.fullversion.outputs.version }}
+        body: |
+          Release build
+          Version: ${{ steps.fullversion.outputs.version }}
+          Commit: ${{ github.sha }}
+        files: SdfGlue-${{ steps.fullversion.outputs.version }}.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
