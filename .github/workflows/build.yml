@@ -48,10 +48,13 @@ jobs:
       id: fullversion
       shell: pwsh
       run: |
-        #$version = "${{ steps.version.outputs.base }}.${{ github.run_number }}"
-        $version = "${{ steps.version.outputs.base }}.${{ github.run_id }}"
-        echo "version=$version" >> $env:GITHUB_OUTPUT
+        if ("${{ inputs.upload_release }}" -eq "true") {
+          $version = "${{ steps.version.outputs.base }}"
+        } else {
+          $version = "${{ steps.version.outputs.base }}.${{ github.run_number }}"
+        }
 
+        echo "version=$version" >> $env:GITHUB_OUTPUT
 
 
     # Install the .NET Core workload
