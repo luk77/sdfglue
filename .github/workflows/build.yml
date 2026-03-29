@@ -108,13 +108,13 @@ jobs:
         path: bin
 
     - name: Create ZIP (for "latest" release)
-      if: inputs.upload_latest == true
+      #if: inputs.upload_latest == true
       shell: pwsh
       run: |
         Compress-Archive -Path bin\* -DestinationPath SdfGlue-latest.zip
 
     - name: Create ZIP (for tagged release)
-      if: inputs.upload_release == true
+      #if: inputs.upload_release == true
       shell: pwsh
       run: |
         Compress-Archive -Path bin\* -DestinationPath SdfGlue-${{ steps.fullversion.outputs.version }}.zip
