@@ -18,7 +18,8 @@ The project is heavily inspired by **Shadertoy** and the work of its community. 
 - There is currently no formal documentation. While the core functionality should be relatively intuitive, some areas would benefit from more detailed explanations. Documentation (written or video) is planned for the future.
 
 # Downloads
-- [Latest build](https://github.com/luk77/sdfglue/releases/tag/latest)
+- [Latest stable release](https://github.com/luk77/sdfglue/releases/latest)
+- [Latest development build](https://github.com/luk77/sdfglue/releases/tag/latest)
 - [All releases](https://github.com/luk77/sdfglue/releases)
 
 # Features
