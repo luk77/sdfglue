@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="2d to 3d" displayName="Revolution with twist (sin funct.)" functionName="opRevolutionTwistedSin">
+<Parameters>
+  <Param type="float" displayName="Radius"              parameterName="radius"          default="1.0"  speed="0.01"/>
+  <Param type="float" displayName="Cycles"              parameterName="cycles"          default="3.0"  speed="0.01"/>
+  <Param type="float" displayName="Amplitude"           parameterName="amplitude"       default="0.5"  speed="0.01"/>
+  <Param type="float" displayName="Inner rotation"      parameterName="innerRot"        default="0.0"  speed="0.01"/>
+  <Param type="float" displayName="Angle offset"        parameterName="angleOffset"     default="0.0"  speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opRevolutionTwistedSin(inout vec3 p, in float radius, in float cycles, in float amplitude, in float innerRot, in float angleOffset)
+{
+    float a = atan(p.z, p.x);
+    g_shapeLoop = a;
+    
+    p.xz *= mat2(cos(a), sin(a), -sin(a), cos(a));
+    p.x -= radius;
+    
+    a += PI;
+    
+    float a2 = a * cycles;
+
+    a2 = innerRot + amplitude * 0.5 * sin(a2 + angleOffset * PI);
+
+    p.xy *= mat2(cos(a2), sin(a2), -sin(a2), cos(a2));
+
+    p.xz = vec2(length(p.xz), p.y);
+}
+]]>
+</Code>
+</FuncDef>

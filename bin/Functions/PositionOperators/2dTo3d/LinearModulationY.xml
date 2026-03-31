@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="2d to 3d" displayName="Linear modulation Y" functionName="opLinearModulationY">
+<Parameters>
+</Parameters>
+<Code>
+<![CDATA[
+// This is pseudo-operator used together with 2d modulated shapes.
+// It only saves Y position in global variable for use by these shapes.
+void opLinearModulationY(inout vec3 p)
+{
+    g_shapeLoop = p.y;
+}
+]]>
+</Code>
+</FuncDef>

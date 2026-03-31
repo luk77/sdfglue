@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="2d to 3d" displayName="Revolution" functionName="opRevolution">
+<Parameters>
+  <Param type="float" displayName="Radius" parameterName="radius" default="1.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opRevolution(inout vec3 p, in float radius)
+{
+    g_shapeLoop = atan(p.z, p.x);
+
+    p.xz = vec2(length(p.xz) - radius, p.y);
+}
+]]>
+</Code>
+</FuncDef>

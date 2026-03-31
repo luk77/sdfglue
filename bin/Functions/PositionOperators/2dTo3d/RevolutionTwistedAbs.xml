@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="2d to 3d" displayName="Revolution with twist (abs)" functionName="opRevolutionTwistedAbs">
+<Parameters>
+  <Param type="float" displayName="Radius"              parameterName="radius"          default="1.0"  speed="0.01"/>
+  <Param type="float" displayName="Cycles"              parameterName="cycles"          default="3.0"  speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opRevolutionTwistedAbs(inout vec3 p, in float radius, in float cycles)
+{
+    float a = atan(p.z, p.x);
+    g_shapeLoop = a;
+
+    p.xz *= mat2(cos(a), sin(a), -sin(a), cos(a));
+    p.x -= radius;
+    float a2 = abs(a * cycles);
+
+    p.xy *= mat2(cos(a2), sin(a2), -sin(a2), cos(a2));
+
+    p.xz = vec2(length(p.xz), p.y);    
+}
+]]>
+</Code>
+</FuncDef>

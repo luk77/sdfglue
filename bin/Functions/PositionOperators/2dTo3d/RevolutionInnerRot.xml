@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="2d to 3d" displayName="Revolution with inner rot" functionName="opRevolutionInnerRot">
+<Parameters>
+  <Param type="float" displayName="Radius" parameterName="radius" default="1.0" speed="0.01"/>
+  <Param type="float" displayName="Inner rotation" parameterName="innerRot" default="0.0"  speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opRevolutionInnerRot(inout vec3 p, in float radius, in float innerRot)
+{
+    float a = atan(p.z, p.x);
+    g_shapeLoop = a;
+    
+    p.xz *= mat2(cos(a), sin(a), -sin(a), cos(a));
+    p.x -= radius;
+    float a2 = PI * innerRot;
+
+    p.xy *= mat2(cos(a2), sin(a2), -sin(a2), cos(a2));
+
+    p.xz = vec2(length(p.xz), p.y);
+}
+]]>
+</Code>
+</FuncDef>

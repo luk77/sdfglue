@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="2d to 3d" displayName="Revolution deformed by sinus" functionName="opRevolutionDeformedSin">
+<Parameters>
+  <Param type="float" displayName="Radius"                  parameterName="radius"      default="1.0" speed="0.01"/>
+  <Param type="float" displayName="Deformation cycles"      parameterName="cycles"      default="3.0" speed="0.01"/>
+  <Param type="float" displayName="Deformation amplitude"   parameterName="amplitude"   default="0.1" speed="0.01"/>
+  <Param type="float" displayName="Deformation power"       parameterName="power"       default="1.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+void opRevolutionDeformedSin(inout vec3 p, in float radius, in float cycles, in float amplitude, in float power)
+{
+    float a = atan(p.z, p.x);
+    g_shapeLoop = a;
+
+    radius += amplitude * pow(0.5 + 0.5 * cos(cycles * a), power);
+
+    p.xz = vec2(length(p.xz) - radius, p.y);
+}
+]]>
+</Code>
+</FuncDef>
