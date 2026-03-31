@@ -300,11 +300,9 @@ vec3 applySingleLightBlinnPhong(
     return diffuse + specular;
 }
 
-vec3 shadeBlinnPhong(vec3 ro, vec3 p, vec3 normal)
+vec3 shadeBlinnPhong(vec3 ro, vec3 p, vec3 normal, Material material)
 {
     vec3 finalColor = vec3(0.0);
-
-    Material material = gen_getMaterial(p).material;
 
     finalColor += renderer_ambientLight_color * material.colorAmbient;
 
@@ -373,7 +371,7 @@ vec3 shade(vec3 ro, vec3 rd, vec3 p, vec3 normal, MaterialDesc matDesc, vec3 fog
 #if USE_PBR
         vec3 col = shadePBR(ro, p, normal);
 #else
-        vec3 col = shadeBlinnPhong(ro, p, normal);
+        vec3 col = shadeBlinnPhong(ro, p, normal, matDesc.material);
 #endif        
 
 #if USE_FOG

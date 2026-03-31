@@ -5,7 +5,7 @@
 </Parameters>
 <Code>
 <![CDATA[
-void opRotate(inout vec3 p, vec3 rotation)
+void opRotate(inout SDFG_VEC p, vec3 rotation)
 {
     float sinX = sin(-rotation.x);
     float cosX = cos(-rotation.x);
@@ -31,7 +31,8 @@ void opRotate(inout vec3 p, vec3 rotation)
     mat3 rot = rY * rX * rZ;
 
     //p *= rot;
-    p = SDFG_MUL(rot, p);
+    //p = SDFG_MUL(rot, p);
+    p.xyz = SDFG_MUL(rot, p.xyz);
 }
 ]]>
 </Code>
