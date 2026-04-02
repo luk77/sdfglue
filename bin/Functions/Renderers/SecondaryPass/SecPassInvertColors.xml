@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Secondary passes" displayName="Invert colors" functionName="SecPassInvertColors">
+<Parameters>
+    <Param type="float" displayName="InvertMix"   parameterName="invertMix"      default="1.0" min="0.0" max="1.0"/>
+</Parameters>
+<Code>
+<![CDATA[
+
+//-------------------------------------------------------------------------------
+// main
+//-------------------------------------------------------------------------------
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = convertFragCoordsToUv(fragCoord);
+
+    //vec4 thisPassOutput = texture(iChannel0, uv);
+    vec4 prevPassOutput = texture(iChannel1, uv);
+
+    vec4 col = prevPassOutput;
+    
+    // invert color
+    col.rgb = mix(col.rgb, vec3(1.0) - col.rgb, renderer_invertMix);
+
+    col.a = 1.0;
+
+    // output to screen
+    fragColor = col;
+}
+
+]]>
+</Code>
+</FuncDef>
