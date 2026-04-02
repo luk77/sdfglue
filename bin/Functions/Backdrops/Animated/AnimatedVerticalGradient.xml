@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Animated" displayName="Animated vertical gradient" functionName="backdropAnimatedVerticalGradient">
+<Author>luk77</Author>
+<License>MIT</License>
+<Description>based on "Matheads" shader</Description>
+<Parameters>
+  <Param type="vec3"    displayName="Color (top)"       parameterName="colorTop"        default="0.0;0.9;0.8"       speed="0.01" editor="color"/>
+  <Param type="vec3"    displayName="Color (bottom)"    parameterName="colorBottom"     default="0.9;0.8;0.8"       speed="0.01" editor="color"/>
+  <Param type="float"   displayName="Speed"             parameterName="animSpeed"       default="0.5"               speed="0.001" />
+  <Param type="float"   displayName="Amplitude"         parameterName="animAmp"         default="0.1"               speed="0.001" />
+</Parameters>
+<Code>
+<![CDATA[
+vec3 backdropAnimatedVerticalGradient(in vec3 dir, in vec3 colorTop, in vec3 colorBottom, in float animSpeed, in float animAmp)
+{
+    vec3 color = mix(colorBottom, colorTop, dir.y * 0.5 + 0.5);
+
+    color += animAmp * vec3( sin(1.36 * iTime * animSpeed),
+                             sin(1.22 * iTime * animSpeed),
+                             sin(1.54 * iTime * animSpeed) );
+
+    color = clamp(color, 0.0, 1.0);
+
+    return color;
+}
+]]>
+</Code>
+</FuncDef>

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef displayName="Vertical gradient" functionName="backdropVerticalGradient">
+<Author>luk77</Author>
+<License>MIT</License>
+<Parameters>
+  <Param type="vec3"    displayName="Color (top)"       parameterName="colorTop"                default="0.1;0.4;0.8"   speed="0.01" editor="color"/>
+  <Param type="vec3"    displayName="Color (bottom)"    parameterName="colorBottom"             default="0.3;0.2;0.1"   speed="0.01" editor="color"/>
+  <Param type="float"   displayName="Contrast multiplier"   parameterName="contrastMul"         default="1.0"           speed="0.01"/>
+  <Param type="float"   displayName="Contrast power"        parameterName="contrastPow"         default="1.0"           speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+vec3 backdropVerticalGradient(in vec3 dir, in vec3 colorTop, in vec3 colorBottom, in float contrastMul, in float contrastPow)
+{
+    vec3 color = mix(colorBottom, colorTop, 0.5 * dir.y + 0.5);
+
+    // contrast
+    color *= contrastMul;
+    color = pow(color, vec3(contrastPow));
+
+    color = clamp(color, 0.0, 1.0);
+
+    return color;
+}
+]]>
+</Code>
+</FuncDef>

@@ -294,10 +294,23 @@
           <PValue name="cameraSafeAreaSmoothness" type="float">0.1</PValue>
         </ParametersValues>
         <Backdrop>
-          <DefinitionName>backdropDefault</DefinitionName>
+          <DefinitionName>backdropAnimatedVerticalGradient</DefinitionName>
           <CompilationParametersValues />
           <ParametersValues>
             <PValue name="bgColor" type="vec3">0.9;0.7271123;0.6000001</PValue>
+            <PValue name="colorTop" type="vec3">0.5505153;0.80946875;0.87137455</PValue>
+            <PValue name="colorBottom" type="vec3">0.29886508;0.23404188;0.16921869</PValue>
+            <PValue name="contrastMul" type="float">1</PValue>
+            <PValue name="contrastPow" type="float">1</PValue>
+            <PValue name="animSpeed" type="float">0.165</PValue>
+            <PValue name="animAmp" type="float">0.244</PValue>
+            <PValue name="colorMiddle" type="vec3">0.6;0.4;0.4</PValue>
+            <PValue name="animOffset" type="float">0</PValue>
+            <PValue name="freq" type="float">1</PValue>
+            <PValue name="color0" type="vec3">0;0;0</PValue>
+            <PValue name="color1" type="vec3">0.3;0;0.1</PValue>
+            <PValue name="color2" type="vec3">0.5;0.7;0</PValue>
+            <PValue name="color3" type="vec3">0.2;0.5;0.8</PValue>
           </ParametersValues>
         </Backdrop>
         <CameraOperators>
