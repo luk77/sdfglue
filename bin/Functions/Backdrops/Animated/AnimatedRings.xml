@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Animated" displayName="Animated rings" functionName="backdropAnimatedRings">
+<Author>luk77</Author>
+<License>MIT</License>
+<Parameters>
+  <Param type="vec3"    displayName="Color (top)"           parameterName="colorTop"        default="0.8;0.9;0.9"       speed="0.01" editor="color"/>
+  <Param type="vec3"    displayName="Color (bottom)"        parameterName="colorBottom"     default="0.14;0.2;0.3"      speed="0.01" editor="color"/>
+  <Param type="float"   displayName="Animation offset"      parameterName="animOffset"      default="0.0"               speed="0.01" />
+  <Param type="float"   displayName="Animation speed"       parameterName="animSpeed"       default="0.5"               speed="0.01" />
+  <Param type="float"   displayName="Rings frequency"       parameterName="freq"            default="1.0"               speed="0.01" />
+  <Param type="float"   displayName="Contrast multiplier"   parameterName="contrastMul"                 default="1.0"           speed="0.01"/>
+  <Param type="float"   displayName="Contrast power"        parameterName="contrastPow"                 default="1.0"           speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+vec3 backdropAnimatedRings(in vec3 dir, in vec3 colorTop, in vec3 colorBottom, in float animOffset, in float animSpeed, in float freq, in float contrastMul, in float contrastPow)
+{
+    float sinArg = animOffset + iTime * animSpeed + freq * PI * dir.y;
+
+    float param01 = 0.5 + 0.5 * sin(sinArg);
+
+    vec3 color = mix(colorBottom, colorTop, param01);
+
+    // light gradient from top to bottom
+    color *= 0.5 * dir.y + 0.5;
+
+    // contrast
+    color *= contrastMul;
+    color = pow(color, vec3(contrastPow));
+
+    return color;
+}
+]]>
+</Code>
+</FuncDef>

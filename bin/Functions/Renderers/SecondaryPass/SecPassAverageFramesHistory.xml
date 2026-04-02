@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Secondary passes" displayName="Average frames history" functionName="SecPassAverageFramesHistory">
+<Parameters>
+  <Param type="int" displayName="History length" parameterName="historyLength"      default="10" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+
+//-------------------------------------------------------------------------------
+// main
+//-------------------------------------------------------------------------------
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = convertFragCoordsToUv(fragCoord);
+
+    vec4 thisPassOutput = texture(iChannel0, uv);
+    vec4 prevPassOutput = texture(iChannel1, uv);
+
+    float step = 1.0/float(renderer_historyLength);
+
+    vec4 col =  thisPassOutput * (1. - step);
+    
+    col += prevPassOutput * step;
+    
+    col.a = 1.0;
+
+    // output to screen
+    fragColor = col;
+}
+
+]]>
+</Code>
+</FuncDef>

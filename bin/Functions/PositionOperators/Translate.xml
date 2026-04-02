@@ -5,9 +5,9 @@
 </Parameters>
 <Code>
 <![CDATA[
-void opTranslate(inout vec3 p, vec3 offset)
+void opTranslate(inout SDFG_VEC p, vec3 offset)
 {
-    p -= offset;
+    p.xyz -= offset;
 }
 ]]>
 </Code>

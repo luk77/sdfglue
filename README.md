@@ -89,3 +89,5 @@ Special thanks to the following tools, resources, and communities:
 
 # License
 This project is licensed under the **MIT License**. See the [LICENSE.md](LICENSE.md) file for details.
+
+Example projects in the `bin/Examples/` directory are licensed separately under the [Creative Commons Attribution 4.0 International License (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).

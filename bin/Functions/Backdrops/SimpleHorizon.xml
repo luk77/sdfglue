@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef displayName="Simple horizon" functionName="backdropSimpleHorizon">
+<Author>luk77</Author>
+<License>MIT</License>
+<Parameters>
+  <Param type="vec3"    displayName="Color (top)"       parameterName="colorTop"                default="0.1;0.4;0.8"   speed="0.01" editor="color"/>
+  <Param type="vec3"    displayName="Color (middle)"    parameterName="colorMiddle"             default="0.6;0.4;0.4"   speed="0.01" editor="color"/>
+  <Param type="vec3"    displayName="Color (bottom)"    parameterName="colorBottom"             default="0.3;0.2;0.1"   speed="0.01" editor="color"/>
+  <Param type="float"   displayName="Contrast multiplier"   parameterName="contrastMul"         default="1.0"           speed="0.01"/>
+  <Param type="float"   displayName="Contrast power"        parameterName="contrastPow"         default="1.0"           speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+vec3 backdropSimpleHorizon(
+    in vec3 dir,
+    in vec3 colorTop,
+    in vec3 colorMiddle,
+    in vec3 colorBottom,
+    in float contrastMul,
+    in float contrastPow
+)
+{
+    float t = 0.5 * dir.y + 0.5; // [-1,1] -> [0,1]
+    
+    vec3 bottomToMid = mix(colorBottom, colorMiddle, t * 2.0);
+    vec3 midToTop    = mix(colorMiddle, colorTop, (t - 0.5) * 2.0);
+
+    vec3 color = mix(bottomToMid, midToTop, step(0.5, t));
+
+    // contrast
+    color *= contrastMul;
+    color = pow(color, vec3(contrastPow));
+    color = clamp(color, 0.0, 1.0);
+
+    return color;
+}
+]]>
+</Code>
+</FuncDef>

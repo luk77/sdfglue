@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Secondary passes" displayName="Circle blur DOF" functionName="SecPassBlurCircleDOF">
+<Parameters>
+  <Param type="float"   displayName="Blur radius"       parameterName="blurRadius"      default="1.0"   speed="0.01"/>
+  <Param type="int"     displayName="Samples"           parameterName="numSamples"      default="12"    speed="0.1"     min="2"     max="256"/>
+  <Param type="float"   displayName="Focus distance"    parameterName="focusDist01"     default="0.1"   speed="0.01"    min="0.0"   max="1.0"/>
+</Parameters>
+<Includes>
+  <Include path="Compatibility.glsl"     />
+  <Include path="MathConstants.glsl"     />
+</Includes>
+<Code>
+<![CDATA[
+
+vec2 uvWrapMirror(vec2 uv)
+{
+    return abs(mod(uv - 1.0, 2.0) - 1.0);
+}
+
+//-------------------------------------------------------------------------------
+// main
+//-------------------------------------------------------------------------------
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = convertFragCoordsToUv(fragCoord);
+    
+    int numSamples = renderer_numSamples;//24;
+    float angleStep = 2.0 * PI / numSamples;
+    float angle = 0.0;
+
+    // DOF params
+    vec4 colCenter = texture(iChannel1, uv);
+    float radius = renderer_blurRadius * abs(colCenter.a - renderer_focusDist01);
+    
+    vec4 col = vec4(0.0);
+    for(int i=0; i<numSamples; i++)
+    {
+        angle = i * angleStep;
+        vec2 uvOffset = 0.01 * radius * vec2(cos(angle), sin(angle));
+
+        vec2 uvToTest = uv + uvOffset;
+        
+        // Mirrored sampling helps reduce visible artifacts at the edges of the screen
+        uvToTest = uvWrapMirror(uvToTest);
+        
+        col += texture(iChannel1, uvToTest);
+    }
+
+    col.rgb /= numSamples;
+    col.a = 1.0;
+    
+    fragColor = col;
+}
+
+]]>
+</Code>
+</FuncDef>

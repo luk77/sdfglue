@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Secondary passes" displayName="Average frames" functionName="SecPassAverageFrames">
+<Parameters>
+</Parameters>
+<Code>
+<![CDATA[
+
+//-------------------------------------------------------------------------------
+// main
+//-------------------------------------------------------------------------------
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = convertFragCoordsToUv(fragCoord);
+    
+    vec4 thisPassOutput = texture(iChannel0, uv);
+    vec4 prevPassOutput = texture(iChannel1, uv);
+
+    vec4 col =  thisPassOutput * (1. - 1./float(iFrame + 1)) + 
+                prevPassOutput *       1./float(iFrame + 1);
+    
+    col.a = 1.0;
+
+    // output to screen
+    fragColor = col;
+}
+
+]]>
+</Code>
+</FuncDef>

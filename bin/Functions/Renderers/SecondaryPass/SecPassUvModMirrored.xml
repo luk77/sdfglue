@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Secondary passes" displayName="UV Mod mirrored" functionName="SecPassUvModMirrored">
+<Parameters>
+  <Param type="vec2" displayName="Periods" parameterName="periods" default="2.0;2.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+
+//-------------------------------------------------------------------------------
+// main
+//-------------------------------------------------------------------------------
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = convertFragCoordsToUv(fragCoord);
+
+    vec2 ind = floor(renderer_periods * uv);
+    
+    // clone
+    uv = renderer_periods * mod(uv, renderer_periods);
+
+    // mirror type 1
+    uv *= mod(ind, 2.0) * 2.0 - 1.0;
+    
+    // mirror type 2
+    //uv *= mod(ind + 1.0, 2.0) * 2.0 - 1.0;
+
+    
+    //vec4 thisPassOutput = texture(iChannel0, uv);
+    vec4 prevPassOutput = texture(iChannel1, uv);
+
+    vec4 col = prevPassOutput;
+    
+    col.a = 1.0;
+
+    // output to screen
+    fragColor = col;
+}
+
+]]>
+</Code>
+</FuncDef>
