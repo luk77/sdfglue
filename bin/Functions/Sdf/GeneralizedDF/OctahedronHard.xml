@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Generalized DF" displayName="Octahedron (hard)" functionName="hgsdfOctahedronHard">
+<Parameters>
+  <Param type="float" displayName="Radius"      parameterName="radius"      default="0.5" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// Based on: "Generalized Distance Functions" by Akleman and Chen.
+// From: http://mercury.sexy/hg_sdf/
+// License: MIT
+float hgsdfOctahedronHard(vec3 p, float r)
+{
+    const vec3 v3 = normalize(vec3( 1,    1,    1));
+    const vec3 v4 = normalize(vec3(-1,    1,    1));
+    const vec3 v5 = normalize(vec3( 1,   -1,    1));
+    const vec3 v6 = normalize(vec3( 1,    1,   -1));
+
+    float d = 0.0;
+    d = max(d, abs(dot(p, v3)));
+    d = max(d, abs(dot(p, v4)));
+    d = max(d, abs(dot(p, v5)));
+    d = max(d, abs(dot(p, v6)));
+
+    return d - r;
+}
+]]>
+</Code>
+</FuncDef>

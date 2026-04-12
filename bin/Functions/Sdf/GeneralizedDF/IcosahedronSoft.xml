@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Generalized DF" displayName="Icosahedron (soft)" functionName="hgsdfIcosahedronSoft">
+<Parameters>
+  <Param type="float" displayName="Radius"      parameterName="radius"      default="0.5" speed="0.01"/>
+  <Param type="float" displayName="Exponent"    parameterName="exponent"    default="16.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// Based on: "Generalized Distance Functions" by Akleman and Chen.
+// From: http://mercury.sexy/hg_sdf/
+// License: MIT
+float hgsdfIcosahedronSoft(vec3 p, float r, float e)
+{
+    const vec3 v3   = normalize(vec3(1, 1, 1 ));
+    const vec3 v4   = normalize(vec3(-1, 1, 1));
+    const vec3 v5   = normalize(vec3(1, -1, 1));
+    const vec3 v6   = normalize(vec3(1, 1, -1));
+    const vec3 v7   = normalize(vec3(0, 1, PHI+1.));
+    const vec3 v8   = normalize(vec3(0, -1, PHI+1.));
+    const vec3 v9   = normalize(vec3(PHI+1., 0, 1));
+    const vec3 v10  = normalize(vec3(-PHI-1., 0, 1));
+    const vec3 v11  = normalize(vec3(1, PHI+1., 0));
+    const vec3 v12  = normalize(vec3(-1, PHI+1., 0));
+
+    float d = 0.0;
+    d += pow(abs(dot(p, v3 )), e);
+    d += pow(abs(dot(p, v4 )), e);
+    d += pow(abs(dot(p, v5 )), e);
+    d += pow(abs(dot(p, v6 )), e);
+    d += pow(abs(dot(p, v7 )), e);
+    d += pow(abs(dot(p, v8 )), e);
+    d += pow(abs(dot(p, v9 )), e);
+    d += pow(abs(dot(p, v10)), e);
+    d += pow(abs(dot(p, v11)), e);
+    d += pow(abs(dot(p, v12)), e);
+
+    return pow(d, 1./e) - r;
+}
+]]>
+</Code>
+</FuncDef>

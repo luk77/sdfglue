@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Generalized DF" displayName="Tetrahedron (hard)" functionName="hgsdfTetrahedronHard">
+<Parameters>
+  <Param type="float" displayName="Radius"      parameterName="radius"      default="0.5" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// Based on: "Generalized Distance Functions" by Akleman and Chen.
+// From: http://mercury.sexy/hg_sdf/
+// License: MIT
+//
+// Code by luk77 based on: 
+// https://en.wikipedia.org/wiki/Tetrahedron
+float hgsdfTetrahedronHard(vec3 p, float r)
+{
+    const vec3 v0 = normalize(vec3( 1,    1,    1));
+    const vec3 v1 = normalize(vec3( 1,   -1,   -1));
+    const vec3 v2 = normalize(vec3(-1,    1,   -1));
+    const vec3 v3 = normalize(vec3(-1,   -1,    1));
+
+    // alternative parameterization
+    //const float s = 1.0 / sqrt(2.0);
+    //const vec3 v0 = normalize(vec3( 1,   -s,    0));
+    //const vec3 v1 = normalize(vec3(-1,   -s,    0));
+    //const vec3 v2 = normalize(vec3( 0,    s,    1));
+    //const vec3 v3 = normalize(vec3( 0,    s,   -1));
+
+    float d = 0.0;
+    d = max(d, (dot(p, v0)));
+    d = max(d, (dot(p, v1)));
+    d = max(d, (dot(p, v2)));
+    d = max(d, (dot(p, v3)));
+
+    return d - r;
+}
+]]>
+</Code>
+</FuncDef>

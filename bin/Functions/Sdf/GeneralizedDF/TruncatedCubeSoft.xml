@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Generalized DF" displayName="Truncated cube (soft)" functionName="hgsdfTruncatedCubeSoft">
+<Parameters>
+  <Param type="float" displayName="Radius"      parameterName="radius"      default="0.5" speed="0.01"/>
+  <Param type="float" displayName="Exponent"    parameterName="exponent"    default="16.0" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// Based on: "Generalized Distance Functions" by Akleman and Chen.
+// From: http://mercury.sexy/hg_sdf/
+// License: MIT
+//
+// Code by luk77 based on: 
+// https://en.wikipedia.org/wiki/Truncated_cube
+float hgsdfTruncatedCubeSoft(vec3 p, float r, float e)
+{
+    const float a = sqrt(2.0) - 1.0;
+
+    const vec3 v0   = vec3( 1, 0, 0 );
+    const vec3 v1   = vec3(-1, 0, 0 );
+    const vec3 v2   = vec3( 0, 1, 0 );
+    const vec3 v3   = vec3( 0,-1, 0 );
+    const vec3 v4   = vec3( 0, 0, 1 );
+    const vec3 v5   = vec3( 0, 0,-1 );
+    const vec3 v6   = vec3( 1, 1, 1 );
+    const vec3 v7   = vec3( 1, 1,-1 );
+    const vec3 v8   = vec3( 1,-1, 1 );
+    const vec3 v9   = vec3( 1,-1,-1 );
+    const vec3 v10  = vec3(-1, 1, 1 );
+    const vec3 v11  = vec3(-1, 1,-1 );
+    const vec3 v12  = vec3(-1,-1, 1 );
+    const vec3 v13  = vec3(-1,-1,-1 );
+
+    float d = 0.0;
+    d += pow(abs(dot(p, v0 )), e);
+    d += pow(abs(dot(p, v1 )), e);
+    d += pow(abs(dot(p, v2 )), e);
+    d += pow(abs(dot(p, v3 )), e);
+    d += pow(abs(dot(p, v4 )), e);
+    d += pow(abs(dot(p, v5 )), e);
+    d += pow(abs(dot(p, v6 ) * a), e);
+    d += pow(abs(dot(p, v7 ) * a), e);
+    d += pow(abs(dot(p, v8 ) * a), e);
+    d += pow(abs(dot(p, v9 ) * a), e);
+    d += pow(abs(dot(p, v10) * a), e);
+    d += pow(abs(dot(p, v11) * a), e);
+    d += pow(abs(dot(p, v12) * a), e);
+    d += pow(abs(dot(p, v13) * a), e);
+
+    return pow(d, 1./e) - r;
+}
+]]>
+</Code>
+</FuncDef>

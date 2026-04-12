@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Generalized DF" displayName="Dodecahedron (hard)" functionName="hgsdfDodecahedronHard">
+<Parameters>
+  <Param type="float" displayName="Radius"      parameterName="radius"      default="0.5" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// Based on: "Generalized Distance Functions" by Akleman and Chen.
+// From: http://mercury.sexy/hg_sdf/
+// License: MIT
+float hgsdfDodecahedronHard(vec3 p, float r)
+{
+    const vec3 v13 = normalize(vec3(0,    PHI,    1));
+    const vec3 v14 = normalize(vec3(0,    -PHI,   1));
+    const vec3 v15 = normalize(vec3(1,    0,      PHI));
+    const vec3 v16 = normalize(vec3(-1,   0,      PHI));
+    const vec3 v17 = normalize(vec3(PHI,  1,      0));
+    const vec3 v18 = normalize(vec3(-PHI, 1,      0));
+
+    float d = 0.0;
+    d = max(d, abs(dot(p, v13)));
+    d = max(d, abs(dot(p, v14)));
+    d = max(d, abs(dot(p, v15)));
+    d = max(d, abs(dot(p, v16)));
+    d = max(d, abs(dot(p, v17)));
+    d = max(d, abs(dot(p, v18)));
+
+    return d - r;
+}
+]]>
+</Code>
+</FuncDef>
