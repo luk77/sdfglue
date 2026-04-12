@@ -84,6 +84,7 @@ Special thanks to the following tools, resources, and communities:
 - **[ImGui.NET OpenTK Sample](https://github.com/NogginBops/ImGui.NET_OpenTK_Sample)** — reference for ImGui + OpenTK integration  
 - **[Shadertoy](https://www.shadertoy.com/)** — inspiration and reference platform for SDF and raymarching  
 - **[Inigo Quilez (iq)](https://iquilezles.org/)** — foundational work on SDFs and raymarching  
+- **[hg_sdf](https://mercury.sexy/hg_sdf/)** - collection of SDF functions and operators for procedural modeling
 - **[LearnOpenGL](https://learnopengl.com/)** — OpenGL tutorials and rendering knowledge base  
 
 

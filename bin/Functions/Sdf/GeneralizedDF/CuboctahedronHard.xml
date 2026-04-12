@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Generalized DF" displayName="Cuboctahedron (hard)" functionName="hgsdfCuboctahedronHard">
+<Parameters>
+  <Param type="float" displayName="Radius"      parameterName="radius"      default="0.5" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// Based on: "Generalized Distance Functions" by Akleman and Chen.
+// From: http://mercury.sexy/hg_sdf/
+// License: MIT
+//
+// Code by luk77 based on: 
+// https://en.wikipedia.org/wiki/Rhombic_dodecahedron
+// https://en.wikipedia.org/wiki/Cuboctahedron
+// (Rhombic dodecahedron vertices are used as normals for "cutting planes" in Cuboctahedron - 
+// - Cuboctahedron and Rhombic dodecahedron are dual polyhedrons)
+float hgsdfCuboctahedronHard(vec3 p, float r)
+{
+    // From: https://en.wikipedia.org/wiki/Rhombic_dodecahedron
+    // "the radius of the sphere passing through the six order 4 vertices, but not through the eight order 3 vertices, is:"
+    const float f2 = 1.1547;
+
+    // first type of faces:
+    const vec3 v0 = normalize(vec3( 1,    1,    1));
+    const vec3 v1 = normalize(vec3( 1,    1,   -1));
+    const vec3 v2 = normalize(vec3( 1,   -1,    1));
+    const vec3 v3 = normalize(vec3( 1,   -1,   -1));
+    const vec3 v4 = normalize(vec3(-1,    1,    1));
+    const vec3 v5 = normalize(vec3(-1,    1,   -1));
+    const vec3 v6 = normalize(vec3(-1,   -1,    1));
+    const vec3 v7 = normalize(vec3(-1,   -1,   -1));
+
+    // second type of faces:
+    const vec3 v8 = normalize(vec3( 2,    0,    0));
+    const vec3 v9 = normalize(vec3(-2,    0,    0));
+    const vec3 v10= normalize(vec3( 0,    2,    0));
+    const vec3 v11= normalize(vec3( 0,   -2,    0));
+    const vec3 v12= normalize(vec3( 0,    0,    2));
+    const vec3 v13= normalize(vec3( 0,    0,   -2));
+
+    float d = 0.0;
+
+    // first type of faces:
+    d = max(d, abs(dot(p, v0 )));
+    d = max(d, abs(dot(p, v1 )));
+    d = max(d, abs(dot(p, v2 )));
+    d = max(d, abs(dot(p, v3 )));
+    d = max(d, abs(dot(p, v4 )));
+    d = max(d, abs(dot(p, v5 )));
+    d = max(d, abs(dot(p, v6 )));
+    d = max(d, abs(dot(p, v7 )));
+
+    // second type of faces:
+    d = max(d, abs(dot(p, v8 ) * f2));
+    d = max(d, abs(dot(p, v9 ) * f2));
+    d = max(d, abs(dot(p, v10) * f2));
+    d = max(d, abs(dot(p, v11) * f2));
+    d = max(d, abs(dot(p, v12) * f2));
+    d = max(d, abs(dot(p, v13) * f2));
+
+    return d - r;
+}
+]]>
+</Code>
+</FuncDef>

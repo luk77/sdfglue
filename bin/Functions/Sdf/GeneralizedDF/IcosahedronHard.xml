@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Generalized DF" displayName="Icosahedron (hard)" functionName="hgsdfIcosahedronHard">
+<Parameters>
+  <Param type="float" displayName="Radius"      parameterName="radius"      default="0.5" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// Based on: "Generalized Distance Functions" by Akleman and Chen.
+// From: http://mercury.sexy/hg_sdf/
+// License: MIT
+float hgsdfIcosahedronHard(vec3 p, float r)
+{
+    const vec3 v3   = normalize(vec3(1, 1, 1 ));
+    const vec3 v4   = normalize(vec3(-1, 1, 1));
+    const vec3 v5   = normalize(vec3(1, -1, 1));
+    const vec3 v6   = normalize(vec3(1, 1, -1));
+    const vec3 v7   = normalize(vec3(0, 1, PHI+1.));
+    const vec3 v8   = normalize(vec3(0, -1, PHI+1.));
+    const vec3 v9   = normalize(vec3(PHI+1., 0, 1));
+    const vec3 v10  = normalize(vec3(-PHI-1., 0, 1));
+    const vec3 v11  = normalize(vec3(1, PHI+1., 0));
+    const vec3 v12  = normalize(vec3(-1, PHI+1., 0));
+
+    float d = 0.0;
+    d = max(d, abs(dot(p, v3 )));
+    d = max(d, abs(dot(p, v4 )));
+    d = max(d, abs(dot(p, v5 )));
+    d = max(d, abs(dot(p, v6 )));
+    d = max(d, abs(dot(p, v7 )));
+    d = max(d, abs(dot(p, v8 )));
+    d = max(d, abs(dot(p, v9 )));
+    d = max(d, abs(dot(p, v10)));
+    d = max(d, abs(dot(p, v11)));
+    d = max(d, abs(dot(p, v12)));
+
+    return d - r;
+}
+]]>
+</Code>
+</FuncDef>

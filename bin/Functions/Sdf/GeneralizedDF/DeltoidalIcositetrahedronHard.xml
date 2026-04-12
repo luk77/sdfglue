@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Generalized DF" displayName="Deltoidal icositetrahedron (hard)" functionName="hgsdfDeltoidalIcositetrahedronHard">
+<Parameters>
+  <Param type="float" displayName="Radius"      parameterName="radius"      default="0.5" speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// Based on: "Generalized Distance Functions" by Akleman and Chen.
+// From: http://mercury.sexy/hg_sdf/
+// License: MIT
+//
+// Code by luk77 based on:
+// (Dual polyhedrons)
+// https://en.wikipedia.org/wiki/Deltoidal_icositetrahedron
+// https://en.wikipedia.org/wiki/Rhombicuboctahedron
+float hgsdfDeltoidalIcositetrahedronHard(vec3 p, float r)
+{
+    const float a = 1.0 + sqrt(2.0);
+
+    // From: https://en.wikipedia.org/wiki/Rhombicuboctahedron
+    // "Cartesian coordinates of a rhombicuboctahedron with an edge length 2 are the permutations of:"
+    const vec3 v0 = normalize(vec3( a,    1,    1));
+    const vec3 v1 = normalize(vec3( a,    1,   -1));
+    const vec3 v2 = normalize(vec3( a,   -1,    1));
+    const vec3 v3 = normalize(vec3( a,   -1,   -1));
+    const vec3 v4 = normalize(vec3(-a,    1,    1));
+    const vec3 v5 = normalize(vec3(-a,    1,   -1));
+    const vec3 v6 = normalize(vec3(-a,   -1,    1));
+    const vec3 v7 = normalize(vec3(-a,   -1,   -1));
+
+    float d = 0.0;
+
+    d = max(d, dot(p, v0));
+    d = max(d, dot(p, v1));
+    d = max(d, dot(p, v2));
+    d = max(d, dot(p, v3));
+    d = max(d, dot(p, v4));
+    d = max(d, dot(p, v5));
+    d = max(d, dot(p, v6));
+    d = max(d, dot(p, v7));
+
+    d = max(d, dot(p, v0.yxz));
+    d = max(d, dot(p, v1.yxz));
+    d = max(d, dot(p, v2.yxz));
+    d = max(d, dot(p, v3.yxz));
+    d = max(d, dot(p, v4.yxz));
+    d = max(d, dot(p, v5.yxz));
+    d = max(d, dot(p, v6.yxz));
+    d = max(d, dot(p, v7.yxz));
+
+    d = max(d, dot(p, v0.yzx));
+    d = max(d, dot(p, v1.yzx));
+    d = max(d, dot(p, v2.yzx));
+    d = max(d, dot(p, v3.yzx));
+    d = max(d, dot(p, v4.yzx));
+    d = max(d, dot(p, v5.yzx));
+    d = max(d, dot(p, v6.yzx));
+    d = max(d, dot(p, v7.yzx));
+
+    return d - r;
+}
+]]>
+</Code>
+</FuncDef>

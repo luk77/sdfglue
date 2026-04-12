@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FuncDef groupName="Generalized DF" displayName="Tetrakis Hexahedron (soft)" functionName="hgsdfTetrakisHexahedronSoft">
+<Parameters>
+  <Param type="float" displayName="Radius"          parameterName="radius"          default="0.5"   speed="0.01"/>
+  <Param type="float" displayName="Exponent"        parameterName="exponent"        default="16.0"  speed="0.01"/>
+</Parameters>
+<Code>
+<![CDATA[
+// Based on: "Generalized Distance Functions" by Akleman and Chen.
+// From: http://mercury.sexy/hg_sdf/
+// License: MIT
+//
+// Based on:
+// https://en.wikipedia.org/wiki/Tetrakis_hexahedron
+// https://en.wikipedia.org/wiki/Truncated_octahedron
+// Dual polyhedron: Tetrakis Hexahedron
+float hgsdfTetrakisHexahedronSoft(vec3 p, float r, float e)
+{
+    float b = 2.0;
+
+    vec3 v0   = normalize(vec3( 0, 1, b));
+    vec3 v1   = normalize(vec3( 0,-1, b));
+    vec3 v2   = normalize(vec3( 0, b, 1));
+    vec3 v3   = normalize(vec3( 0,-b, 1));
+    vec3 v4   = normalize(vec3( 1, 0, b));
+    vec3 v5   = normalize(vec3(-1, 0, b));
+    vec3 v6   = normalize(vec3( 1, b, 0));
+    vec3 v7   = normalize(vec3(-1, b, 0));
+    vec3 v8   = normalize(vec3( b, 0, 1));
+    vec3 v9   = normalize(vec3(-b, 0, 1));
+    vec3 v10  = normalize(vec3( b, 1, 0));
+    vec3 v11  = normalize(vec3(-b, 1, 0));
+
+    float d = 0.0;
+    d += pow(abs(dot(p, v0 )), e);
+    d += pow(abs(dot(p, v1 )), e);
+    d += pow(abs(dot(p, v2 )), e);
+    d += pow(abs(dot(p, v3 )), e);
+    d += pow(abs(dot(p, v4 )), e);
+    d += pow(abs(dot(p, v5 )), e);
+    d += pow(abs(dot(p, v6 )), e);
+    d += pow(abs(dot(p, v7 )), e);
+    d += pow(abs(dot(p, v8 )), e);
+    d += pow(abs(dot(p, v9 )), e);
+    d += pow(abs(dot(p, v10)), e);
+    d += pow(abs(dot(p, v11)), e);
+
+    return pow(d, 1./e) - r;
+}
+]]>
+</Code>
+</FuncDef>
