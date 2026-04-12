@@ -42,6 +42,13 @@ The project is heavily inspired by **Shadertoy** and the work of its community. 
 
 
 # Gallery
+
+### Editor Screenshots
+| | | |
+|---|---|---|
+| ![](images/ed_005_s.jpg) | ![](images/ed_008_s.jpg) | ![](images/ed_010_s.jpg) |
+
+### Example Projects
 | | | |
 |---|---|---|
 | ![](images/001.png) | ![](images/002.png) | ![](images/005.png) |
