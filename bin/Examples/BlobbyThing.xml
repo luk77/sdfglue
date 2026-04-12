@@ -1,0 +1,559 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Data>
+  <Version>1.0.14.0</Version>
+  <NextAvailableId>12</NextAvailableId>
+  <NextAvailableMaterialId>6</NextAvailableMaterialId>
+  <NextAvailableRenderPassId>1</NextAvailableRenderPassId>
+  <ProjectSettings>
+    <FixAllObjects>False</FixAllObjects>
+    <Use4d>False</Use4d>
+  </ProjectSettings>
+  <Camera>
+    <TargetPosition>-0.6438762;1.8393993;0.35740712</TargetPosition>
+    <RotationPitch>-0.5</RotationPitch>
+    <RotationYaw>-23.5</RotationYaw>
+    <RotationRoll>0</RotationRoll>
+    <DistanceToTarget>9.001</DistanceToTarget>
+    <Zoom>1</Zoom>
+  </Camera>
+  <Materials>
+    <Material>
+      <Id>2</Id>
+      <Name>Object</Name>
+      <IsFixed>False</IsFixed>
+      <DefinitionName>
+      </DefinitionName>
+      <CompilationParametersValues />
+      <ParametersValues>
+        <PValue name="colorAmbient" type="vec3">0.2;0.2;0.2</PValue>
+        <PValue name="colorDiffuse" type="vec3">0.14792582;0.6338326;0.8562421</PValue>
+        <PValue name="colorSpecular" type="vec3">0;0;0</PValue>
+        <PValue name="specularStrength" type="float">1</PValue>
+        <PValue name="colorRim" type="vec3">1;1;1</PValue>
+        <PValue name="shininess" type="float">10</PValue>
+        <PValue name="rimStrength" type="float">0</PValue>
+        <PValue name="rimWidth" type="float">0.5</PValue>
+        <PValue name="reflectance" type="float">0.37</PValue>
+        <PValue name="fresnel" type="float">0</PValue>
+        <PValue name="cellVarDiffuse" type="float">0</PValue>
+      </ParametersValues>
+    </Material>
+    <Material>
+      <Id>3</Id>
+      <Name>Ground 2</Name>
+      <IsFixed>False</IsFixed>
+      <DefinitionName>
+      </DefinitionName>
+      <CompilationParametersValues />
+      <ParametersValues>
+        <PValue name="colorAmbient" type="vec3">0.2;0.2;0.2</PValue>
+        <PValue name="colorDiffuse" type="vec3">0.050850034;0.2792028;0.407314</PValue>
+        <PValue name="colorSpecular" type="vec3">0.1;0.1;0.1</PValue>
+        <PValue name="specularStrength" type="float">1</PValue>
+        <PValue name="colorRim" type="vec3">1;1;1</PValue>
+        <PValue name="shininess" type="float">10</PValue>
+        <PValue name="rimStrength" type="float">0</PValue>
+        <PValue name="rimWidth" type="float">0.5</PValue>
+        <PValue name="reflectance" type="float">0.44</PValue>
+        <PValue name="fresnel" type="float">0</PValue>
+        <PValue name="cellVarDiffuse" type="float">0</PValue>
+      </ParametersValues>
+    </Material>
+    <Material>
+      <Id>4</Id>
+      <Name>Ground 1</Name>
+      <IsFixed>False</IsFixed>
+      <DefinitionName>
+      </DefinitionName>
+      <CompilationParametersValues />
+      <ParametersValues>
+        <PValue name="colorAmbient" type="vec3">0.22358003;0.22572511;0.20523053</PValue>
+        <PValue name="colorDiffuse" type="vec3">0.28657916;0.33443648;0.34174025</PValue>
+        <PValue name="colorSpecular" type="vec3">0;0;0</PValue>
+        <PValue name="specularStrength" type="float">1</PValue>
+        <PValue name="colorRim" type="vec3">0.6554245;0.7714509;0.8108449</PValue>
+        <PValue name="shininess" type="float">11</PValue>
+        <PValue name="rimStrength" type="float">0.8</PValue>
+        <PValue name="rimWidth" type="float">0.47</PValue>
+        <PValue name="reflectance" type="float">0</PValue>
+        <PValue name="fresnel" type="float">0</PValue>
+        <PValue name="cellVarDiffuse" type="float">0</PValue>
+      </ParametersValues>
+    </Material>
+    <Material>
+      <Id>5</Id>
+      <Name>Ground 2</Name>
+      <IsFixed>False</IsFixed>
+      <DefinitionName>
+      </DefinitionName>
+      <CompilationParametersValues />
+      <ParametersValues>
+        <PValue name="colorAmbient" type="vec3">0.09030627;0.11765477;0.13745272</PValue>
+        <PValue name="colorDiffuse" type="vec3">0.17281574;0.2606541;0.28373265</PValue>
+        <PValue name="colorSpecular" type="vec3">0;0;0</PValue>
+        <PValue name="specularStrength" type="float">1</PValue>
+        <PValue name="colorRim" type="vec3">1;1;1</PValue>
+        <PValue name="shininess" type="float">333</PValue>
+        <PValue name="rimStrength" type="float">0</PValue>
+        <PValue name="rimWidth" type="float">0.5</PValue>
+        <PValue name="reflectance" type="float">0</PValue>
+        <PValue name="fresnel" type="float">0</PValue>
+        <PValue name="cellVarDiffuse" type="float">0</PValue>
+      </ParametersValues>
+    </Material>
+  </Materials>
+  <SdfObject>
+    <Id>1</Id>
+    <Name>Ground</Name>
+    <IsSelected>False</IsSelected>
+    <IsExpanded>True</IsExpanded>
+    <IsFixed>False</IsFixed>
+    <UseInDistanceFunction>True</UseInDistanceFunction>
+    <UseInMaterialsFunction>True</UseInMaterialsFunction>
+    <UseShape>True</UseShape>
+    <MaterialId>4</MaterialId>
+    <MatBlendFactor>0</MatBlendFactor>
+    <BlendFactor>0</BlendFactor>
+    <DefinitionName>sdPlane</DefinitionName>
+    <CompilationParametersValues />
+    <ParametersValues />
+    <MixOp>
+      <DefinitionName>opSmoothUnion</DefinitionName>
+      <CompilationParametersValues />
+      <ParametersValues />
+    </MixOp>
+    <PositionOperators>
+      <OpEntity>
+        <Enabled>False</Enabled>
+        <DefinitionName>opTranslate</DefinitionName>
+        <CompilationParametersValues />
+        <ParametersValues>
+          <PValue name="offset" type="vec3">0;0;0</PValue>
+        </ParametersValues>
+      </OpEntity>
+      <OpEntity>
+        <Enabled>False</Enabled>
+        <DefinitionName>opRotate</DefinitionName>
+        <CompilationParametersValues />
+        <ParametersValues>
+          <PValue name="rotation" type="vec3">0;0;0</PValue>
+        </ParametersValues>
+      </OpEntity>
+    </PositionOperators>
+    <DistanceOperators />
+    <Children>
+      <SdfObject>
+        <Id>2</Id>
+        <Name>Fbm</Name>
+        <IsSelected>False</IsSelected>
+        <IsExpanded>True</IsExpanded>
+        <IsFixed>False</IsFixed>
+        <UseInDistanceFunction>True</UseInDistanceFunction>
+        <UseInMaterialsFunction>True</UseInMaterialsFunction>
+        <UseShape>True</UseShape>
+        <MaterialId>5</MaterialId>
+        <MatBlendFactor>0.14</MatBlendFactor>
+        <BlendFactor>0.51</BlendFactor>
+        <DefinitionName>sdFbm6</DefinitionName>
+        <CompilationParametersValues />
+        <ParametersValues>
+          <PValue name="fbmScale" type="float">1.11</PValue>
+          <PValue name="fbmValOffset" type="float">-4.24</PValue>
+          <PValue name="fbmValMul" type="float">7</PValue>
+          <PValue name="dim" type="vec3">0.5;0.5;0.5</PValue>
+        </ParametersValues>
+        <MixOp>
+          <DefinitionName>opSmoothSubtraction</DefinitionName>
+          <CompilationParametersValues />
+          <ParametersValues />
+        </MixOp>
+        <PositionOperators>
+          <OpEntity>
+            <Enabled>True</Enabled>
+            <DefinitionName>opTranslate</DefinitionName>
+            <CompilationParametersValues />
+            <ParametersValues>
+              <PValue name="offset" type="vec3">0;0.5;0</PValue>
+            </ParametersValues>
+          </OpEntity>
+          <OpEntity>
+            <Enabled>False</Enabled>
+            <DefinitionName>opRotate</DefinitionName>
+            <CompilationParametersValues />
+            <ParametersValues>
+              <PValue name="rotation" type="vec3">0;0.7853982;0</PValue>
+            </ParametersValues>
+          </OpEntity>
+        </PositionOperators>
+        <DistanceOperators />
+        <Children />
+      </SdfObject>
+      <SdfObject>
+        <Id>3</Id>
+        <Name>Object</Name>
+        <IsSelected>False</IsSelected>
+        <IsExpanded>True</IsExpanded>
+        <IsFixed>False</IsFixed>
+        <UseInDistanceFunction>True</UseInDistanceFunction>
+        <UseInMaterialsFunction>True</UseInMaterialsFunction>
+        <UseShape>True</UseShape>
+        <MaterialId>2</MaterialId>
+        <MatBlendFactor>0</MatBlendFactor>
+        <BlendFactor>0</BlendFactor>
+        <DefinitionName>sdEmptiness</DefinitionName>
+        <CompilationParametersValues />
+        <ParametersValues>
+          <PValue name="radius" type="float">0.96</PValue>
+          <PValue name="amp" type="float">0.78</PValue>
+          <PValue name="animSpeed" type="float">0.31</PValue>
+          <PValue name="blending" type="float">0.19</PValue>
+        </ParametersValues>
+        <MixOp>
+          <DefinitionName>opSmoothUnion</DefinitionName>
+          <CompilationParametersValues />
+          <ParametersValues />
+        </MixOp>
+        <PositionOperators>
+          <OpEntity>
+            <Enabled>True</Enabled>
+            <DefinitionName>opTranslate</DefinitionName>
+            <CompilationParametersValues />
+            <ParametersValues>
+              <PValue name="offset" type="vec3">0;2.6;0</PValue>
+            </ParametersValues>
+          </OpEntity>
+          <OpEntity>
+            <Enabled>True</Enabled>
+            <DefinitionName>opAnimRotate</DefinitionName>
+            <CompilationParametersValues />
+            <ParametersValues>
+              <PValue name="animSpeed" type="vec3">0;0.078;0</PValue>
+              <PValue name="animOffset" type="vec3">0;0;0</PValue>
+            </ParametersValues>
+          </OpEntity>
+        </PositionOperators>
+        <DistanceOperators />
+        <Children>
+          <SdfObject>
+            <Id>9</Id>
+            <Name>Sph3</Name>
+            <IsSelected>True</IsSelected>
+            <IsExpanded>True</IsExpanded>
+            <IsFixed>False</IsFixed>
+            <UseInDistanceFunction>True</UseInDistanceFunction>
+            <UseInMaterialsFunction>True</UseInMaterialsFunction>
+            <UseShape>True</UseShape>
+            <MaterialId>2</MaterialId>
+            <MatBlendFactor>0</MatBlendFactor>
+            <BlendFactor>0</BlendFactor>
+            <DefinitionName>sdSphere</DefinitionName>
+            <CompilationParametersValues />
+            <ParametersValues>
+              <PValue name="radius" type="float">1.4</PValue>
+            </ParametersValues>
+            <MixOp>
+              <DefinitionName>opSmoothUnion</DefinitionName>
+              <CompilationParametersValues />
+              <ParametersValues />
+            </MixOp>
+            <PositionOperators>
+              <OpEntity>
+                <Enabled>True</Enabled>
+                <DefinitionName>opAnimTranslateSin</DefinitionName>
+                <CompilationParametersValues />
+                <ParametersValues>
+                  <PValue name="amp" type="vec3">1.79;0.75;0.7</PValue>
+                  <PValue name="freq" type="vec3">0.1;0.2;0.3</PValue>
+                  <PValue name="phase" type="vec3">0;3.028;0</PValue>
+                  <PValue name="offset" type="vec3">0;0;0</PValue>
+                </ParametersValues>
+              </OpEntity>
+              <OpEntity>
+                <Enabled>False</Enabled>
+                <DefinitionName>opRotate</DefinitionName>
+                <CompilationParametersValues />
+                <ParametersValues>
+                  <PValue name="rotation" type="vec3">0;0;0</PValue>
+                </ParametersValues>
+              </OpEntity>
+            </PositionOperators>
+            <DistanceOperators />
+            <Children />
+          </SdfObject>
+          <SdfObject>
+            <Id>10</Id>
+            <Name>Sph2</Name>
+            <IsSelected>False</IsSelected>
+            <IsExpanded>True</IsExpanded>
+            <IsFixed>False</IsFixed>
+            <UseInDistanceFunction>True</UseInDistanceFunction>
+            <UseInMaterialsFunction>True</UseInMaterialsFunction>
+            <UseShape>True</UseShape>
+            <MaterialId>2</MaterialId>
+            <MatBlendFactor>0</MatBlendFactor>
+            <BlendFactor>2.17</BlendFactor>
+            <DefinitionName>sdSphere</DefinitionName>
+            <CompilationParametersValues />
+            <ParametersValues>
+              <PValue name="radius" type="float">1</PValue>
+            </ParametersValues>
+            <MixOp>
+              <DefinitionName>opSmoothUnion</DefinitionName>
+              <CompilationParametersValues />
+              <ParametersValues />
+            </MixOp>
+            <PositionOperators>
+              <OpEntity>
+                <Enabled>True</Enabled>
+                <DefinitionName>opAnimTranslateSin</DefinitionName>
+                <CompilationParametersValues />
+                <ParametersValues>
+                  <PValue name="amp" type="vec3">1.51;0.78;0.29</PValue>
+                  <PValue name="freq" type="vec3">0.12;0.262;0.264</PValue>
+                  <PValue name="phase" type="vec3">0;0;0</PValue>
+                  <PValue name="offset" type="vec3">0;0;0</PValue>
+                </ParametersValues>
+              </OpEntity>
+              <OpEntity>
+                <Enabled>False</Enabled>
+                <DefinitionName>opRotate</DefinitionName>
+                <CompilationParametersValues />
+                <ParametersValues>
+                  <PValue name="rotation" type="vec3">0;0;0</PValue>
+                </ParametersValues>
+              </OpEntity>
+            </PositionOperators>
+            <DistanceOperators />
+            <Children />
+          </SdfObject>
+          <SdfObject>
+            <Id>11</Id>
+            <Name>Sph3</Name>
+            <IsSelected>False</IsSelected>
+            <IsExpanded>True</IsExpanded>
+            <IsFixed>False</IsFixed>
+            <UseInDistanceFunction>True</UseInDistanceFunction>
+            <UseInMaterialsFunction>True</UseInMaterialsFunction>
+            <UseShape>True</UseShape>
+            <MaterialId>2</MaterialId>
+            <MatBlendFactor>0</MatBlendFactor>
+            <BlendFactor>0.49</BlendFactor>
+            <DefinitionName>sdSphere</DefinitionName>
+            <CompilationParametersValues />
+            <ParametersValues>
+              <PValue name="radius" type="float">1</PValue>
+            </ParametersValues>
+            <MixOp>
+              <DefinitionName>opSmoothUnion</DefinitionName>
+              <CompilationParametersValues />
+              <ParametersValues />
+            </MixOp>
+            <PositionOperators>
+              <OpEntity>
+                <Enabled>True</Enabled>
+                <DefinitionName>opAnimTranslateSin</DefinitionName>
+                <CompilationParametersValues />
+                <ParametersValues>
+                  <PValue name="amp" type="vec3">1.57;0.78;0.31</PValue>
+                  <PValue name="freq" type="vec3">0.081;0.191;0.316</PValue>
+                  <PValue name="phase" type="vec3">0.402;0.406;0.096</PValue>
+                  <PValue name="offset" type="vec3">0;0;0</PValue>
+                </ParametersValues>
+              </OpEntity>
+              <OpEntity>
+                <Enabled>False</Enabled>
+                <DefinitionName>opRotate</DefinitionName>
+                <CompilationParametersValues />
+                <ParametersValues>
+                  <PValue name="rotation" type="vec3">0;0;0</PValue>
+                </ParametersValues>
+              </OpEntity>
+            </PositionOperators>
+            <DistanceOperators />
+            <Children />
+          </SdfObject>
+          <SdfObject>
+            <Id>7</Id>
+            <Name>Gaps</Name>
+            <IsSelected>False</IsSelected>
+            <IsExpanded>True</IsExpanded>
+            <IsFixed>False</IsFixed>
+            <UseInDistanceFunction>True</UseInDistanceFunction>
+            <UseInMaterialsFunction>True</UseInMaterialsFunction>
+            <UseShape>True</UseShape>
+            <MaterialId>2</MaterialId>
+            <MatBlendFactor>0.09</MatBlendFactor>
+            <BlendFactor>0.15</BlendFactor>
+            <DefinitionName>sdBox</DefinitionName>
+            <CompilationParametersValues />
+            <ParametersValues>
+              <PValue name="dim" type="vec3">9.86;19.26;0.13</PValue>
+            </ParametersValues>
+            <MixOp>
+              <DefinitionName>opSmoothSubtraction</DefinitionName>
+              <CompilationParametersValues />
+              <ParametersValues />
+            </MixOp>
+            <PositionOperators>
+              <OpEntity>
+                <Enabled>True</Enabled>
+                <DefinitionName>opTranslate</DefinitionName>
+                <CompilationParametersValues />
+                <ParametersValues>
+                  <PValue name="offset" type="vec3">0;0;-9.04</PValue>
+                </ParametersValues>
+              </OpEntity>
+              <OpEntity>
+                <Enabled>True</Enabled>
+                <DefinitionName>opRotate</DefinitionName>
+                <CompilationParametersValues />
+                <ParametersValues>
+                  <PValue name="rotation" type="vec3">0;0;0</PValue>
+                </ParametersValues>
+              </OpEntity>
+              <OpEntity>
+                <Enabled>True</Enabled>
+                <DefinitionName>opFiniteRepeatZ</DefinitionName>
+                <CompilationParametersValues />
+                <ParametersValues>
+                  <PValue name="spacingZ" type="float">0.72</PValue>
+                  <PValue name="repZ" type="int">70</PValue>
+                </ParametersValues>
+              </OpEntity>
+            </PositionOperators>
+            <DistanceOperators />
+            <Children />
+          </SdfObject>
+        </Children>
+      </SdfObject>
+    </Children>
+  </SdfObject>
+  <RenderingData>
+    <RenderPasses>
+      <RenderPassData>
+        <Id>-1001</Id>
+        <Name>Primary pass</Name>
+        <IsPrimaryPass>True</IsPrimaryPass>
+        <ForceClear>False</ForceClear>
+        <Enabled>True</Enabled>
+        <IsFixed>False</IsFixed>
+        <ClearOnEveryFrame>True</ClearOnEveryFrame>
+        <ClearColor>0;0;0</ClearColor>
+        <ClearOpacity>1</ClearOpacity>
+        <AutoResetFrameCounter>True</AutoResetFrameCounter>
+        <UseTextureFiltering>True</UseTextureFiltering>
+        <DefinitionName>Default</DefinitionName>
+        <CompilationParametersValues>
+          <PValue name="USE_FOG" type="int">1</PValue>
+          <PValue name="USE_BG" type="int">0</PValue>
+          <PValue name="USE_POINT_LIGHT_1" type="int">0</PValue>
+          <PValue name="USE_POINT_LIGHT_2" type="int">0</PValue>
+          <PValue name="USE_DIR_LIGHT_1" type="int">1</PValue>
+          <PValue name="USE_DIR_LIGHT_2" type="int">1</PValue>
+          <PValue name="USE_RIM_LIGHT" type="int">1</PValue>
+          <PValue name="USE_SHADOWS" type="int">1</PValue>
+          <PValue name="USE_AO" type="int">0</PValue>
+          <PValue name="USE_REFLECTIONS" type="int">1</PValue>
+          <PValue name="USE_TONE_MAPPING" type="int">1</PValue>
+          <PValue name="USE_VIGNETTE" type="int">1</PValue>
+          <PValue name="USE_DITHERING" type="int">1</PValue>
+          <PValue name="USE_OUTLINE" type="int">0</PValue>
+          <PValue name="USE_SHADOWS_RAY_RND_OFFSET" type="int">0</PValue>
+          <PValue name="TEMPORAL_CAMERA_BLUR" type="int">0</PValue>
+          <PValue name="USE_CAMERA_SAFE_AREA" type="int">0</PValue>
+          <PValue name="DEPTH_AS_ALPHA" type="int">0</PValue>
+          <PValue name="VOXELIZE" type="int">0</PValue>
+          <PValue name="DEBUG_NORMALS" type="int">0</PValue>
+          <PValue name="DEBUG_DEPTH" type="int">0</PValue>
+          <PValue name="DEBUG_AO" type="int">0</PValue>
+          <PValue name="USE_MATERIAL_CELL_VARIATIONS" type="int">1</PValue>
+          <PValue name="USE_FRESNEL" type="int">0</PValue>
+          <PValue name="USE_BLINN_PHONG" type="int">0</PValue>
+          <PValue name="PREVENT_BACK_LIGHTING" type="int">1</PValue>
+          <PValue name="REFLECT_BG_COLOR" type="int">0</PValue>
+          <PValue name="DEBUG_SHADOWS" type="int">0</PValue>
+        </CompilationParametersValues>
+        <ParametersValues>
+          <PValue name="min_dist_mul" type="float">1</PValue>
+          <PValue name="fogColor" type="vec3">0.8243489;0.9117276;0.91139704</PValue>
+          <PValue name="fogDensity" type="float">1</PValue>
+          <PValue name="ambientLight_color" type="vec3">0.1;0.1;0.1</PValue>
+          <PValue name="pointLight1_pos" type="vec3">3;5;-3</PValue>
+          <PValue name="pointLight1_intensity" type="float">1.3</PValue>
+          <PValue name="pointLight1_color" type="vec3">1;0.9;0.8</PValue>
+          <PValue name="pointLight2_pos" type="vec3">-1;7;-3</PValue>
+          <PValue name="pointLight2_intensity" type="float">1.3</PValue>
+          <PValue name="pointLight2_color" type="vec3">0.6;0.7;1</PValue>
+          <PValue name="dirLight1_pitch" type="float">0.34906584</PValue>
+          <PValue name="dirLight1_yaw" type="float">2.268928</PValue>
+          <PValue name="dirLight1_intensity" type="float">1.3</PValue>
+          <PValue name="dirLight1_color" type="vec3">1;0.9;0.8</PValue>
+          <PValue name="dirLight2_pitch" type="float">0.6981317</PValue>
+          <PValue name="dirLight2_yaw" type="float">1.2217305</PValue>
+          <PValue name="dirLight2_intensity" type="float">1.3</PValue>
+          <PValue name="dirLight2_color" type="vec3">0.6;0.7;1</PValue>
+          <PValue name="contrastMul" type="float">0.9</PValue>
+          <PValue name="contrastPow" type="float">1.3</PValue>
+          <PValue name="vignettePow" type="float">0.4</PValue>
+          <PValue name="outlineColor" type="vec3">0;0;0</PValue>
+          <PValue name="outlineWidth" type="float">0.1</PValue>
+          <PValue name="shadowSharpness" type="float">2</PValue>
+          <PValue name="shadowRndRayOff" type="float">0.1</PValue>
+          <PValue name="aoEpsilon" type="float">0.2</PValue>
+          <PValue name="aoStrength" type="float">1</PValue>
+          <PValue name="voxelParam" type="float">10</PValue>
+          <PValue name="cameraSafeAreaRadius" type="float">4</PValue>
+          <PValue name="cameraSafeAreaSmoothness" type="float">0.1</PValue>
+          <PValue name="shadowRayNudge" type="float">0.1</PValue>
+          <PValue name="backSideSmoothness" type="float">0.6</PValue>
+        </ParametersValues>
+        <Backdrop>
+          <DefinitionName>backdropSimpleHorizon</DefinitionName>
+          <CompilationParametersValues />
+          <ParametersValues>
+            <PValue name="bgColor" type="vec3">0.6;0.7;0.9</PValue>
+            <PValue name="colorTop" type="vec3">0.1;0.4;0.8</PValue>
+            <PValue name="colorMiddle" type="vec3">0.7553594;0.658201;0.658201</PValue>
+            <PValue name="colorBottom" type="vec3">0.3;0.2;0.1</PValue>
+            <PValue name="contrastMul" type="float">1</PValue>
+            <PValue name="contrastPow" type="float">1</PValue>
+          </ParametersValues>
+        </Backdrop>
+        <CameraOperators>
+          <OpEntity>
+            <Enabled>True</Enabled>
+            <DefinitionName>cameraOpDefault</DefinitionName>
+            <CompilationParametersValues />
+            <ParametersValues />
+          </OpEntity>
+        </CameraOperators>
+      </RenderPassData>
+      <RenderPassData>
+        <Id>-1003</Id>
+        <Name>Average frames</Name>
+        <IsPrimaryPass>False</IsPrimaryPass>
+        <ForceClear>False</ForceClear>
+        <Enabled>True</Enabled>
+        <IsFixed>False</IsFixed>
+        <ClearOnEveryFrame>False</ClearOnEveryFrame>
+        <ClearColor>0;0;0</ClearColor>
+        <ClearOpacity>1</ClearOpacity>
+        <AutoResetFrameCounter>True</AutoResetFrameCounter>
+        <UseTextureFiltering>True</UseTextureFiltering>
+        <DefinitionName>SecPassAverageFramesHistory</DefinitionName>
+        <CompilationParametersValues />
+        <ParametersValues>
+          <PValue name="historyLength" type="int">10</PValue>
+        </ParametersValues>
+        <Backdrop>
+          <DefinitionName>backdropDefault</DefinitionName>
+          <CompilationParametersValues />
+          <ParametersValues>
+            <PValue name="bgColor" type="vec3">0.6;0.7;0.9</PValue>
+          </ParametersValues>
+        </Backdrop>
+        <CameraOperators />
+      </RenderPassData>
+    </RenderPasses>
+  </RenderingData>
+</Data>
