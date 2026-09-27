@@ -9,13 +9,15 @@ using ImGuiNET;
 
 namespace SdfGlueUi.Ui.Windows
 {
-    public class WndPlayback : UiWindowBase
+    public class WndPlayback : UiWindowSdfGlue
     {
         public override string Title => "Playback";
 
         public override void Build()
         {
-            BuildWindow(uiMgr_.DistanceX, uiMgr_.PlaybackPosY, uiMgr_.LeftColWidth, uiMgr_.PlaybackHeight, delegate ()
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
+            BuildWindow(uiMgr.DistanceX, uiMgr.PlaybackPosY, uiMgr.LeftColWidth, uiMgr.PlaybackHeight, delegate ()
             {
                 Vector2 butSize = new Vector2(120, 60);
 

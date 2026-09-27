@@ -5,8 +5,8 @@
 //---------------------------------------------------------------------------
 using ImGuiNET;
 using SdfGlueUi.Ui.Components;
-using SdfGlueCore.UndoSystem;
-using SdfGlueCore.UndoSystem.Actions;
+using SingleDocAppCore.UndoSystem;
+using SingleDocAppCore.UndoSystem.Actions;
 using System.Numerics;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.Entities;
@@ -15,7 +15,7 @@ namespace SdfGlueUi.Ui.Properties
 {
     class UiFunctionDefinition
     {
-        public static void Build(IUiActionsExecutor actionsExec, ref int id, string name, FunctionEntity functionEntity, FunctionDefinitionsSet definitions)
+        public static void Build(IUiExecutorSdfGlue actionsExec, ref int id, string name, FunctionEntity functionEntity, FunctionDefinitionsSet definitions)
         {
             ImGui.PushID(id++);
             ImGui.Text(name);
@@ -40,7 +40,7 @@ namespace SdfGlueUi.Ui.Properties
             ImGui.NextColumn();
         }
 
-        public static void AddFunctionEntityUndoAction(string name, FunctionEntity functionEntity, FunctionDefinitionsSet definitions, IUiActionsExecutor actionsExec)
+        public static void AddFunctionEntityUndoAction(string name, FunctionEntity functionEntity, FunctionDefinitionsSet definitions, IUiExecutorSdfGlue actionsExec)
         {
             //Console.WriteLine("Undo save: {0}: {1}", name, functionEntity.DefinitionName.Val);
             UndoManager.Instance.SaveAction(new ActionString(functionEntity.DefinitionName, delegate 

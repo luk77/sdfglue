@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using SdfGlueCore.Model.DataNodes.Signals;
+using SingleDocAppCore.Model.BaseTypes;
 
 namespace SdfGlueCore.Model.BaseTypes
 {

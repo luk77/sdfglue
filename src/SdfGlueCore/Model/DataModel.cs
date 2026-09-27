@@ -3,20 +3,22 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
-using SdfGlueCore.Model.BaseTypes;
+using SingleDocAppCore.Model.BaseTypes;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueCore.Model.DataNodes.Signals;
 using SdfGlueCore.Model.Entities;
-using SdfGlueCore.Utils;
+using SingleDocAppCore.Utils;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Xml;
+using SingleDocAppCore.Model;
+using SingleDocAppCore.Model.DataNodes;
 
 namespace SdfGlueCore.Model
 {
-    public class DataModel : TreeNode
+    public class DataModel : TreeNode, IAbstractDocument
     {
         // Version management moved to Directory.Build.props file
         //public static readonly int      VersionMajor                = 0;
@@ -26,7 +28,6 @@ namespace SdfGlueCore.Model
         public static readonly bool     UseCameraControllers        = true;
         public static readonly bool     ImportOldMaterials          = false;
         public static readonly bool     UseSignals                  = false;//true;
-        public static readonly bool     UseDocking                  = true;
         public static readonly bool     UseMultiplePreviews         = true;
         public static readonly bool     UseMultipleCodeViews        = true;
         public static readonly bool     GenCodeCleanup              = true;
@@ -40,10 +41,6 @@ namespace SdfGlueCore.Model
 
         public static readonly int      NumOfPreviews               = 4;
         public static readonly int      NumOfCodeViews              = 4;
-
-        public delegate void OnValueChanged();
-
-        public static StringBuilder     OutputLog                   = new StringBuilder(32000);
 
         public  int                     NextAvailableId             = 1;
         public  int                     NextAvailableMaterialId     = 1;
@@ -178,7 +175,7 @@ namespace SdfGlueCore.Model
 
         private void InitDefaultData()
         {
-            UndoSystem.UndoManager.Instance.ClearAll();
+            SingleDocAppCore.UndoSystem.UndoManager.Instance.ClearAll();
 
             NextAvailableId             = 1;
             NextAvailableMaterialId     = 1;
@@ -284,7 +281,7 @@ namespace SdfGlueCore.Model
             if (opRotate != null)
             {
                 opRotate.Enabled.Val = true;
-                opRotate.SetParameterVec3("rotation", new System.Numerics.Vector3(0.0f, 45.0f * Utils.GMath.DegToRad, 0.0f));
+                opRotate.SetParameterVec3("rotation", new System.Numerics.Vector3(0.0f, 45.0f * GMath.DegToRad, 0.0f));
             }
         }
 

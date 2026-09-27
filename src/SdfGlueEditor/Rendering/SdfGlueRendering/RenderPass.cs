@@ -14,7 +14,7 @@ using SdfGlueCore.Model;
 using SdfGlueCore.Model.BaseTypes;
 using SdfGlueEditor.Rendering.OpenTk;
 using SdfGlueEditor.Utils;
-using SdfGlueCore.Utils;
+using SingleDocAppCore.Utils;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueCore.Model.Entities;
@@ -22,7 +22,8 @@ using System.Text;
 using OpenTK.Mathematics;
 using SdfGlueCore.AbstractRenderer;
 using System.Drawing;
-using TreeNode = SdfGlueCore.Model.DataNodes.TreeNode;
+using TreeNode = SingleDocAppCore.Model.DataNodes.TreeNode;
+using SingleDocAppCore.Model.BaseTypes;
 
 namespace SdfGlueEditor.Rendering.SdfGlueRendering
 {

@@ -11,7 +11,7 @@ using System.Numerics;
 
 namespace SdfGlueUi.Ui.Windows
 {
-    public class WndGeneratedCode : UiWindowBase
+    public class WndGeneratedCode : UiWindowSdfGlue
     {
         //public override string Title => "Generated Code";
 
@@ -36,7 +36,9 @@ namespace SdfGlueUi.Ui.Windows
 
         public override void Build()
         {
-            BuildWindow(uiMgr_.CenterColPosX, uiMgr_.BasePosY, uiMgr_.CenterColWidth, uiMgr_.BaseHeight, delegate ()
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
+            BuildWindow(uiMgr.CenterColPosX, uiMgr.BasePosY, uiMgr.CenterColWidth, uiMgr.BaseHeight, delegate ()
             {
                 int id = 1;
                 ImGui.PushID(id++);
@@ -102,7 +104,7 @@ namespace SdfGlueUi.Ui.Windows
                 {
                     if (!String.IsNullOrEmpty(selectedCode))
                     {
-                        uiMgr_.ActionsExecutor.CopyTextToClipboard(selectedCode);
+                        uiMgr.ActionsExecutor.CopyTextToClipboard(selectedCode);
                     }
                 }
 
@@ -119,14 +121,12 @@ namespace SdfGlueUi.Ui.Windows
 
                 if (ImGui.Button("Copy shader to clipboard"))
                 {
-                    //new SetClipboardHelper(System.Windows.Forms.DataFormats.Text, GetModel().LastGenCode.FullShader).Go();
-                    uiMgr_.ActionsExecutor.CopyTextToClipboard(selectedPass_.LastGenCode.FullShader);
+                    uiMgr.ActionsExecutor.CopyTextToClipboard(selectedPass_.LastGenCode.FullShader);
                 }
 
                 if (ImGui.Button("Copy unity shader to clipboard"))
                 {
-                    //new SetClipboardHelper(System.Windows.Forms.DataFormats.Text, GetModel().LastGenCodeUnity).Go();
-                    uiMgr_.ActionsExecutor.CopyTextToClipboard(selectedPass_.LastGenCodeUnity);
+                    uiMgr.ActionsExecutor.CopyTextToClipboard(selectedPass_.LastGenCodeUnity);
                 }
 
                 ImGui.BeginTabBar("TabsGenCode", ImGuiTabBarFlags.None); 

@@ -3,9 +3,11 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
-using SdfGlueCore.Model.BaseTypes;
 using SdfGlueCore.Model.CodeFragments;
-using SdfGlueCore.Utils;
+using SingleDocAppCore.Utils;
+using SingleDocAppCore.Model;
+using SingleDocAppCore.Model.BaseTypes;
+using SingleDocAppCore.Model.DataNodes;
 using System.Numerics;
 using System.Xml;
 
@@ -63,7 +65,7 @@ namespace SdfGlueCore.Model.DataNodes
             }
         }
 
-        public override bool Deserialize(XmlNode nodeThis, DataModel model)
+        public override bool Deserialize(XmlNode nodeThis, IAbstractDocument model)
         {
             XmlNode? nodePasses = nodeThis.SelectSingleNode("RenderPasses");
             if (nodePasses == null)

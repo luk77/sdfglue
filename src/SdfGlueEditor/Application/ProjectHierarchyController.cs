@@ -6,14 +6,14 @@
 using SdfGlueCore.AbstractRenderer;
 using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
-using SdfGlueCore.Model.BaseTypes;
+using SingleDocAppCore.Model.BaseTypes;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
-using SdfGlueCore.UndoSystem;
-using SdfGlueCore.UndoSystem.Actions;
-using SdfGlueEditor.Platform;
+using SingleDocAppCore.UndoSystem;
+using SingleDocAppCore.UndoSystem.Actions;
+using SingleDocAppFramework.Platform;
 using System.Xml;
-using TreeNode = SdfGlueCore.Model.DataNodes.TreeNode;
+using TreeNode = SingleDocAppCore.Model.DataNodes.TreeNode;
 
 namespace SdfGlueEditor.Application
 {
@@ -100,8 +100,7 @@ namespace SdfGlueEditor.Application
 
             string txt = doc.InnerXml.ToString();
 
-            //new SetClipboardHelper(System.Windows.Forms.DataFormats.Text, txt).Go();
-            ClipboardHelper.SetTextToClipboard(txt);
+            ClipboardUtils.SetText(txt);
         }
 
         public void OnCutObject(SdfObject node)
@@ -126,7 +125,8 @@ namespace SdfGlueEditor.Application
                 return;
 
             //string txt = System.Windows.Forms.Clipboard.GetText();
-            string txt = ClipboardHelper.GetTextFromClipboard();
+            string? txt = ClipboardUtils.GetText();
+
             XmlDocument doc = new XmlDocument();
             XmlNode xmlNode = null;
 

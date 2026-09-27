@@ -3,6 +3,8 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
+using SingleDocAppCore.Model.DataNodes;
+
 namespace SdfGlueCore.Model.DataNodes.Signals
 {
     public class SignalsCollection : TreeNode

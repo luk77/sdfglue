@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using SdfGlueCore.Model.CodeFragments;
+using SingleDocAppCore.Model.DataNodes;
 
 namespace SdfGlueCore.Model.DataNodes
 {

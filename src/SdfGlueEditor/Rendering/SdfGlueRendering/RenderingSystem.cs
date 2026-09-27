@@ -7,8 +7,8 @@ using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
 using OpenTK.Graphics.OpenGL4;
 using SdfGlueCore.Model.DataNodes;
-using SdfGlueCore.Model.BaseTypes;
-using TreeNode = SdfGlueCore.Model.DataNodes.TreeNode;
+using SingleDocAppCore.Model.BaseTypes;
+using TreeNode = SingleDocAppCore.Model.DataNodes.TreeNode;
 using OpenTK.Mathematics;
 using SdfGlueCore.AbstractRenderer;
 

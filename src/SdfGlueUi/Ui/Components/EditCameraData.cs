@@ -6,6 +6,8 @@
 using ImGuiNET;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueUi.Ui.Properties;
+using SingleDocAppFramework.Ui.Properties;
+using SingleDocAppFramework.Ui;
 
 namespace SdfGlueUi.Ui.Components
 {

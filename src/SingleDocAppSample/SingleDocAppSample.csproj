@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>True</UseWindowsForms>
+  </PropertyGroup>
+
+  <!-- Uses only the framework projects - nothing from SdfGlue -->
+  <ItemGroup>
+    <ProjectReference Include="..\SingleDocAppCore\SingleDocAppCore.csproj" />
+    <ProjectReference Include="..\SingleDocAppFramework\SingleDocAppFramework.csproj" />
+    <ProjectReference Include="..\SingleDocAppPlatformWin\SingleDocAppPlatformWin.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -3,9 +3,10 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
-using SdfGlueCore.Model.BaseTypes;
-using SdfGlueCore.Utils;
+using SingleDocAppCore.Model.BaseTypes;
+using SingleDocAppCore.Utils;
 using System.Xml;
+using SingleDocAppCore.Model.DataNodes;
 
 namespace SdfGlueCore.Model.DataNodes
 {

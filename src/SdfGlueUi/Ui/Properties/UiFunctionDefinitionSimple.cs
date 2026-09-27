@@ -13,7 +13,7 @@ namespace SdfGlueUi.Ui.Properties
 {
     public class UiFunctionDefinitionSimple
     {
-        public static void Build(IUiActionsExecutor actionsExec, ref int id, string name, FunctionEntity functionEntity, FunctionDefinitionsSet definitions)
+        public static void Build(IUiExecutorSdfGlue actionsExec, ref int id, string name, FunctionEntity functionEntity, FunctionDefinitionsSet definitions)
         {
             string[] defs = definitions.GetDefinitionsNames();
 

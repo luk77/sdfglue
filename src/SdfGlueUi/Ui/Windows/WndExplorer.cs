@@ -4,16 +4,18 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using ImGuiNET;
-using SdfGlueUi.Input;
+using SingleDocAppFramework.Input;
 using SdfGlueCore.Model;
 using SdfGlueUi.Ui.Components;
 using SdfGlueUi.Ui.Properties;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
+using SingleDocAppCore.Model.DataNodes;
+using SingleDocAppFramework.Ui.Properties;
 
 namespace SdfGlueUi.Ui.Windows
 {
-    public class WndExplorer : UiWindowBase
+    public class WndExplorer : UiWindowSdfGlue
     {
         public override string Title => "Project Explorer";
 
@@ -23,7 +25,9 @@ namespace SdfGlueUi.Ui.Windows
 
         public override void Build()
         {
-            BuildWindow(uiMgr_.DistanceX, uiMgr_.BasePosY, uiMgr_.LeftColWidth, uiMgr_.ExplorerHeight, delegate()
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
+            BuildWindow(uiMgr.DistanceX, uiMgr.BasePosY, uiMgr.LeftColWidth, uiMgr.ExplorerHeight, delegate()
             {
                 //Debug_BuildTestTree();
 
@@ -69,6 +73,8 @@ namespace SdfGlueUi.Ui.Windows
 
         private void AddTreeNodeToUi(ref int id, TreeNode node, ref TreeNode clickedNode)
         {
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
             ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick | ImGuiTreeNodeFlags.DefaultOpen;
             if (node.IsSelected)
                 flags |= ImGuiTreeNodeFlags.Selected;
@@ -101,30 +107,30 @@ namespace SdfGlueUi.Ui.Windows
                 {
                     //if (ImGui.BeginMenu("Edit"))
                     {
-                        //if (ImGui.MenuItem("Insert new" , "CTRL+I"      ))  { uiMgr_.ActionsExecutor.OnAddChildObject           (node as SdfObject, null); ImGui.CloseCurrentPopup(); }
+                        //if (ImGui.MenuItem("Insert new" , "CTRL+I"      ))  { uiMgr.ActionsExecutor.OnAddChildObject           (node as SdfObject, null); ImGui.CloseCurrentPopup(); }
                         if (ImGui.BeginMenu("Insert as child"))
                         {
                             //FunctionDefinition fd = MenuFunctionDefinition.Build("insert_child_"+node.Name, ((SdfObject)node).FunctionSdf, GetModel().SdfDefinitions);
                             FunctionDefinition fd = MenuFunctionDefinition.Build(GetModel().SdfDefinitions);
                             if (fd != null)
                             {
-                                uiMgr_.ActionsExecutor.OnAddChildObject(node as SdfObject, fd);
+                                uiMgr.ActionsExecutor.OnAddChildObject(node as SdfObject, fd);
                                 ImGui.CloseCurrentPopup(); 
                             }
                             ImGui.EndMenu();
                         }
-                        if (ImGui.MenuItem("Delete"     , "DEL"         ))  { uiMgr_.ActionsExecutor.OnDeleteNode               (node); ImGui.CloseCurrentPopup(); }
+                        if (ImGui.MenuItem("Delete"     , "DEL"         ))  { uiMgr.ActionsExecutor.OnDeleteNode               (node); ImGui.CloseCurrentPopup(); }
                         ImGui.Separator();
-                        if (ImGui.MenuItem("Cut"        , "CTRL+X"      ))  { uiMgr_.ActionsExecutor.OnCutObject                (node as SdfObject); ImGui.CloseCurrentPopup(); }
-                        if (ImGui.MenuItem("Copy"       , "CTRL+C"      ))  { uiMgr_.ActionsExecutor.OnCopyObject               (node as SdfObject); ImGui.CloseCurrentPopup(); }
-                        //if (ImGui.MenuItem("Paste"      , "CTRL+V"      ))  { uiMgr_.ActionsExecutor.OnPasteObject              (node as SdfObject); ImGui.CloseCurrentPopup(); }
+                        if (ImGui.MenuItem("Cut"        , "CTRL+X"      ))  { uiMgr.ActionsExecutor.OnCutObject                (node as SdfObject); ImGui.CloseCurrentPopup(); }
+                        if (ImGui.MenuItem("Copy"       , "CTRL+C"      ))  { uiMgr.ActionsExecutor.OnCopyObject               (node as SdfObject); ImGui.CloseCurrentPopup(); }
+                        //if (ImGui.MenuItem("Paste"      , "CTRL+V"      ))  { uiMgr.ActionsExecutor.OnPasteObject              (node as SdfObject); ImGui.CloseCurrentPopup(); }
                         if (ImGui.MenuItem("Paste"          , "CTRL+V"          ))  { pasteRequest_ = true; pasteActionSelectedNode_ = node; pasteAsChild_ = false; ImGui.CloseCurrentPopup(); }
                         if (ImGui.MenuItem("Paste as child" , "CTRL+SHIFT+V"    ))  { pasteRequest_ = true; pasteActionSelectedNode_ = node; pasteAsChild_ = true;  ImGui.CloseCurrentPopup(); }
                         ImGui.Separator();
-                        if (ImGui.MenuItem("Move up"    , "CTRL+UP"     ))  { uiMgr_.ActionsExecutor.OnMoveNodeUp               (node); ImGui.CloseCurrentPopup(); }
-                        if (ImGui.MenuItem("Move down"  , "CTRL+DOWN"   ))  { uiMgr_.ActionsExecutor.OnMoveNodeDown             (node); ImGui.CloseCurrentPopup(); }
+                        if (ImGui.MenuItem("Move up"    , "CTRL+UP"     ))  { uiMgr.ActionsExecutor.OnMoveNodeUp               (node); ImGui.CloseCurrentPopup(); }
+                        if (ImGui.MenuItem("Move down"  , "CTRL+DOWN"   ))  { uiMgr.ActionsExecutor.OnMoveNodeDown             (node); ImGui.CloseCurrentPopup(); }
                         ImGui.Separator();
-                        if (ImGui.MenuItem("Focus"      , "F"           ))  { uiMgr_.ActionsExecutor.OnFocusObject              (node as SdfObject); ImGui.CloseCurrentPopup(); }
+                        if (ImGui.MenuItem("Focus"      , "F"           ))  { uiMgr.ActionsExecutor.OnFocusObject              (node as SdfObject); ImGui.CloseCurrentPopup(); }
                         //ImGui.EndMenu();
 
                     }
@@ -143,7 +149,7 @@ namespace SdfGlueUi.Ui.Windows
                         FunctionDefinition fd = MenuFunctionDefinition.Build(GetModel().Renderers);
                         if (fd != null)
                         {
-                            uiMgr_.ActionsExecutor.OnAddRenderPass(node as RenderingData, fd);
+                            uiMgr.ActionsExecutor.OnAddRenderPass(node as RenderingData, fd);
                             ImGui.CloseCurrentPopup(); 
                         }
 
@@ -163,15 +169,15 @@ namespace SdfGlueUi.Ui.Windows
 
                 if (ImGui.BeginPopupContextItem())
                 {
-                    if (ImGui.MenuItem("Delete"     , "DEL"         ))  { uiMgr_.ActionsExecutor.OnDeleteNode           (node); ImGui.CloseCurrentPopup(); }
+                    if (ImGui.MenuItem("Delete"     , "DEL"         ))  { uiMgr.ActionsExecutor.OnDeleteNode           (node); ImGui.CloseCurrentPopup(); }
                     ImGui.Separator();
-                    if (ImGui.MenuItem("Cut"        , "CTRL+X"      ))  { uiMgr_.ActionsExecutor.OnCutRenderPass        (node as RenderPassData); ImGui.CloseCurrentPopup(); }
-                    if (ImGui.MenuItem("Copy"       , "CTRL+C"      ))  { uiMgr_.ActionsExecutor.OnCopyRenderPass       (node as RenderPassData); ImGui.CloseCurrentPopup(); }
-                    //if (ImGui.MenuItem("Paste"      , "CTRL+V"      ))  { uiMgr_.ActionsExecutor.OnPasteRenderPass      (node as RenderPassData); ImGui.CloseCurrentPopup(); }
+                    if (ImGui.MenuItem("Cut"        , "CTRL+X"      ))  { uiMgr.ActionsExecutor.OnCutRenderPass        (node as RenderPassData); ImGui.CloseCurrentPopup(); }
+                    if (ImGui.MenuItem("Copy"       , "CTRL+C"      ))  { uiMgr.ActionsExecutor.OnCopyRenderPass       (node as RenderPassData); ImGui.CloseCurrentPopup(); }
+                    //if (ImGui.MenuItem("Paste"      , "CTRL+V"      ))  { uiMgr.ActionsExecutor.OnPasteRenderPass      (node as RenderPassData); ImGui.CloseCurrentPopup(); }
                     if (ImGui.MenuItem("Paste"      , "CTRL+V"      ))  { pasteRequest_ = true; pasteActionSelectedNode_ = node; pasteAsChild_ = false; ImGui.CloseCurrentPopup(); }
                     ImGui.Separator();
-                    if (ImGui.MenuItem("Move up"    , "CTRL+UP"     ))  { uiMgr_.ActionsExecutor.OnMoveNodeUp           (node); ImGui.CloseCurrentPopup(); }
-                    if (ImGui.MenuItem("Move down"  , "CTRL+DOWN"   ))  { uiMgr_.ActionsExecutor.OnMoveNodeDown         (node); ImGui.CloseCurrentPopup(); }
+                    if (ImGui.MenuItem("Move up"    , "CTRL+UP"     ))  { uiMgr.ActionsExecutor.OnMoveNodeUp           (node); ImGui.CloseCurrentPopup(); }
+                    if (ImGui.MenuItem("Move down"  , "CTRL+DOWN"   ))  { uiMgr.ActionsExecutor.OnMoveNodeDown         (node); ImGui.CloseCurrentPopup(); }
 
                     clickedNode = node;
 
@@ -186,7 +192,7 @@ namespace SdfGlueUi.Ui.Windows
                     if (ImGui.MenuItem("Add new material"     , ""))
                     {
                         GetModel().AddNewMaterial("New material " + GetModel().NextAvailableMaterialId);
-                        uiMgr_.ActionsExecutor.OnRebuildShader();
+                        uiMgr.ActionsExecutor.OnRebuildShader();
 
                         ImGui.CloseCurrentPopup(); 
                     }
@@ -200,14 +206,14 @@ namespace SdfGlueUi.Ui.Windows
             {
                 if (ImGui.BeginPopupContextItem())
                 {
-                    if (ImGui.MenuItem("Delete"     , "DEL"         ))  { uiMgr_.ActionsExecutor.OnDeleteNode           (node); ImGui.CloseCurrentPopup(); }
+                    if (ImGui.MenuItem("Delete"     , "DEL"         ))  { uiMgr.ActionsExecutor.OnDeleteNode           (node); ImGui.CloseCurrentPopup(); }
                     ImGui.Separator();
-                    //if (ImGui.MenuItem("Cut"        , "CTRL+X"      ))  { uiMgr_.ActionsExecutor.OnCutMaterial          (node as MaterialInstance); ImGui.CloseCurrentPopup(); }
-                    //if (ImGui.MenuItem("Copy"       , "CTRL+C"      ))  { uiMgr_.ActionsExecutor.OnCopyMaterial         (node as MaterialInstance); ImGui.CloseCurrentPopup(); }
-                    //if (ImGui.MenuItem("Paste"      , "CTRL+V"      ))  { uiMgr_.ActionsExecutor.OnPasteMaterial        (node as MaterialInstance); ImGui.CloseCurrentPopup(); }
+                    //if (ImGui.MenuItem("Cut"        , "CTRL+X"      ))  { uiMgr.ActionsExecutor.OnCutMaterial          (node as MaterialInstance); ImGui.CloseCurrentPopup(); }
+                    //if (ImGui.MenuItem("Copy"       , "CTRL+C"      ))  { uiMgr.ActionsExecutor.OnCopyMaterial         (node as MaterialInstance); ImGui.CloseCurrentPopup(); }
+                    //if (ImGui.MenuItem("Paste"      , "CTRL+V"      ))  { uiMgr.ActionsExecutor.OnPasteMaterial        (node as MaterialInstance); ImGui.CloseCurrentPopup(); }
                     //ImGui.Separator();
-                    if (ImGui.MenuItem("Move up"    , "CTRL+UP"     ))  { uiMgr_.ActionsExecutor.OnMoveNodeUp           (node); ImGui.CloseCurrentPopup(); }
-                    if (ImGui.MenuItem("Move down"  , "CTRL+DOWN"   ))  { uiMgr_.ActionsExecutor.OnMoveNodeDown         (node); ImGui.CloseCurrentPopup(); }
+                    if (ImGui.MenuItem("Move up"    , "CTRL+UP"     ))  { uiMgr.ActionsExecutor.OnMoveNodeUp           (node); ImGui.CloseCurrentPopup(); }
+                    if (ImGui.MenuItem("Move down"  , "CTRL+DOWN"   ))  { uiMgr.ActionsExecutor.OnMoveNodeDown         (node); ImGui.CloseCurrentPopup(); }
 
                     clickedNode = node;
 
@@ -328,30 +334,32 @@ namespace SdfGlueUi.Ui.Windows
             if (!IsFocused)
                 return;
 
-            bool isControlKeyDown   = uiMgr_.ActionsExecutor.IsKeyDown(UiKey.LeftControl)  || uiMgr_.ActionsExecutor.IsKeyDown(UiKey.RightControl);
-            bool isShiftKeyDown     = uiMgr_.ActionsExecutor.IsKeyDown(UiKey.LeftShift)    || uiMgr_.ActionsExecutor.IsKeyDown(UiKey.RightShift);
-            //bool isAltKeyDown     = uiMgr_.ActionsExecutor.IsKeyDown(UiKey.LeftAlt)      || uiMgr_.ActionsExecutor.IsKeyDown(UiKey.RightAlt);
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
 
-            DataModel model = uiMgr_.ActionsExecutor.GetModel();
+            bool isControlKeyDown   = uiMgr.ActionsExecutor.IsKeyDown(UiKey.LeftControl)  || uiMgr.ActionsExecutor.IsKeyDown(UiKey.RightControl);
+            bool isShiftKeyDown     = uiMgr.ActionsExecutor.IsKeyDown(UiKey.LeftShift)    || uiMgr.ActionsExecutor.IsKeyDown(UiKey.RightShift);
+            //bool isAltKeyDown     = uiMgr.ActionsExecutor.IsKeyDown(UiKey.LeftAlt)      || uiMgr.ActionsExecutor.IsKeyDown(UiKey.RightAlt);
+
+            DataModel model = uiMgr.ActionsExecutor.GetModel();
 
             // Delete object
-            if (uiMgr_.ActionsExecutor.IsKeyPressed(UiKey.Delete))
+            if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.Delete))
             {
-                uiMgr_.ActionsExecutor.OnDeleteNode(model.SelectedNode);
+                uiMgr.ActionsExecutor.OnDeleteNode(model.SelectedNode);
             }
 
             if (isControlKeyDown)
             {
                 // Cut, copy, paste
-                if (uiMgr_.ActionsExecutor.IsKeyPressed(UiKey.X))
+                if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.X))
                 {
-                    uiMgr_.ActionsExecutor.OnCutObject(GetModel().SelectedNode as SdfObject);
+                    uiMgr.ActionsExecutor.OnCutObject(GetModel().SelectedNode as SdfObject);
                 }
-                if (uiMgr_.ActionsExecutor.IsKeyPressed(UiKey.C))
+                if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.C))
                 {
-                    uiMgr_.ActionsExecutor.OnCopyObject(GetModel().SelectedNode as SdfObject);
+                    uiMgr.ActionsExecutor.OnCopyObject(GetModel().SelectedNode as SdfObject);
                 }
-                if (uiMgr_.ActionsExecutor.IsKeyPressed(UiKey.V))
+                if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.V))
                 {
                     if (isShiftKeyDown)
                     {
@@ -366,13 +374,13 @@ namespace SdfGlueUi.Ui.Windows
                 }
 
                 // Move up / down
-                if (uiMgr_.ActionsExecutor.IsKeyPressed(UiKey.Up))
+                if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.Up))
                 {
-                    uiMgr_.ActionsExecutor.OnMoveNodeUp(GetModel().SelectedNode);
+                    uiMgr.ActionsExecutor.OnMoveNodeUp(GetModel().SelectedNode);
                 }
-                if (uiMgr_.ActionsExecutor.IsKeyPressed(UiKey.Down))
+                if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.Down))
                 {
-                    uiMgr_.ActionsExecutor.OnMoveNodeDown(GetModel().SelectedNode);
+                    uiMgr.ActionsExecutor.OnMoveNodeDown(GetModel().SelectedNode);
                 }
             }
         }
@@ -382,6 +390,8 @@ namespace SdfGlueUi.Ui.Windows
             if (selectedNode == null)
                 return;
 
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
             SdfObject sdfObject = selectedNode as SdfObject;
             if (sdfObject != null)
             {
@@ -390,24 +400,24 @@ namespace SdfGlueUi.Ui.Windows
                     // We prefer to add object as sibling (attach to parent if it exist)
                     if (sdfObject.Parent as SdfObject != null)
                     {
-                        uiMgr_.ActionsExecutor.OnPasteObject(sdfObject.Parent as SdfObject);
+                        uiMgr.ActionsExecutor.OnPasteObject(sdfObject.Parent as SdfObject);
                     }
                     else
                     {
                         // If there is no parent, we paste as a child
-                        uiMgr_.ActionsExecutor.OnPasteObject(sdfObject);
+                        uiMgr.ActionsExecutor.OnPasteObject(sdfObject);
                     }
                 }
                 else
                 {
                     // Pasting with shift adds object as child
-                    uiMgr_.ActionsExecutor.OnPasteObject(sdfObject as SdfObject);
+                    uiMgr.ActionsExecutor.OnPasteObject(sdfObject as SdfObject);
                 }
             }
 
             if (selectedNode is RenderPassData)
             {
-                uiMgr_.ActionsExecutor.OnPasteRenderPass();
+                uiMgr.ActionsExecutor.OnPasteRenderPass();
             }
         }
     }
