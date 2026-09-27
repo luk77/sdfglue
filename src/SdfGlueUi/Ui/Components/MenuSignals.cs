@@ -4,14 +4,14 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using ImGuiNET;
-using SdfGlueCore.Model;
 using SdfGlueCore.Model.DataNodes.Signals;
+using SingleDocAppCore.Model;
 
 namespace SdfGlueUi.Ui.Components
 {
     public class MenuSignals
     {
-        public static SignalInstance Build(SignalsCollection signals, SignalInstance oldVal, DataModel.OnValueChanged onValueChanged = null)
+        public static SignalInstance Build(SignalsCollection signals, SignalInstance oldVal, OnValueChanged onValueChanged = null)
         {
             SignalInstance selected = null;
             if (ImGui.MenuItem("None"))
@@ -44,7 +44,7 @@ namespace SdfGlueUi.Ui.Components
             return oldVal; // no change
         }
 
-        public static SignalInstance BuildPopup(string menuName, SignalsCollection signals, SignalInstance oldVal, DataModel.OnValueChanged onValueChanged = null)
+        public static SignalInstance BuildPopup(string menuName, SignalsCollection signals, SignalInstance oldVal, OnValueChanged onValueChanged = null)
         {
             if (!ImGui.BeginPopup(menuName))
                 return oldVal;

@@ -1,6 +1,6 @@
 ﻿using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
-using SdfGlueCore.Model.BaseTypes;
+using SingleDocAppCore.Model.BaseTypes;
 using SdfGlueCore.Model.DataNodes;
 
 namespace SdfGlueCore.AbstractRenderer

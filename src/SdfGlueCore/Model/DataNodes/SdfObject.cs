@@ -6,7 +6,9 @@
 using SdfGlueCore.Model.BaseTypes;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.Entities;
-using SdfGlueCore.Utils;
+using SingleDocAppCore.Utils;
+using SingleDocAppCore.Model;
+using SingleDocAppCore.Model.BaseTypes;
 using System.Numerics;
 using System.Xml;
 
@@ -91,8 +93,10 @@ namespace SdfGlueCore.Model.DataNodes
             return opEntity;
         }
 
-        public override bool Deserialize(XmlNode nodeThis, DataModel model)
+        public override bool Deserialize(XmlNode nodeThis, IAbstractDocument doc)
         {
+            DataModel? model = doc as DataModel;
+
             XmlUtils.DeserializeInt     (nodeThis, "Id"             , ref Id            );
             XmlUtils.DeserializeString  (nodeThis, "Name"           , ref Name.Val      );
             XmlUtils.DeserializeBool    (nodeThis, "IsSelected"     , ref IsSelected    );

@@ -4,14 +4,14 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using ImGuiNET;
-using SdfGlueCore.Model;
 using SdfGlueCore.Model.DataNodes;
+using SingleDocAppCore.Model;
 
 namespace SdfGlueUi.Ui.Components
 {
     public class MenuMaterials
     {
-        public static MaterialInstance Build(MaterialsCollection materials, DataModel.OnValueChanged onValueChanged = null)
+        public static MaterialInstance Build(MaterialsCollection materials, OnValueChanged onValueChanged = null)
         {
             MaterialInstance selected = null;
             foreach (MaterialInstance mat in materials.Children)
@@ -27,7 +27,7 @@ namespace SdfGlueUi.Ui.Components
             return selected;
         }
 
-        public static MaterialInstance BuildPopup(string menuName, MaterialsCollection materials, DataModel.OnValueChanged onValueChanged = null)
+        public static MaterialInstance BuildPopup(string menuName, MaterialsCollection materials, OnValueChanged onValueChanged = null)
         {
             if (!ImGui.BeginPopup(menuName))
                 return null;

@@ -4,7 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using SdfGlueCore.Model.Entities;
-using SdfGlueCore.Utils;
+using SingleDocAppCore.Utils;
 using System.Xml;
 
 namespace SdfGlueCore.Model.CodeFragments

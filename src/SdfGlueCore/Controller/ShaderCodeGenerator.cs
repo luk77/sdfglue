@@ -4,12 +4,14 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using SdfGlueCore.Model;
-using SdfGlueCore.Model.BaseTypes;
+using SingleDocAppCore.Model.BaseTypes;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueCore.Model.Entities;
 using System.Globalization;
+using System.Reflection;
 using System.Text;
+using SingleDocAppCore.Model.DataNodes;
 
 namespace SdfGlueCore.Controller
 {
@@ -54,17 +56,17 @@ namespace SdfGlueCore.Controller
         }
 
 
+        private DataModel                   model_ = null;
 
-        private DataModel                   model_ = new DataModel();
 
-        public ShaderCodeGenerator()
+        public ShaderCodeGenerator(DataModel model)
         {
-            CreateNewModel();
+            SetModel(model);
         }
 
-        public void CreateNewModel()
+        public void SetModel(DataModel model)
         {
-            model_ = new DataModel();
+            model_ = model;
         }
 
         public DataModel GetModel()

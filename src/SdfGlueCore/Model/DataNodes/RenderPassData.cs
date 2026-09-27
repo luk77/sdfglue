@@ -8,7 +8,9 @@ using SdfGlueCore.Controller;
 using SdfGlueCore.Model.BaseTypes;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.Entities;
-using SdfGlueCore.Utils;
+using SingleDocAppCore.Utils;
+using SingleDocAppCore.Model;
+using SingleDocAppCore.Model.BaseTypes;
 using System.Drawing;
 using System.Text;
 using System.Xml;
@@ -166,7 +168,7 @@ namespace SdfGlueCore.Model.DataNodes
             CameraOperators      .ResetPrevVal();
         }
 
-        public override bool Deserialize(XmlNode nodeThis, DataModel model)
+        public override bool Deserialize(XmlNode nodeThis, IAbstractDocument model)
         {
             XmlUtils.DeserializeInt     (nodeThis, "Id"             , ref Id                    );
             XmlUtils.DeserializeString  (nodeThis, "Name"           , ref Name.Val              );

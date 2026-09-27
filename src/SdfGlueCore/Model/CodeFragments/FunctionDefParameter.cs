@@ -3,9 +3,11 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
-using SdfGlueCore.Model.BaseTypes;
-using SdfGlueCore.Utils;
+using SingleDocAppCore.Model.BaseTypes;
+using SingleDocAppCore.Utils;
 using System.Xml;
+using SdfGlueCore.Model.BaseTypes;
+using SingleDocAppCore.Model;
 
 namespace SdfGlueCore.Model.CodeFragments
 {
@@ -22,7 +24,7 @@ namespace SdfGlueCore.Model.CodeFragments
         public          float                           MinVal;
         public          float                           MaxVal;
         public          float                           ValSpeed = 0.01f;
-        public          SdfParamLimitsType              LimitsType;
+        public          LimitsType                      LimitsType;
         public          bool                            EditInDegrees;
         public          ParamEditorType                 EditorType;
 
@@ -84,11 +86,11 @@ namespace SdfGlueCore.Model.CodeFragments
 
             bool hasMin = node.Attributes?.GetNamedItem("min") != null;
             bool hasMax = node.Attributes?.GetNamedItem("max") != null;
-            LimitsType = SdfParamLimitsType.None;
+            LimitsType = LimitsType.None;
             if (hasMin)
-                LimitsType = SdfParamLimitsType.Min;
+                LimitsType = LimitsType.Min;
             if (hasMax)
-                LimitsType = SdfParamLimitsType.MinMax;
+                LimitsType = LimitsType.MinMax;
 
             EditorType = ParamEditorType.Default;
             string? strEditor = XmlUtils.LoadAttributeAsString(node, "editor", null);

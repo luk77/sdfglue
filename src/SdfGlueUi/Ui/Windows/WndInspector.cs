@@ -7,27 +7,32 @@ using ImGuiNET;
 using SdfGlueCore.Model;
 using SdfGlueUi.Ui.Components;
 using SdfGlueUi.Ui.Properties;
-using SdfGlueCore.UndoSystem;
-using SdfGlueCore.UndoSystem.Actions;
+using SingleDocAppCore.UndoSystem;
+using SingleDocAppCore.UndoSystem.Actions;
 using System.Numerics;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueCore.Model.Entities;
 using SdfGlueCore.Model.DataNodes.Signals;
+using SingleDocAppCore.Model.DataNodes;
+using SingleDocAppFramework.Ui.Properties;
+using SingleDocAppCore.Model;
 
 namespace SdfGlueUi.Ui.Windows
 {
-    public class WndInspector : UiWindowBase
+    public class WndInspector : UiWindowSdfGlue
     {
         public override string Title => "Details";
 
         public override void Build()
         {
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
             TreeNode selectedNode = GetModel().SelectedNode;
 
             int index = 1;
 
-            BuildWindow(uiMgr_.LeftColPosX, uiMgr_.InspectorPosY, uiMgr_.LeftColWidth, uiMgr_.InspectorHeight, delegate()
+            BuildWindow(uiMgr.LeftColPosX, uiMgr.InspectorPosY, uiMgr.LeftColWidth, uiMgr.InspectorHeight, delegate()
             {
                 if (selectedNode is DataModel)
                 {
@@ -35,8 +40,8 @@ namespace SdfGlueUi.Ui.Windows
                     if (ImGui.CollapsingHeader("Project settings", ImGuiTreeNodeFlags.DefaultOpen))
                     {
                         BeginPropertyGrid(GetDefaultFirstColumnWidth());
-                        UiBool.Build(ref index, "Fix all objects"         , model.ProjSettings.FixAllObjects   , uiMgr_.ActionsExecutor.OnRebuildShader);
-                        UiBool.Build(ref index, "Use 4d (experimental)"   , model.ProjSettings.Use4d           , uiMgr_.ActionsExecutor.OnRebuildShader);
+                        UiBool.Build(ref index, "Fix all objects"         , model.ProjSettings.FixAllObjects   , uiMgr.ActionsExecutor.OnRebuildShader);
+                        UiBool.Build(ref index, "Use 4d (experimental)"   , model.ProjSettings.Use4d           , uiMgr.ActionsExecutor.OnRebuildShader);
                         EndPropertyGrid();
                     }
                 }
@@ -53,29 +58,29 @@ namespace SdfGlueUi.Ui.Windows
 
                     UiString.BuildReadonly  (ref index, "Id"          , selectedSdfNode.Id.ToString());
                     UiString.Build          (ref index, "Name"        , selectedSdfNode.Name);
-                    UiBool.Build            (ref index, "Fixed"       , selectedSdfNode.IsFixed, uiMgr_.ActionsExecutor.OnRebuildShader);
+                    UiBool.Build            (ref index, "Fixed"       , selectedSdfNode.IsFixed, uiMgr.ActionsExecutor.OnRebuildShader);
 
                     ImGui.Separator();
 
                     bool isFixed = GetModel().ProjSettings.FixAllObjects.Val || selectedSdfNode.IsFixed.Val;
                     if (!isFixed)
                     {
-                        UiBool.Build(ref index, "Use in distance func."     , selectedSdfNode.UseInDistanceFunction , uiMgr_.ActionsExecutor.OnRebuildShader);
-                        UiBool.Build(ref index, "Use in materials func."    , selectedSdfNode.UseInMaterialsFunction, uiMgr_.ActionsExecutor.OnRebuildShader);
+                        UiBool.Build(ref index, "Use in distance func."     , selectedSdfNode.UseInDistanceFunction , uiMgr.ActionsExecutor.OnRebuildShader);
+                        UiBool.Build(ref index, "Use in materials func."    , selectedSdfNode.UseInMaterialsFunction, uiMgr.ActionsExecutor.OnRebuildShader);
                         ImGui.Separator();
 
-                        UiBool.Build(ref index, "Use Shape"     , selectedSdfNode.UseShape, uiMgr_.ActionsExecutor.OnRebuildShader);
+                        UiBool.Build(ref index, "Use Shape"     , selectedSdfNode.UseShape, uiMgr.ActionsExecutor.OnRebuildShader);
                         if (selectedSdfNode.UseShape.Val)
                         {
-                            UiFunctionDefinition.Build(uiMgr_.ActionsExecutor, ref index, "Shape definition", selectedSdfNode.FunctionSdf, GetModel().SdfDefinitions);
+                            UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Shape definition", selectedSdfNode.FunctionSdf, GetModel().SdfDefinitions);
                             BuildPropertiesForParameters(ref index, selectedSdfNode.FunctionSdf);
                         }
                         ImGui.Separator();
 
-                        UiFunctionDefinition.Build(uiMgr_.ActionsExecutor, ref index, "Mix operator", selectedSdfNode.FunctionMixOp, GetModel().MixOpDefinitions);
+                        UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Mix operator", selectedSdfNode.FunctionMixOp, GetModel().MixOpDefinitions);
                         BuildPropertiesForParameters(ref index, selectedSdfNode.FunctionMixOp);
 
-                        UiFloat.Build(ref index, "Blending"      , selectedSdfNode.BlendFactor, 0.01f, SdfParamLimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals);
+                        UiFloatWithSignal.Build(ref index, "Blending"      , selectedSdfNode.BlendFactor, 0.01f, LimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals);
                     }
                     EndPropertyGrid();
 
@@ -96,7 +101,7 @@ namespace SdfGlueUi.Ui.Windows
                                 // Material Id
                                 BuildPropertyMaterial(index++, "Material", selectedSdfNode);
 
-                                UiFloat.Build(ref index, "Material Blending"      , selectedSdfNode.MaterialBlendFactor, 0.01f, SdfParamLimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals);
+                                UiFloatWithSignal.Build(ref index, "Material Blending"      , selectedSdfNode.MaterialBlendFactor, 0.01f, LimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals);
 
                                 EndPropertyGrid();
                             }
@@ -143,20 +148,20 @@ namespace SdfGlueUi.Ui.Windows
                         BeginPropertyGrid(GetDefaultFirstColumnWidth());
 
                         // renderer
-                        UiFunctionDefinition.Build(uiMgr_.ActionsExecutor, ref index, "Pass type", passData.RendererFunc, GetModel().Renderers);
+                        UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Pass type", passData.RendererFunc, GetModel().Renderers);
 
                         UiString.Build(ref index, "Name"                 , passData.Name);
 
                         ImGui.Separator();
 
                         UiBool.Build(ref index, "Enabled"                 , passData.Enabled);
-                        UiBool.Build(ref index, "Fixed"                   , passData.IsFixed, uiMgr_.ActionsExecutor.OnRebuildShader);
+                        UiBool.Build(ref index, "Fixed"                   , passData.IsFixed, uiMgr.ActionsExecutor.OnRebuildShader);
 
                         UiBool.Build(ref index, "Clear on every frame"    , passData.ClearOnEveryFrame);
                         UiColor3.Build(ref index, "Clear color"             , passData.ClearColor);
                         UiFloat.Build(ref index, "Clear opacity"           , passData.ClearOpacity, 0.01f);
 
-                        UiBool.Build(ref index, "Use texture filtering"       , passData.UseTextureFiltering, uiMgr_.ActionsExecutor.OnRebuildPreviewTexture);
+                        UiBool.Build(ref index, "Use texture filtering"       , passData.UseTextureFiltering, uiMgr.ActionsExecutor.OnRebuildPreviewTexture);
 
                         ImGui.Separator();
 
@@ -176,7 +181,7 @@ namespace SdfGlueUi.Ui.Windows
                         {
                             BeginPropertyGrid(GetDefaultFirstColumnWidth());
 
-                            UiFunctionDefinition.Build(uiMgr_.ActionsExecutor, ref index, "Backdrop type", passData.BackdropFunc, GetModel().BackdropsDefinitions);
+                            UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Backdrop type", passData.BackdropFunc, GetModel().BackdropsDefinitions);
 
                             if (passData.BackdropFunc.HasAnyParameters())
                             {
@@ -206,7 +211,7 @@ namespace SdfGlueUi.Ui.Windows
                         {
                             BeginPropertyGrid(GetDefaultFirstColumnWidth());
 
-                            BuildPropertiesForCompilationParameters(ref index, passData.RendererFunc, uiMgr_.ActionsExecutor.OnRebuildShader);
+                            BuildPropertiesForCompilationParameters(ref index, passData.RendererFunc, uiMgr.ActionsExecutor.OnRebuildShader);
                             //ImGui.Separator();
 
                             EndPropertyGrid();
@@ -244,7 +249,7 @@ namespace SdfGlueUi.Ui.Windows
 
                     UiString.BuildReadonly(ref index, "Id"          , mat.Id.ToString());
                     UiString.Build(ref index, "Name"        , mat.Name);
-                    UiBool.Build(ref index, "Fixed"       , mat.IsFixed, uiMgr_.ActionsExecutor.OnRebuildShader);
+                    UiBool.Build(ref index, "Fixed"       , mat.IsFixed, uiMgr.ActionsExecutor.OnRebuildShader);
 
                     bool isFixed = GetModel().ProjSettings.FixAllObjects.Val || mat.IsFixed.Val;
                     if (!isFixed)
@@ -278,6 +283,8 @@ namespace SdfGlueUi.Ui.Windows
 
         private void BuildEditorForOperatorsCollection(ref int index, string title, OperatorsCollection opCollection, FunctionDefinitionsSet opDefinitions, SdfObject.DelegateInsertNewOperator delegateInsertNewOp)
         {
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
             ImGui.PushID(index++);
             if (!ImGui.CollapsingHeader(title, ImGuiTreeNodeFlags.DefaultOpen))
             {
@@ -323,14 +330,14 @@ namespace SdfGlueUi.Ui.Windows
             {
                 OperatorEntity newOpEnt = delegateInsertNewOp(indexForInsert);
                 newOpEnt.RefreshDefinitionReference(opDefinitions);
-                uiMgr_.ActionsExecutor.OnRebuildShader();
+                uiMgr.ActionsExecutor.OnRebuildShader();
                 // undo/redo support
                 UndoManager.Instance.SaveAction(new ActionDelegates(
                     delegate
                     {
                         // undo
                         opList.RemoveAt(indexForInsert);
-                        uiMgr_.ActionsExecutor.OnRebuildShader();
+                        uiMgr.ActionsExecutor.OnRebuildShader();
                     },
                     delegate
                     {
@@ -338,7 +345,7 @@ namespace SdfGlueUi.Ui.Windows
                         //tu nie można tworzyć nowej instancji, trzeba użyć istniejącej
                         opList.Insert(indexForInsert, newOpEnt);
                         //newOpEnt.RefreshDefinitionReference(opDefinitions);
-                        uiMgr_.ActionsExecutor.OnRebuildShader();
+                        uiMgr.ActionsExecutor.OnRebuildShader();
                     }
                     ));
 
@@ -347,20 +354,20 @@ namespace SdfGlueUi.Ui.Windows
             {
                 OperatorEntity opDeleted = opList[indexForDelete];
                 opList.RemoveAt(indexForDelete);
-                uiMgr_.ActionsExecutor.OnRebuildShader();
+                uiMgr.ActionsExecutor.OnRebuildShader();
                 // undo/redo support
                 UndoManager.Instance.SaveAction(new ActionDelegates(
                     delegate
                     {
                         // undo
                         opList.Insert(indexForDelete, opDeleted);
-                        uiMgr_.ActionsExecutor.OnRebuildShader();
+                        uiMgr.ActionsExecutor.OnRebuildShader();
                     },
                     delegate
                     {
                         // redo
                         opList.RemoveAt(indexForDelete);
-                        uiMgr_.ActionsExecutor.OnRebuildShader();
+                        uiMgr.ActionsExecutor.OnRebuildShader();
                     }
                     ));
             }
@@ -369,7 +376,7 @@ namespace SdfGlueUi.Ui.Windows
                 OperatorEntity tempEnt = opList[indexForMoveUp];
                 opList.RemoveAt(indexForMoveUp);
                 opList.Insert(indexForMoveUp-1, tempEnt);
-                uiMgr_.ActionsExecutor.OnRebuildShader();
+                uiMgr.ActionsExecutor.OnRebuildShader();
                 // undo/redo support
                 UndoManager.Instance.SaveAction(new ActionDelegates(
                     delegate
@@ -377,14 +384,14 @@ namespace SdfGlueUi.Ui.Windows
                         // undo
                         opList.RemoveAt(indexForMoveUp-1);
                         opList.Insert(indexForMoveUp, tempEnt);
-                        uiMgr_.ActionsExecutor.OnRebuildShader();
+                        uiMgr.ActionsExecutor.OnRebuildShader();
                     },
                     delegate
                     {
                         // redo
                         opList.RemoveAt(indexForMoveUp);
                         opList.Insert(indexForMoveUp-1, tempEnt);
-                        uiMgr_.ActionsExecutor.OnRebuildShader();
+                        uiMgr.ActionsExecutor.OnRebuildShader();
                     }
                     ));
             }
@@ -393,7 +400,7 @@ namespace SdfGlueUi.Ui.Windows
                 OperatorEntity tempEnt = opList[indexForMoveDown];
                 opList.RemoveAt(indexForMoveDown);
                 opList.Insert(indexForMoveDown+1, tempEnt);
-                uiMgr_.ActionsExecutor.OnRebuildShader();
+                uiMgr.ActionsExecutor.OnRebuildShader();
                 // undo/redo support
                 UndoManager.Instance.SaveAction(new ActionDelegates(
                     delegate
@@ -401,14 +408,14 @@ namespace SdfGlueUi.Ui.Windows
                         // undo
                         opList.RemoveAt(indexForMoveDown+1);
                         opList.Insert(indexForMoveDown, tempEnt);
-                        uiMgr_.ActionsExecutor.OnRebuildShader();
+                        uiMgr.ActionsExecutor.OnRebuildShader();
                     },
                     delegate
                     {
                         // redo
                         opList.RemoveAt(indexForMoveDown);
                         opList.Insert(indexForMoveDown+1, tempEnt);
-                        uiMgr_.ActionsExecutor.OnRebuildShader();
+                        uiMgr.ActionsExecutor.OnRebuildShader();
                     }
                     ));
             }
@@ -419,10 +426,12 @@ namespace SdfGlueUi.Ui.Windows
 
         public void BuildPropertyChooseDefinitionOpEntity(ref int id, string title, OperatorEntity opEntity, FunctionDefinitionsSet definitions, int entIndex, ref int indexForInsert, ref int indexForDelete, ref int indexForMoveUp, ref int indexForMoveDown)
         {
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
             // string[] defs = definitions.GetDefinitionsNames(); // unused
 
             // enabled
-            UiBool.BuildSimpleCheckBoxWithUndo(ref id, opEntity.Enabled, uiMgr_.ActionsExecutor.OnRebuildShader);
+            UiBool.BuildSimpleCheckBoxWithUndo(ref id, opEntity.Enabled, uiMgr.ActionsExecutor.OnRebuildShader);
 
             ImGui.SameLine();
             ImGui.PushID(id++);
@@ -436,8 +445,8 @@ namespace SdfGlueUi.Ui.Windows
             {
                 opEntity.Definition       = fd;
                 opEntity.DefinitionName.Val   = opEntity.Definition.FunctionName;
-                uiMgr_.ActionsExecutor.OnRebuildShader();
-                UiFunctionDefinition.AddFunctionEntityUndoAction(opEntity.Definition.DisplayName, opEntity, definitions, uiMgr_.ActionsExecutor);
+                uiMgr.ActionsExecutor.OnRebuildShader();
+                UiFunctionDefinition.AddFunctionEntityUndoAction(opEntity.Definition.DisplayName, opEntity, definitions, uiMgr.ActionsExecutor);
             }
             ImGui.PopID(); // balanced the PushID used for the definition button
 
@@ -480,6 +489,8 @@ namespace SdfGlueUi.Ui.Windows
 
         private void BuildPropertyMaterial(int id, string name, SdfObject sdfObj)
         {
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
             // ComboBox w Imgui jest kiepski bo polega na indeksach i nazwach
             // Lepiej zastąpić go prostym menu.
 
@@ -503,9 +514,9 @@ namespace SdfGlueUi.Ui.Windows
                 {
                     sdfObj.MaterialId.Val = newMat.Id;
                     //Console.WriteLine("Undo save: {0}: {1}", name, sdfObj.MaterialId.Val);
-                    UndoManager.Instance.SaveAction(new ActionFloat(sdfObj.MaterialId, uiMgr_.ActionsExecutor.OnRebuildShader));
+                    UndoManager.Instance.SaveAction(new ActionFloat(sdfObj.MaterialId, uiMgr.ActionsExecutor.OnRebuildShader));
 
-                    uiMgr_.ActionsExecutor.OnRebuildShader();
+                    uiMgr.ActionsExecutor.OnRebuildShader();
                 }
             }
             else

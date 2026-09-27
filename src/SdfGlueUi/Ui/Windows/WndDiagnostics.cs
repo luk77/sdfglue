@@ -8,13 +8,15 @@ using System.Globalization;
 
 namespace SdfGlueUi.Ui.Windows
 {
-    public class WndDiagnostics : UiWindowBase
+    public class WndDiagnostics : UiWindowSdfGlue
     {
         public override string Title => "Diagnostics";
 
         public override void Build()
         {
-            BuildWindow(uiMgr_.CenterColPosX, uiMgr_.LogPosY, uiMgr_.CenterColWidth, uiMgr_.LogHeight, delegate()
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
+            BuildWindow(uiMgr.CenterColPosX, uiMgr.LogPosY, uiMgr.CenterColWidth, uiMgr.LogHeight, delegate()
             {
                 if (ImGui.CollapsingHeader("Rendering", ImGuiTreeNodeFlags.DefaultOpen))
                 {
@@ -33,9 +35,9 @@ namespace SdfGlueUi.Ui.Windows
                     ImGui.Text(String.Format("WheelPrecise: {0}", mouseState.WheelPrecise.ToString("0.0", CultureInfo.InvariantCulture)));
                     */
 
-                    ImGui.Text(String.Format("X: {0}", uiMgr_.ActionsExecutor.GetMouseStateX()));
-                    ImGui.Text(String.Format("Y: {0}", uiMgr_.ActionsExecutor.GetMouseStateY()));
-                    ImGui.Text(String.Format("WheelPrecise: {0}", uiMgr_.ActionsExecutor.GetWheelPrecise().ToString("0.0", CultureInfo.InvariantCulture)));
+                    ImGui.Text(String.Format("X: {0}", uiMgr.ActionsExecutor.GetMouseStateX()));
+                    ImGui.Text(String.Format("Y: {0}", uiMgr.ActionsExecutor.GetMouseStateY()));
+                    ImGui.Text(String.Format("WheelPrecise: {0}", uiMgr.ActionsExecutor.GetWheelPrecise().ToString("0.0", CultureInfo.InvariantCulture)));
                 }
 
             });

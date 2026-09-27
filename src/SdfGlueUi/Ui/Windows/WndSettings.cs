@@ -5,17 +5,20 @@
 //---------------------------------------------------------------------------
 using ImGuiNET;
 using SdfGlueUi.Ui.Properties;
+using SingleDocAppFramework.Ui.Properties;
 
 namespace SdfGlueUi.Ui.Windows
 {
-    public class WndSettings : UiWindowBase
+    public class WndSettings : UiWindowSdfGlue
     {
         public override string Title => "Settings";
 
         public override void Build()
         {
-            int materialsPosY = uiMgr_.BasePosY + uiMgr_.MaterialsHeight + uiMgr_.DistanceY;
-            BuildWindow(uiMgr_.RightColPosX, materialsPosY, uiMgr_.RightColWidth, uiMgr_.BaseHeight - materialsPosY + 3 * uiMgr_.DistanceY, delegate ()
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
+            int materialsPosY = uiMgr.BasePosY + uiMgr.MaterialsHeight + uiMgr.DistanceY;
+            BuildWindow(uiMgr.RightColPosX, materialsPosY, uiMgr.RightColWidth, uiMgr.BaseHeight - materialsPosY + 3 * uiMgr.DistanceY, delegate ()
             {
                 int firstColumnWidth = (int)GetDefaultFirstColumnWidth();
 

@@ -7,15 +7,17 @@ using ImGuiNET;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.BaseTypes;
 using SdfGlueCore.Model.DataNodes;
-using SdfGlueCore.Utils;
+using SingleDocAppCore.Utils;
 using SdfGlueUi.Input;
+using SingleDocAppFramework.Input;
 using SdfGlueUi.Ui.Components;
+using SingleDocAppCore.Model.BaseTypes;
 using System.Numerics;
 using System.Xml.Linq;
 
 namespace SdfGlueUi.Ui.Windows
 {
-    public class WndPreview : UiWindowBase
+    public class WndPreview : UiWindowSdfGlue
     {
         private bool                        prevStateRmb_               = false;
 
@@ -54,7 +56,9 @@ namespace SdfGlueUi.Ui.Windows
 
         public override void Build()
         {
-            BuildWindow(uiMgr_.CenterColPosX, uiMgr_.BasePosY, uiMgr_.PreviewWidth, uiMgr_.PreviewHeight, delegate()
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
+            BuildWindow(uiMgr.CenterColPosX, uiMgr.BasePosY, uiMgr.PreviewWidth, uiMgr.PreviewHeight, delegate()
             {
                 DataModel model = GetModel();
 
@@ -75,7 +79,7 @@ namespace SdfGlueUi.Ui.Windows
                 ImGui.Combo("", ref GetModel().Config.CurrentResolutionIndex, resolutions, resolutions.Length, resolutions.Length);
                 if (lastResolutionIndex != GetModel().Config.CurrentResolutionIndex)
                 {
-                    uiMgr_.ActionsExecutor.OnPreviewResolutionChanged();
+                    uiMgr.ActionsExecutor.OnPreviewResolutionChanged();
                 }
                 ImGui.PopID();
 
@@ -155,8 +159,8 @@ namespace SdfGlueUi.Ui.Windows
                         // preview image
                         //Vector2 margin = new Vector2(18.0f, 64.0f);
                         //float additionalOffsetY = 24.0f;
-                        Vector2 margin = new Vector2(9.0f, 32.0f) * (1.0f + uiMgr_.WindowsScaling);
-                        float additionalOffsetY = 12.0f * (1.0f + uiMgr_.WindowsScaling);
+                        Vector2 margin = new Vector2(9.0f, 32.0f) * (1.0f + uiMgr.WindowsScaling);
+                        float additionalOffsetY = 12.0f * (1.0f + uiMgr.WindowsScaling);
 
                         System.Numerics.Vector2 imgSize = ImGui.GetWindowSize();
                         System.Numerics.Vector2 imgSizeOrg = imgSize;
@@ -192,7 +196,7 @@ namespace SdfGlueUi.Ui.Windows
 
                         // >> debug
                         //ImGui.GetForegroundDrawList().AddRect( previewPos_, previewPos_ + previewSize_, 0xff0000ff );
-                        //IUiActionsExecutor input = uiMgr_.ActionsExecutor;
+                        //IUiInput input = uiMgr.ActionsExecutor;
                         //float mouseX = (float)input.GetMouseStateX();
                         //float mouseY = (float)input.GetMouseStateY();
                         //ImGui.GetForegroundDrawList().AddCircle( new Vector2(mouseX, mouseY), 10.0f, 0xff0000ff );
@@ -215,8 +219,10 @@ namespace SdfGlueUi.Ui.Windows
 
         public void BuildFullPreview()
         {
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
 //            ImGui.SetNextWindowPos  (new Vector2(0, 0));
-//            ImGui.SetNextWindowSize (new Vector2(uiMgr_.MainWindowSizeX, uiMgr_.MainWindowSizeY));
+//            ImGui.SetNextWindowSize (new Vector2(uiMgr.MainWindowSizeX, uiMgr.MainWindowSizeY));
 //
 //            if (!ImGui.Begin(Title, ref IsVisible, 
 //                ImGuiWindowFlags.NoTitleBar
@@ -237,7 +243,7 @@ namespace SdfGlueUi.Ui.Windows
                                     | ImGuiWindowFlags.NoScrollbar
                                     | ImGuiWindowFlags.NoCollapse;
 
-            BuildWindow(0, 0, uiMgr_.MainWindowSizeX, uiMgr_.MainWindowSizeY, flags, delegate()
+            BuildWindow(0, 0, uiMgr.MainWindowSizeX, uiMgr.MainWindowSizeY, flags, delegate()
             {
                 RenderPassData renderPass = GetModel().GetRPassDataForPreview();
 
@@ -246,9 +252,9 @@ namespace SdfGlueUi.Ui.Windows
                 // preview image
                 //Vector2 margin = new Vector2(18.0f, 64.0f);
                 //float additionalOffsetY = 24.0f;
-                //Vector2 margin = new Vector2(9.0f, 32.0f) * (1.0f + uiMgr_.WindowsScaling);
-                Vector2 margin = new Vector2(marg, marg) * (1.0f + uiMgr_.WindowsScaling);
-                float additionalOffsetY = 0.0f;//12.0f * (1.0f + uiMgr_.WindowsScaling);
+                //Vector2 margin = new Vector2(9.0f, 32.0f) * (1.0f + uiMgr.WindowsScaling);
+                Vector2 margin = new Vector2(marg, marg) * (1.0f + uiMgr.WindowsScaling);
+                float additionalOffsetY = 0.0f;//12.0f * (1.0f + uiMgr.WindowsScaling);
 
                 System.Numerics.Vector2 imgSize = ImGui.GetWindowSize();
                 System.Numerics.Vector2 imgSizeOrg = imgSize;
@@ -284,7 +290,7 @@ namespace SdfGlueUi.Ui.Windows
 
                 // >> debug
                 //ImGui.GetForegroundDrawList().AddRect( previewPos_, previewPos_ + previewSize_, 0xff0000ff );
-                //IUiActionsExecutor input = uiMgr_.ActionsExecutor;
+                //IUiInput input = uiMgr.ActionsExecutor;
                 //float mouseX = (float)input.GetMouseStateX();
                 //float mouseY = (float)input.GetMouseStateY();
                 //ImGui.GetForegroundDrawList().AddCircle( new Vector2(mouseX, mouseY), 10.0f, 0xff0000ff );
@@ -325,10 +331,12 @@ namespace SdfGlueUi.Ui.Windows
 
         private void HandleCameraDistanceByMouseWheel()
         {
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
             //KeyboardState   input       = currKeyboardState_;
             //MouseState      mouseState  = Mouse.GetCursorState();
 
-            IUiActionsExecutor input = uiMgr_.ActionsExecutor;
+            IUiInput input = uiMgr.ActionsExecutor;
 
             if (IsHovered)
             {
@@ -349,7 +357,9 @@ namespace SdfGlueUi.Ui.Windows
 
         private void HandlePanAndRotationByMouse()
         {
-            IUiActionsExecutor input = uiMgr_.ActionsExecutor;
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
+            IUiInput input = uiMgr.ActionsExecutor;
 
             if (GetModel().Config.UseAltRmbForCameraRotation)
             {
@@ -394,8 +404,10 @@ namespace SdfGlueUi.Ui.Windows
 
         private Vector2 CalculateMousePosForShader()
         {
-            float mouseX = (float)uiMgr_.ActionsExecutor.GetMouseStateX();
-            float mouseY = (float)uiMgr_.ActionsExecutor.GetMouseStateY();
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
+            float mouseX = (float)uiMgr.ActionsExecutor.GetMouseStateX();
+            float mouseY = (float)uiMgr.ActionsExecutor.GetMouseStateY();
             float mX = (mouseX - previewPos_.X) / previewSize_.X;
             float mY = (mouseY - previewPos_.Y) / previewSize_.Y;
 
@@ -427,7 +439,9 @@ namespace SdfGlueUi.Ui.Windows
 
         private void HandleMovementByWASD(float deltaTime)
         {
-            IUiActionsExecutor input = uiMgr_.ActionsExecutor;
+            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+
+            IUiInput input = uiMgr.ActionsExecutor;
 
             //bool stateRmb = input.IsRmbDown();
             

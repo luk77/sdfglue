@@ -4,10 +4,11 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using System.Xml;
-using SdfGlueCore.Model.BaseTypes;
+using SingleDocAppCore.Model.BaseTypes;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.Entities;
-using SdfGlueCore.Utils;
+using SingleDocAppCore.Utils;
+using SingleDocAppCore.Model;
 
 namespace SdfGlueCore.Model.DataNodes
 {
@@ -39,7 +40,7 @@ namespace SdfGlueCore.Model.DataNodes
             MaterialProps.ResetPrevVal();
         }
 
-        public override bool Deserialize(XmlNode nodeThis, DataModel model)
+        public override bool Deserialize(XmlNode nodeThis, IAbstractDocument model)
         {
             XmlUtils.DeserializeInt     (nodeThis, "Id"             , ref Id                    );
             XmlUtils.DeserializeString  (nodeThis, "Name"           , ref Name.Val              );
