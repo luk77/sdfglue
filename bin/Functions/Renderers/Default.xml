@@ -73,6 +73,7 @@
   <Include path="ColorInterpolation.glsl"/>
   <Include path="ModEx.glsl"             />
   <Include path="Dithering.glsl"         />
+  <Include path="CellIndexing.glsl"      />
   <Include path="BasicRaymarching.glsl"  />
 </Includes>
 <Code>
