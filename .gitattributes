@@ -1,0 +1,36 @@
+# Line endings: normalized to LF in the repository,
+# always CRLF in the working tree (Windows-only project).
+* text=auto eol=crlf
+
+# Explicit text files (never auto-detected as binary)
+*.cs      text eol=crlf
+*.csproj  text eol=crlf
+*.sln     text eol=crlf
+*.props   text eol=crlf
+*.xml     text eol=crlf
+*.glsl    text eol=crlf
+*.frag    text eol=crlf
+*.vert    text eol=crlf
+*.shader  text eol=crlf
+*.json    text eol=crlf
+*.md      text eol=crlf
+*.yml     text eol=crlf
+*.cmd     text eol=crlf
+*.bat     text eol=crlf
+
+# Binary files (no EOL conversion, no text diff)
+*.png     binary
+*.jpg     binary
+*.bmp     binary
+*.gif     binary
+*.ico     binary
+*.dll     binary
+*.exe     binary
+*.pdb     binary
+*.so      binary
+*.dylib   binary
+*.zip     binary
+*.nupkg   binary
+*.p7s     binary
+*.lnk     binary
+*.mp4     binary
