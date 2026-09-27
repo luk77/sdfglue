@@ -12,9 +12,9 @@ namespace SingleDocAppFramework.Layouts
 
     public class LayoutData
     {
-        public  string                      DisplayName;
-        public  WindowsVisibilityCollection WindowsVisibility;
-        public  string                      ImguiLayoutSettingsTxt;
+        public  string                      DisplayName             = "";
+        public  WindowsVisibilityCollection WindowsVisibility       = new WindowsVisibilityCollection();
+        public  string                      ImguiLayoutSettingsTxt  = "";
 
         public XmlDocument Serialize()
         {
@@ -46,8 +46,13 @@ namespace SingleDocAppFramework.Layouts
             if (parentNode == null)
                 return false;
 
-            XmlUtils.DeserializeString (parentNode, "DisplayName"                , ref DisplayName              );
-            XmlUtils.DeserializeString (parentNode, "ImguiLayoutSettingsTxt"     , ref ImguiLayoutSettingsTxt   );
+            // DeserializeString works on string?; keep the current value when the node is missing
+            string? displayName     = DisplayName;
+            string? imguiLayoutTxt  = ImguiLayoutSettingsTxt;
+            XmlUtils.DeserializeString (parentNode, "DisplayName"                , ref displayName              );
+            XmlUtils.DeserializeString (parentNode, "ImguiLayoutSettingsTxt"     , ref imguiLayoutTxt           );
+            DisplayName             = displayName       ?? "";
+            ImguiLayoutSettingsTxt  = imguiLayoutTxt    ?? "";
 
             XmlNode? nodeWindowsVisibility = parentNode.SelectSingleNode("WindowsVisibility");
             if (nodeWindowsVisibility != null)

@@ -25,18 +25,18 @@ namespace SdfGlueUi.Ui
         void OnSaveImage();
         void OnExportAnimation();
 
-        void OnDeleteNode           (TreeNode node);
-        void OnMoveNodeUp           (TreeNode node);
-        void OnMoveNodeDown         (TreeNode node);
-        void OnAddChildObject       (SdfObject node, FunctionDefinition definition);
-        void OnCopyObject           (SdfObject node);
-        void OnCutObject            (SdfObject node);
-        void OnPasteObject          (SdfObject node);
-        void OnFocusObject          (SdfObject node);
+        void OnDeleteNode           (TreeNode? node);
+        void OnMoveNodeUp           (TreeNode? node);
+        void OnMoveNodeDown         (TreeNode? node);
+        void OnAddChildObject       (SdfObject? node, FunctionDefinition definition);
+        void OnCopyObject           (SdfObject? node);
+        void OnCutObject            (SdfObject? node);
+        void OnPasteObject          (SdfObject? node);
+        void OnFocusObject          (SdfObject? node);
 
-        void OnAddRenderPass        (RenderingData parent, FunctionDefinition definition);
-        void OnCutRenderPass        (RenderPassData node);
-        void OnCopyRenderPass       (RenderPassData node);
+        void OnAddRenderPass        (RenderingData? parent, FunctionDefinition definition);
+        void OnCutRenderPass        (RenderPassData? node);
+        void OnCopyRenderPass       (RenderPassData? node);
         void OnPasteRenderPass      ();
     }
 }

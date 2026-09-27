@@ -25,7 +25,7 @@ namespace SdfGlueUi.Ui.Windows
 
         public override void Build()
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             BuildWindow(uiMgr.DistanceX, uiMgr.BasePosY, uiMgr.LeftColWidth, uiMgr.ExplorerHeight, delegate()
             {
@@ -35,7 +35,7 @@ namespace SdfGlueUi.Ui.Windows
 
                 TreeNode root = GetModel();
 
-                TreeNode clickedNode = null;
+                TreeNode? clickedNode = null;
 
                 AddTreeNodeToUi(ref id, root, ref clickedNode);
 
@@ -49,7 +49,7 @@ namespace SdfGlueUi.Ui.Windows
 
 
                 // zaznaczanie po kliknięciu
-                TreeNode nodeToSelect = clickedNode;
+                TreeNode? nodeToSelect = clickedNode;
                 if (GetModel().ImportantNodeToSelect != null)
                 {
                     nodeToSelect = GetModel().ImportantNodeToSelect;
@@ -71,9 +71,9 @@ namespace SdfGlueUi.Ui.Windows
             });
         }
 
-        private void AddTreeNodeToUi(ref int id, TreeNode node, ref TreeNode clickedNode)
+        private void AddTreeNodeToUi(ref int id, TreeNode node, ref TreeNode? clickedNode)
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick | ImGuiTreeNodeFlags.DefaultOpen;
             if (node.IsSelected)
@@ -83,7 +83,7 @@ namespace SdfGlueUi.Ui.Windows
 
 
             // Render pass enable buttons
-            RenderPassData rpData = node as RenderPassData;
+            RenderPassData? rpData = node as RenderPassData;
             if (rpData != null)
             {
                 UiBool.BuildSimpleCheckBoxWithUndo(ref id, rpData.Enabled, null);
@@ -98,7 +98,7 @@ namespace SdfGlueUi.Ui.Windows
 
 
             //string displayName = String.Format("[{0}] {1}", node.Id, node.Name);
-            string displayName = node.Name.Val;
+            string displayName = node.Name.Val ?? "";
             ImGui.PushID(id++);
             node.IsExpanded = ImGui.TreeNodeEx(node.Id.ToString(), flags, displayName);
             if (node is SdfObject)
@@ -110,8 +110,8 @@ namespace SdfGlueUi.Ui.Windows
                         //if (ImGui.MenuItem("Insert new" , "CTRL+I"      ))  { uiMgr.ActionsExecutor.OnAddChildObject           (node as SdfObject, null); ImGui.CloseCurrentPopup(); }
                         if (ImGui.BeginMenu("Insert as child"))
                         {
-                            //FunctionDefinition fd = MenuFunctionDefinition.Build("insert_child_"+node.Name, ((SdfObject)node).FunctionSdf, GetModel().SdfDefinitions);
-                            FunctionDefinition fd = MenuFunctionDefinition.Build(GetModel().SdfDefinitions);
+                            //FunctionDefinition? fd = MenuFunctionDefinition.Build("insert_child_"+node.Name, ((SdfObject)node).FunctionSdf, GetModel().SdfDefinitions);
+                            FunctionDefinition? fd = MenuFunctionDefinition.Build(GetModel().SdfDefinitions);
                             if (fd != null)
                             {
                                 uiMgr.ActionsExecutor.OnAddChildObject(node as SdfObject, fd);
@@ -146,7 +146,7 @@ namespace SdfGlueUi.Ui.Windows
                 {
                     if (ImGui.BeginMenu("Add render pass"))
                     {
-                        FunctionDefinition fd = MenuFunctionDefinition.Build(GetModel().Renderers);
+                        FunctionDefinition? fd = MenuFunctionDefinition.Build(GetModel().Renderers);
                         if (fd != null)
                         {
                             uiMgr.ActionsExecutor.OnAddRenderPass(node as RenderingData, fd);
@@ -334,7 +334,7 @@ namespace SdfGlueUi.Ui.Windows
             if (!IsFocused)
                 return;
 
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             bool isControlKeyDown   = uiMgr.ActionsExecutor.IsKeyDown(UiKey.LeftControl)  || uiMgr.ActionsExecutor.IsKeyDown(UiKey.RightControl);
             bool isShiftKeyDown     = uiMgr.ActionsExecutor.IsKeyDown(UiKey.LeftShift)    || uiMgr.ActionsExecutor.IsKeyDown(UiKey.RightShift);
@@ -385,14 +385,14 @@ namespace SdfGlueUi.Ui.Windows
             }
         }
 
-        private void TryToPasteObject(TreeNode selectedNode, bool pasteAsChild)
+        private void TryToPasteObject(TreeNode? selectedNode, bool pasteAsChild)
         {
             if (selectedNode == null)
                 return;
 
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
-            SdfObject sdfObject = selectedNode as SdfObject;
+            SdfObject? sdfObject = selectedNode as SdfObject;
             if (sdfObject != null)
             {
                 if (!pasteAsChild)

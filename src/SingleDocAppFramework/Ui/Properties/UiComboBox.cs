@@ -10,7 +10,7 @@ namespace SingleDocAppFramework.Ui.Properties
 {
     public class UiComboBox
     {
-        public static void Build(ref int id, string name, string[] names, ref int val, OnValueChanged onValueChanged = null)
+        public static void Build(ref int id, string name, string[] names, ref int val, OnValueChanged? onValueChanged = null)
         {
             ImGui.PushID(id++);
             ImGui.Text(name);

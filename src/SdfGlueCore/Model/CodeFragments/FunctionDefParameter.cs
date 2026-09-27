@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 using SingleDocAppCore.Model.BaseTypes;
 using SingleDocAppCore.Utils;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 using SdfGlueCore.Model.BaseTypes;
 using SingleDocAppCore.Model;
@@ -133,6 +134,7 @@ namespace SdfGlueCore.Model.CodeFragments
             return "float";
         }
 
+        [MemberNotNullWhen(true, nameof(ParameterName))]
         public bool IsEditable()
         {
             if (ParameterName == null)

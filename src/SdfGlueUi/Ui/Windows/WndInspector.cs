@@ -26,17 +26,16 @@ namespace SdfGlueUi.Ui.Windows
 
         public override void Build()
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
-            TreeNode selectedNode = GetModel().SelectedNode;
+            TreeNode? selectedNode = GetModel().SelectedNode;
 
             int index = 1;
 
             BuildWindow(uiMgr.LeftColPosX, uiMgr.InspectorPosY, uiMgr.LeftColWidth, uiMgr.InspectorHeight, delegate()
             {
-                if (selectedNode is DataModel)
+                if (selectedNode is DataModel model)
                 {
-                    DataModel model = selectedNode as DataModel;
                     if (ImGui.CollapsingHeader("Project settings", ImGuiTreeNodeFlags.DefaultOpen))
                     {
                         BeginPropertyGrid(GetDefaultFirstColumnWidth());
@@ -45,10 +44,8 @@ namespace SdfGlueUi.Ui.Windows
                         EndPropertyGrid();
                     }
                 }
-                else if (selectedNode is SdfObject)
+                else if (selectedNode is SdfObject selectedSdfNode)
                 {
-                    SdfObject selectedSdfNode = selectedNode as SdfObject;
-
                     ImGui.Separator();
                     ImGui.Text(selectedSdfNode.Name.Val);
 
@@ -136,11 +133,9 @@ namespace SdfGlueUi.Ui.Windows
                         EndPropertyGrid();
                     }
                 }
-                else if (selectedNode is RenderPassData)
+                else if (selectedNode is RenderPassData passData)
                 {
                     int index = 0;
-
-                    RenderPassData passData = selectedNode as RenderPassData;
 
                     ImGui.PushID(index++);
                     if (ImGui.CollapsingHeader("Common render pass parameters", ImGuiTreeNodeFlags.DefaultOpen))
@@ -237,10 +232,8 @@ namespace SdfGlueUi.Ui.Windows
                         }
                     }
                 }
-                else if (selectedNode is MaterialInstance)
+                else if (selectedNode is MaterialInstance mat)
                 {
-                    MaterialInstance mat = selectedNode as MaterialInstance;
-
                     float firstColumnWidth = GetDefaultFirstColumnWidth();
 
                     BeginPropertyGrid(firstColumnWidth);
@@ -260,12 +253,11 @@ namespace SdfGlueUi.Ui.Windows
                     EndPropertyGrid();
 
                 }
-                else if (selectedNode is SignalOscillator)
+                else if (selectedNode is SignalOscillator obj)
                 {
                     float firstColumnWidth = GetDefaultFirstColumnWidth();
                     BeginPropertyGrid(firstColumnWidth);
 
-                    SignalOscillator? obj = selectedNode as SignalOscillator;
                     int index = 0;
                     UiFloat.Build(ref index, "Amplitude", obj.Amplitude   , 0.001f);
                     UiFloat.Build(ref index, "Frequency", obj.Frequency   , 0.001f);
@@ -283,7 +275,7 @@ namespace SdfGlueUi.Ui.Windows
 
         private void BuildEditorForOperatorsCollection(ref int index, string title, OperatorsCollection opCollection, FunctionDefinitionsSet opDefinitions, SdfObject.DelegateInsertNewOperator delegateInsertNewOp)
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             ImGui.PushID(index++);
             if (!ImGui.CollapsingHeader(title, ImGuiTreeNodeFlags.DefaultOpen))
@@ -426,7 +418,7 @@ namespace SdfGlueUi.Ui.Windows
 
         public void BuildPropertyChooseDefinitionOpEntity(ref int id, string title, OperatorEntity opEntity, FunctionDefinitionsSet definitions, int entIndex, ref int indexForInsert, ref int indexForDelete, ref int indexForMoveUp, ref int indexForMoveDown)
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             // string[] defs = definitions.GetDefinitionsNames(); // unused
 
@@ -436,17 +428,17 @@ namespace SdfGlueUi.Ui.Windows
             ImGui.SameLine();
             ImGui.PushID(id++);
             ImGui.SetNextItemWidth(-1);
-            if (ImGui.Button(opEntity.Definition.DisplayName, new Vector2(-1, 0)))
+            if (ImGui.Button(opEntity.Definition?.DisplayName ?? UiFunctionDefinition.MissingDefinitionLabel, new Vector2(-1, 0)))
             {
                 ImGui.OpenPopup("menu_"+title);
             }
-            FunctionDefinition fd = MenuFunctionDefinition.BuildPopup("menu_"+title, opEntity, definitions);
+            FunctionDefinition? fd = MenuFunctionDefinition.BuildPopup("menu_"+title, opEntity, definitions);
             if (fd != null)
             {
                 opEntity.Definition       = fd;
                 opEntity.DefinitionName.Val   = opEntity.Definition.FunctionName;
                 uiMgr.ActionsExecutor.OnRebuildShader();
-                UiFunctionDefinition.AddFunctionEntityUndoAction(opEntity.Definition.DisplayName, opEntity, definitions, uiMgr.ActionsExecutor);
+                UiFunctionDefinition.AddFunctionEntityUndoAction(fd.DisplayName ?? title, opEntity, definitions, uiMgr.ActionsExecutor);
             }
             ImGui.PopID(); // balanced the PushID used for the definition button
 
@@ -489,7 +481,7 @@ namespace SdfGlueUi.Ui.Windows
 
         private void BuildPropertyMaterial(int id, string name, SdfObject sdfObj)
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             // ComboBox w Imgui jest kiepski bo polega na indeksach i nazwach
             // Lepiej zastąpić go prostym menu.
@@ -498,7 +490,7 @@ namespace SdfGlueUi.Ui.Windows
             ImGui.Text(name);
             ImGui.NextColumn();
 
-            MaterialInstance oldMat = GetModel().FindMaterialById((int)sdfObj.MaterialId.Val);
+            MaterialInstance? oldMat = GetModel().FindMaterialById((int)sdfObj.MaterialId.Val);
             if (oldMat != null)
             {
                 ImGui.SetNextItemWidth(-1);
@@ -507,7 +499,7 @@ namespace SdfGlueUi.Ui.Windows
                     ImGui.OpenPopup("menu_" + name);
                 }
 
-                MaterialInstance newMat = MenuMaterials.BuildPopup("menu_" + name, GetModel().Materials);
+                MaterialInstance? newMat = MenuMaterials.BuildPopup("menu_" + name, GetModel().Materials);
                 ImGui.NextColumn();
 
                 if (newMat != null && newMat != oldMat)

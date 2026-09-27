@@ -43,8 +43,8 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
         private     int                         windowFrameBufferTexture_       = 0;
 
         private     Vector3                     resolution_                     = new Vector3(0.0f, 0.0f, 1.0f);
-        private     string                      pathShaderVert_                 = null;
-        private     string                      pathShaderFrag_                 = null;
+        private     string                      pathShaderVert_;
+        private     string                      pathShaderFrag_;
 
         private readonly float[] vertices_ =
         {
@@ -218,7 +218,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             string shaderFrag = File.ReadAllText(pathShaderFrag_);
             shaderFrag = codeGenerator.ModifyFragShaderSource(sbErrors, shaderFrag, passData_.LastGenCode, false, passData_);
 
-            shader_.Reinitialize(sbErrors, shaderVert, shaderFrag, passData_.Name.Val);
+            shader_.Reinitialize(sbErrors, shaderVert, shaderFrag, passData_.Name.Val ?? "");
             shader_.Use();
 
             passData_.LastErrors = sbErrors.ToString();
@@ -351,10 +351,16 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
                 if (isFixed)
                     continue;
 
+                if (mat.MaterialProps.Definition == null)
+                    continue;
+
                 string materialPrefix = String.Format("material_{0}.", mat.Id);
 
                 foreach(FunctionDefParameter p in mat.MaterialProps.Definition.MaterialParameters)
                 {
+                    if (p.ParameterName == null)
+                        continue;
+
                     string uniformFullName = String.Format("{0}{1}", materialPrefix, p.ParameterName);
                     ISimpleType paramVal = mat.MaterialProps.ParametersValues[p.ParameterName];
                     SetShaderParameterByType(paramVal, uniformFullName);
@@ -375,9 +381,9 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             // Objects
             TreeNode.CallRecursive(model.SdfRoot, delegate(TreeNode node)
             {
-                string nodeId   = model.Config.UseNamesAsIds ? node.Name.Val : node.Id.ToString();
+                string? nodeId  = model.Config.UseNamesAsIds ? node.Name.Val : node.Id.ToString();
 
-                SdfObject sdfObj = node as SdfObject;
+                SdfObject? sdfObj = node as SdfObject;
                 if (sdfObj == null)
                     return;
 
@@ -404,7 +410,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             GL.DrawElements(PrimitiveType.Triangles, indices_.Length, DrawElementsType.UnsignedInt, 0);
         }
 
-        private void SetShaderParametersForOperatorsCollection(OperatorsCollection collection, string nodeId)
+        private void SetShaderParametersForOperatorsCollection(OperatorsCollection collection, string? nodeId)
         {
             for(int i=0; i<collection.Operators.Count; i++)
             {
@@ -415,43 +421,34 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
 
         private void SetShaderParameterByType(ISimpleType paramVal, string uniformName)
         {
-            if (paramVal is ExFloat)
+            if (paramVal is ExFloatWithSignal exObjFS)
             {
-                if (paramVal is ExFloatWithSignal)
+                float currVal = exObjFS.Val;
+                if (exObjFS.SignalRef != null)
                 {
-                    ExFloatWithSignal exObjF = paramVal as ExFloatWithSignal;
-                    float currVal = exObjF.Val;
-                    if (exObjF.SignalRef != null)
-                    {
-                        currVal = exObjF.SignalRef.GetCurrentValue();
-                    }
+                    currVal = exObjFS.SignalRef.GetCurrentValue();
+                }
 
-                    shader_.SetFloat(uniformName, currVal);
-                }
-                else
-                {
-                    ExFloat exObjF = paramVal as ExFloat;
-                    shader_.SetFloat(uniformName, exObjF.Val);
-                }
+                shader_.SetFloat(uniformName, currVal);
             }
-            else if (paramVal is ExInt)
+            else if (paramVal is ExFloat exObjF)
             {
-                ExInt exObjI = paramVal as ExInt;
+                shader_.SetFloat(uniformName, exObjF.Val);
+            }
+            else if (paramVal is ExInt exObjI)
+            {
                 shader_.SetInt(uniformName, exObjI.Val);
             }
-            else if (paramVal is ExVector2)
+            else if (paramVal is ExVector2 exObjV2)
             {
-                ExVector2 exObjV2 = paramVal as ExVector2;
                 shader_.SetVector2(uniformName, MathUtils.ToGlVec2(exObjV2.Val));
             }
-            else if (paramVal is ExVector3)
+            else if (paramVal is ExVector3 exObjV3)
             {
-                ExVector3 exObjV3 = paramVal as ExVector3;
                 shader_.SetVector3(uniformName, MathUtils.ToGlVec3(exObjV3.Val));
             }
-            else if (paramVal is ExVector4)
+            else if (paramVal is ExVector4 exObjV4)
             {
-                ExVector4 exObjV4 = paramVal as ExVector4;
                 shader_.SetVector4(uniformName, MathUtils.ToGlVec4(exObjV4.Val));
             }
             //else if (paramVal is ExBool)
@@ -461,13 +458,18 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             //}
         }
 
-        private void SetShaderParametersForFunctionEntity(FunctionEntity functionEntity, string nodeId, int opEntityIndex = -1)
+        private void SetShaderParametersForFunctionEntity(FunctionEntity functionEntity, string? nodeId, int opEntityIndex = -1)
         {
+            if (functionEntity.Definition == null)
+                return;
+
             bool simpleParamsFormat = String.IsNullOrEmpty(nodeId);
 
             for(int i=0; i<functionEntity.Definition.Parameters.Count; i++)
             {
                 FunctionDefParameter p = functionEntity.Definition.Parameters[i];
+                if (p.ParameterName == null)
+                    continue;
 
                 string? fullNameId = null;
                 if (opEntityIndex == -1)

@@ -46,8 +46,11 @@ namespace SingleDocAppFramework.Rendering.OpenTk.ImGuiRendering
             public int VboHandle;
             public int EboHandle;
             // FIXME: ??
+            // Kept for parity with the original C++ backend; never assigned here.
+#pragma warning disable CS0649
             public bool HasPolygonMode;
             public bool HasClipOrigin;
+#pragma warning restore CS0649
 
             public int GlslVersion;
         }

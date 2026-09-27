@@ -9,6 +9,7 @@ using SdfGlueCore.Model.DataNodes;
 using SdfGlueCore.Model.DataNodes.Signals;
 using SdfGlueCore.Model.Entities;
 using SingleDocAppCore.Utils;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
@@ -173,6 +174,7 @@ namespace SdfGlueCore.Model
             //Materials.IsExpanded = false;
         }
 
+        [MemberNotNull(nameof(RenderingSysData))]
         private void InitDefaultData()
         {
             SingleDocAppCore.UndoSystem.UndoManager.Instance.ClearAll();

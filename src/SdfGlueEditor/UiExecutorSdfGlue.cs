@@ -54,20 +54,20 @@ namespace SdfGlueEditor
         public void OnExportAnimation           ()                  { render_.ExportAnimation();            }
 
         // camera
-        public void OnFocusObject       (SdfObject node)                                    { camera_.FocusObject(node);                        }
+        public void OnFocusObject       (SdfObject? node)                                   { camera_.FocusObject(node);                        }
 
         // project hierarchy
-        public void OnDeleteNode        (TreeNode node)                                     { hierarchy_.OnDeleteNode(node);                    }
-        public void OnMoveNodeUp        (TreeNode node)                                     { hierarchy_.OnMoveNodeUp(node);                    }
-        public void OnMoveNodeDown      (TreeNode node)                                     { hierarchy_.OnMoveNodeDown(node);                  }
-        public void OnAddChildObject    (SdfObject node, FunctionDefinition definition)     { hierarchy_.OnAddChildObject(node, definition);    }
-        public void OnCopyObject        (SdfObject node)                                    { hierarchy_.OnCopyObject(node);                    }
-        public void OnCutObject         (SdfObject node)                                    { hierarchy_.OnCutObject(node);                     }
-        public void OnPasteObject       (SdfObject node)                                    { hierarchy_.OnPasteObject(node);                   }
+        public void OnDeleteNode        (TreeNode? node)                                    { hierarchy_.OnDeleteNode(node);                    }
+        public void OnMoveNodeUp        (TreeNode? node)                                    { hierarchy_.OnMoveNodeUp(node);                    }
+        public void OnMoveNodeDown      (TreeNode? node)                                    { hierarchy_.OnMoveNodeDown(node);                  }
+        public void OnAddChildObject    (SdfObject? node, FunctionDefinition definition)    { hierarchy_.OnAddChildObject(node, definition);    }
+        public void OnCopyObject        (SdfObject? node)                                   { hierarchy_.OnCopyObject(node);                    }
+        public void OnCutObject         (SdfObject? node)                                   { hierarchy_.OnCutObject(node);                     }
+        public void OnPasteObject       (SdfObject? node)                                   { hierarchy_.OnPasteObject(node);                   }
 
-        public void OnAddRenderPass     (RenderingData parent, FunctionDefinition definition) { hierarchy_.OnAddRenderPass(parent, definition); }
-        public void OnCutRenderPass     (RenderPassData node)                               { hierarchy_.OnCutRenderPass(node);                 }
-        public void OnCopyRenderPass    (RenderPassData node)                               { hierarchy_.OnCopyRenderPass(node);                }
+        public void OnAddRenderPass     (RenderingData? parent, FunctionDefinition definition) { hierarchy_.OnAddRenderPass(parent, definition); }
+        public void OnCutRenderPass     (RenderPassData? node)                              { hierarchy_.OnCutRenderPass(node);                 }
+        public void OnCopyRenderPass    (RenderPassData? node)                              { hierarchy_.OnCopyRenderPass(node);                }
         public void OnPasteRenderPass   ()                                                  { hierarchy_.OnPasteRenderPass();                   }
     }
 }

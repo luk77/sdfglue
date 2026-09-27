@@ -96,6 +96,8 @@ namespace SdfGlueCore.Model.DataNodes
         public override bool Deserialize(XmlNode nodeThis, IAbstractDocument doc)
         {
             DataModel? model = doc as DataModel;
+            if (model == null)
+                return false;
 
             XmlUtils.DeserializeInt     (nodeThis, "Id"             , ref Id            );
             XmlUtils.DeserializeString  (nodeThis, "Name"           , ref Name.Val      );

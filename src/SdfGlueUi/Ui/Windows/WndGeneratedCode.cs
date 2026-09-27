@@ -36,7 +36,7 @@ namespace SdfGlueUi.Ui.Windows
 
         public override void Build()
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             BuildWindow(uiMgr.CenterColPosX, uiMgr.BasePosY, uiMgr.CenterColWidth, uiMgr.BaseHeight, delegate ()
             {
@@ -119,14 +119,19 @@ namespace SdfGlueUi.Ui.Windows
                 {
                     // Old code preview
 
+                if (selectedPass_ == null)
+                    return;
+
                 if (ImGui.Button("Copy shader to clipboard"))
                 {
-                    uiMgr.ActionsExecutor.CopyTextToClipboard(selectedPass_.LastGenCode.FullShader);
+                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCode.FullShader))
+                        uiMgr.ActionsExecutor.CopyTextToClipboard(selectedPass_.LastGenCode.FullShader);
                 }
 
                 if (ImGui.Button("Copy unity shader to clipboard"))
                 {
-                    uiMgr.ActionsExecutor.CopyTextToClipboard(selectedPass_.LastGenCodeUnity);
+                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCodeUnity))
+                        uiMgr.ActionsExecutor.CopyTextToClipboard(selectedPass_.LastGenCodeUnity);
                 }
 
                 ImGui.BeginTabBar("TabsGenCode", ImGuiTabBarFlags.None); 

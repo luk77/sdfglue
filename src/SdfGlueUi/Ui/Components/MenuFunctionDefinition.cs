@@ -11,13 +11,13 @@ namespace SdfGlueUi.Ui.Components
 {
     public class MenuFunctionDefinition
     {
-        public static FunctionDefinition Build(FunctionDefinitionsSet definitions)
+        public static FunctionDefinition? Build(FunctionDefinitionsSet definitions)
         {
-            FunctionDefinition selectedDefinition = null;
+            FunctionDefinition? selectedDefinition = null;
 
             //List<FunctionDefinition> definitionsList    = definitions.GetDefinitions();
             SortedDictionary<string, FunctionDefGroup> groups = definitions.GetGroups();
-            FunctionDefGroup groupUngrouped = null;
+            FunctionDefGroup? groupUngrouped = null;
             foreach (var keyVal in groups)
             {
                 FunctionDefGroup group = keyVal.Value;
@@ -54,12 +54,12 @@ namespace SdfGlueUi.Ui.Components
             return selectedDefinition;
         }
 
-        public static FunctionDefinition BuildPopup(string menuName, FunctionEntity functionEntity, FunctionDefinitionsSet definitions)
+        public static FunctionDefinition? BuildPopup(string menuName, FunctionEntity functionEntity, FunctionDefinitionsSet definitions)
         {
             if (!ImGui.BeginPopup(menuName))
                 return null;
 
-            FunctionDefinition selectedDefinition = MenuFunctionDefinition.Build(definitions);
+            FunctionDefinition? selectedDefinition = MenuFunctionDefinition.Build(definitions);
 
             ImGui.EndPopup();
 

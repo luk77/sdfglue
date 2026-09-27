@@ -86,7 +86,7 @@ namespace SingleDocAppFramework
             int windowPosY  = (int)((screenRes.Y - windowSizeY) * 0.5);
 
             nativeWindowSettings.Location   = new Vector2i(windowPosX, windowPosY);
-            nativeWindowSettings.Size       = new Vector2i(windowSizeX, windowSizeY);
+            nativeWindowSettings.ClientSize = new Vector2i(windowSizeX, windowSizeY);
 
             return nativeWindowSettings;
         }

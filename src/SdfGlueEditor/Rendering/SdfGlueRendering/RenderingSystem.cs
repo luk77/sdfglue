@@ -26,11 +26,11 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
         {
             Dispose();
 
-            RenderPass prevPass = null;
+            RenderPass? prevPass = null;
 
             foreach(TreeNode node in renderingData.Children)
             {
-                RenderPassData passData = node as RenderPassData;
+                RenderPassData? passData = node as RenderPassData;
                 if (passData == null)
                     continue;
 
@@ -95,7 +95,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             IntCoords previewResolution = model.Config.GetPreviewResolution();
             GL.Viewport(0, 0, previewResolution.X, previewResolution.Y);
 
-            RenderPass prevEnabledPass = null;
+            RenderPass? prevEnabledPass = null;
 
             foreach(RenderPass pass in passes_)
             {

@@ -33,41 +33,41 @@ namespace SdfGlueUi.Ui
 
         private bool                    fullPreviewMode_        = false;
 
-        private UiWindowBase            WindowPreview           = null;
-        private UiWindowBase            WindowExplorer          = null;
-        private UiWindowBase            WindowInspector         = null;
-        private UiWindowBase            WindowGeneratedCode     = null;
-        private UiWindowBase            WindowLog               = null;
-        private UiWindowBase            WindowSettings          = null;
-        private UiWindowBase            WindowDiagnostics       = null;
-        private UiWindowBase            WindowPlayback          = null;
+        private WndPreview              WindowPreview;
+        private UiWindowBase            WindowExplorer;
+        private UiWindowBase            WindowInspector;
+        private UiWindowBase            WindowGeneratedCode;
+        private UiWindowBase            WindowLog;
+        private UiWindowBase            WindowSettings;
+        private UiWindowBase            WindowDiagnostics;
+        private UiWindowBase            WindowPlayback;
 
         public UiManagerSdfGlue(IUiExecutorSdfGlue uiActionsExecutor, int mainWindowSizeX, int mainWindowSizeY)
             : base(uiActionsExecutor)
         {
             if (DataModel.UseMultiplePreviews)
             {
-                for(int i=0; i<DataModel.NumOfPreviews; i++)
+                // The first preview is the main one (the only one visible on start, used by full preview mode)
+                WindowPreview           = new WndPreview("Preview 1");
+                RegisterWindow(WindowPreview, ViewGroupPreviews, true);
+                for(int i=1; i<DataModel.NumOfPreviews; i++)
                 {
-                    WndPreview? wndPreview = RegisterWindow(new WndPreview(String.Format("Preview {0}", i+1)), ViewGroupPreviews, i == 0) as WndPreview;
-
-                    if (i == 0)
-                        WindowPreview = wndPreview;
+                    RegisterWindow(new WndPreview(String.Format("Preview {0}", i+1)), ViewGroupPreviews, false);
                 }
             }
             else
             {
-                WindowPreview           = RegisterWindow(new WndPreview("Preview"));
+                WindowPreview           = new WndPreview("Preview");
+                RegisterWindow(WindowPreview);
             }
             WindowExplorer          = RegisterWindow(new WndExplorer());
             WindowInspector         = RegisterWindow(new WndInspector());
             if (DataModel.UseMultipleCodeViews)
             {
-                for(int i=0; i<DataModel.NumOfCodeViews; i++)
+                WindowGeneratedCode     = RegisterWindow(new WndGeneratedCode("Code view 1"), ViewGroupCode, false);
+                for(int i=1; i<DataModel.NumOfCodeViews; i++)
                 {
-                    WndGeneratedCode? wnd = RegisterWindow(new WndGeneratedCode(String.Format("Code view {0}", i+1)), ViewGroupCode, false) as WndGeneratedCode;
-                    if (i == 0)
-                        WindowGeneratedCode = wnd;
+                    RegisterWindow(new WndGeneratedCode(String.Format("Code view {0}", i+1)), ViewGroupCode, false);
                 }
             }
             else
@@ -137,8 +137,7 @@ namespace SdfGlueUi.Ui
             if (!fullPreviewMode_)
                 return false;
 
-            if (WindowPreview != null)
-                ((WndPreview)WindowPreview).BuildFullPreview();
+            WindowPreview.BuildFullPreview();
 
             return true;
         }

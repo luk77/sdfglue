@@ -298,7 +298,7 @@ namespace SingleDocAppFramework.Rendering.OpenTk.ImGuiRendering
             io.NativePtr->BackendPlatformName = null;
             io.BackendPlatformUserData = 0;
             io.BackendFlags &= ~(ImGuiBackendFlags.HasMouseCursors | ImGuiBackendFlags.HasSetMousePos | ImGuiBackendFlags.HasGamepad);
-            if (WindowMap.TryGetValue(bd->WindowPtr, out NativeWindow window))
+            if (WindowMap.TryGetValue(bd->WindowPtr, out NativeWindow? window))
             {
                 RestoreCallbacks(window);
             }
@@ -485,8 +485,11 @@ namespace SingleDocAppFramework.Rendering.OpenTk.ImGuiRendering
         {
             public nint WindowPtr;
             public bool WindowOwned;
+            // Kept for parity with the original C++ backend; never assigned here.
+#pragma warning disable CS0649
             public int IgnoreWindowPosEventFrame;
             public int IgnoreWindowSizeEventFrame;
+#pragma warning restore CS0649
         }
 
         static void InitMultiViewportSupport()
@@ -618,7 +621,7 @@ namespace SingleDocAppFramework.Rendering.OpenTk.ImGuiRendering
         static void Platform_GetWindowPos(ImGuiViewportPtr viewport, SNVector2* outPos)
         {
             ViewportData* vd = (ViewportData*)viewport.PlatformUserData;
-            if (WindowMap.TryGetValue(vd->WindowPtr, out NativeWindow window))
+            if (WindowMap.TryGetValue(vd->WindowPtr, out NativeWindow? window))
             {
                 *outPos = new(window.ClientLocation.X, window.ClientLocation.Y);
             }
