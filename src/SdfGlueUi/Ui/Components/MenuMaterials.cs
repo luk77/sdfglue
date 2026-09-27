@@ -11,9 +11,9 @@ namespace SdfGlueUi.Ui.Components
 {
     public class MenuMaterials
     {
-        public static MaterialInstance Build(MaterialsCollection materials, OnValueChanged onValueChanged = null)
+        public static MaterialInstance? Build(MaterialsCollection materials, OnValueChanged? onValueChanged = null)
         {
-            MaterialInstance selected = null;
+            MaterialInstance? selected = null;
             foreach (MaterialInstance mat in materials.Children)
             {
                 if (ImGui.MenuItem(mat.Name.Val))
@@ -27,12 +27,12 @@ namespace SdfGlueUi.Ui.Components
             return selected;
         }
 
-        public static MaterialInstance BuildPopup(string menuName, MaterialsCollection materials, OnValueChanged onValueChanged = null)
+        public static MaterialInstance? BuildPopup(string menuName, MaterialsCollection materials, OnValueChanged? onValueChanged = null)
         {
             if (!ImGui.BeginPopup(menuName))
                 return null;
 
-            MaterialInstance mat = Build(materials, onValueChanged);
+            MaterialInstance? mat = Build(materials, onValueChanged);
 
             ImGui.EndPopup();
 

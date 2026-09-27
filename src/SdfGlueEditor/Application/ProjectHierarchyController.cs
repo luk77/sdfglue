@@ -19,8 +19,8 @@ namespace SdfGlueEditor.Application
 {
     public class ProjectHierarchyController
     {
-        private IRenderingSystem?       renderingSystem_        = null;
-        private ShaderCodeGenerator?    codeGenerator_          = null;
+        private readonly IRenderingSystem       renderingSystem_;
+        private readonly ShaderCodeGenerator    codeGenerator_;
 
         public ProjectHierarchyController(IRenderingSystem renderingSystem, ShaderCodeGenerator codeGenerator)
         {
@@ -28,13 +28,13 @@ namespace SdfGlueEditor.Application
             codeGenerator_      = codeGenerator;
         }
 
-        private DataModel? GetModel()
+        private DataModel GetModel()
         {
-            return codeGenerator_?.GetModel();
+            return codeGenerator_.GetModel();
         }
 
 
-        public void OnAddChildObject(SdfObject node, FunctionDefinition definition)
+        public void OnAddChildObject(SdfObject? node, FunctionDefinition definition)
         {
             if (node == null)
                 return;
@@ -70,7 +70,7 @@ namespace SdfGlueEditor.Application
                 ));
         }
 
-        public void OnDeleteNode(TreeNode node)
+        public void OnDeleteNode(TreeNode? node)
         {
             if (node == null)
                 return;
@@ -84,12 +84,12 @@ namespace SdfGlueEditor.Application
             GetModel().ImportantNodeToSelect = node.Parent;
         }
 
-        public void OnCopyObject(SdfObject node)
+        public void OnCopyObject(SdfObject? node)
         {
             OnCopyNode(node);
         }
 
-        private void OnCopyNode(SerializableNode node)
+        private void OnCopyNode(SerializableNode? node)
         {
             if (node == null)
                 return;
@@ -103,11 +103,11 @@ namespace SdfGlueEditor.Application
             ClipboardUtils.SetText(txt);
         }
 
-        public void OnCutObject(SdfObject node)
+        public void OnCutObject(SdfObject? node)
         {
             OnCutNode(node);
         }
-        private void OnCutNode(SerializableNode node)
+        private void OnCutNode(SerializableNode? node)
         {
             if (node == null)
                 return;
@@ -119,16 +119,18 @@ namespace SdfGlueEditor.Application
 
         public delegate void AssignIdentifiersDelegate(TreeNode node);
 
-        private void OnPasteNode<T>(TreeNode pasteTarget, AssignIdentifiersDelegate assignIdentifiersDelegate) where T : SerializableNode, new()
+        private void OnPasteNode<T>(TreeNode? pasteTarget, AssignIdentifiersDelegate assignIdentifiersDelegate) where T : SerializableNode, new()
         {
             if (pasteTarget == null)
                 return;
 
             //string txt = System.Windows.Forms.Clipboard.GetText();
             string? txt = ClipboardUtils.GetText();
+            if (string.IsNullOrEmpty(txt))
+                return;
 
             XmlDocument doc = new XmlDocument();
-            XmlNode xmlNode = null;
+            XmlNode? xmlNode = null;
 
             try
             {
@@ -162,11 +164,12 @@ namespace SdfGlueEditor.Application
             if (typeof(T) == typeof(RenderPassData) ||
                 typeof(T) == typeof(RenderingData))
             {
-                RenderPassData passData = obj as RenderPassData;
-
-                passData.RendererFunc    ?.RefreshDefinitionReference(GetModel().Renderers);
-                //passData.CameraCtrlFunc  ?.RefreshDefinitionReference(GetModel().CameraControllers);
-                passData.CameraOperators ?.RefreshDefinitionReference(GetModel().CameraControllers);
+                if (obj is RenderPassData passData)
+                {
+                    passData.RendererFunc    ?.RefreshDefinitionReference(GetModel().Renderers);
+                    //passData.CameraCtrlFunc  ?.RefreshDefinitionReference(GetModel().CameraControllers);
+                    passData.CameraOperators ?.RefreshDefinitionReference(GetModel().CameraControllers);
+                }
 
                 renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
             }
@@ -199,11 +202,12 @@ namespace SdfGlueEditor.Application
                     if (typeof(T) == typeof(RenderPassData) ||
                         typeof(T) == typeof(RenderingData))
                     {
-                        RenderPassData passData = obj as RenderPassData;
-
-                        passData.RendererFunc    ?.RefreshDefinitionReference(GetModel().Renderers);
-                        //passData.CameraCtrlFunc  ?.RefreshDefinitionReference(GetModel().CameraControllers);
-                        passData.CameraOperators ?.RefreshDefinitionReference(GetModel().CameraControllers);
+                        if (obj is RenderPassData passData)
+                        {
+                            passData.RendererFunc    ?.RefreshDefinitionReference(GetModel().Renderers);
+                            //passData.CameraCtrlFunc  ?.RefreshDefinitionReference(GetModel().CameraControllers);
+                            passData.CameraOperators ?.RefreshDefinitionReference(GetModel().CameraControllers);
+                        }
 
                         renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
                     }
@@ -223,7 +227,7 @@ namespace SdfGlueEditor.Application
 
         }
 
-        public void OnPasteObject(SdfObject pasteTarget)
+        public void OnPasteObject(SdfObject? pasteTarget)
         {
             OnPasteNode<SdfObject>(pasteTarget,
             delegate (TreeNode node)
@@ -235,7 +239,7 @@ namespace SdfGlueEditor.Application
 
 
 
-        public void OnMoveNodeUp(TreeNode node)
+        public void OnMoveNodeUp(TreeNode? node)
         {
             if (node == null)
                 return;
@@ -243,7 +247,7 @@ namespace SdfGlueEditor.Application
             GetModel().NodeToMoveUp = node;
         }
 
-        public void OnMoveNodeDown(TreeNode node)
+        public void OnMoveNodeDown(TreeNode? node)
         {
             if (node == null)
                 return;
@@ -251,7 +255,7 @@ namespace SdfGlueEditor.Application
             GetModel().NodeToMoveDown = node;
         }
 
-        public void OnAddRenderPass(RenderingData parent, FunctionDefinition definition)
+        public void OnAddRenderPass(RenderingData? parent, FunctionDefinition definition)
         {
             if (parent == null)
                 return;
@@ -289,13 +293,13 @@ namespace SdfGlueEditor.Application
                 ));
         }
 
-        public void OnCopyRenderPass(RenderPassData node)
+        public void OnCopyRenderPass(RenderPassData? node)
         {
             // TODO: to wymaga dokończenia:
             //OnCopyNode(node);
         }
 
-        public void OnCutRenderPass(RenderPassData node)
+        public void OnCutRenderPass(RenderPassData? node)
         {
             // TODO: to wymaga dokończenia:
             //OnCutNode(node);
@@ -325,8 +329,10 @@ namespace SdfGlueEditor.Application
             if (!CanDeleteNode(node))
                 return;
 
-            TreeNode oryginalParent = node.Parent;
-            int oryginalIndex = node.Parent.GetChildrenIndex(node);
+            TreeNode? oryginalParent = node.Parent;
+            if (oryginalParent == null)
+                return;
+            int oryginalIndex = oryginalParent.GetChildrenIndex(node);
 
             DeleteNodeInternal(node);
 
@@ -363,9 +369,9 @@ namespace SdfGlueEditor.Application
                 return false;
 
             // nie pozwalamy usunąć roota SDF
-            if (node is SdfObject)
+            if (node is SdfObject sdfObject)
             {
-                if ((node as SdfObject).ParentAsSdf == null)
+                if (sdfObject.ParentAsSdf == null)
                     return false;
             }
 

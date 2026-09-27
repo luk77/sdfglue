@@ -16,7 +16,7 @@ namespace SdfGlueUi.Ui.Properties
     public class UiFloatWithSignal : UiFloat
     {
 
-        public static void Build(ref int id, string name, ExFloat obj, float speed, LimitsType limitsType, float minVal, float maxVal, bool editInDegrees, SignalsCollection signals = null)
+        public static void Build(ref int id, string name, ExFloat obj, float speed, LimitsType limitsType, float minVal, float maxVal, bool editInDegrees, SignalsCollection? signals = null)
         {
             float valF = obj.Val;
             if (editInDegrees)
@@ -29,13 +29,13 @@ namespace SdfGlueUi.Ui.Properties
             ImGui.PopID();
             ImGui.NextColumn();
 
-            SignalInstance signalRef = null;
+            SignalInstance? signalRef = null;
             if (SdfGlueCore.Model.DataModel.UseSignals)
             {
-                ExFloatWithSignal objWithSignal = obj as ExFloatWithSignal;
+                ExFloatWithSignal? objWithSignal = obj as ExFloatWithSignal;
                 if (objWithSignal != null && signals != null)
                 {
-                    SignalInstance oldInst = objWithSignal.SignalRef;
+                    SignalInstance? oldInst = objWithSignal.SignalRef;
 
                     ImGui.PushID(id++);
                     if (ImGui.Button("*"))

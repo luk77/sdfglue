@@ -15,7 +15,7 @@ namespace SdfGlueUi.Ui.Windows
 
         public override void Build()
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             BuildWindow(uiMgr.DistanceX, uiMgr.PlaybackPosY, uiMgr.LeftColWidth, uiMgr.PlaybackHeight, delegate ()
             {

@@ -13,7 +13,7 @@ namespace SingleDocAppFramework.Ui.Properties
 {
     public class UiBool
     {
-        public static void Build(ref int id, string name, ExBool obj, OnValueChanged onValueChanged = null)
+        public static void Build(ref int id, string name, ExBool obj, OnValueChanged? onValueChanged = null)
         {
             Build(ref id, name, ref obj.Val, onValueChanged);
             if (ImGui.IsItemDeactivatedAfterEdit())
@@ -23,7 +23,7 @@ namespace SingleDocAppFramework.Ui.Properties
             }
         }
 
-        public static void Build(ref int id, string name, ref bool val, OnValueChanged onValueChanged = null)
+        public static void Build(ref int id, string name, ref bool val, OnValueChanged? onValueChanged = null)
         {
             bool oldVal = val;
             ImGui.PushID(id++);
@@ -44,7 +44,7 @@ namespace SingleDocAppFramework.Ui.Properties
         }
 
         // Checkbox operating on an int value (0/1)
-        public static void Build(int id, string name, ExInt obj, OnValueChanged onValueChanged = null)
+        public static void Build(int id, string name, ExInt obj, OnValueChanged? onValueChanged = null)
         {
             Build(id, name, ref obj.Val, onValueChanged);
             if (ImGui.IsItemDeactivatedAfterEdit())
@@ -55,7 +55,7 @@ namespace SingleDocAppFramework.Ui.Properties
         }
 
         // Checkbox operating on an int value (0/1)
-        public static void Build(int id, string name, ref int val, OnValueChanged onValueChanged = null)
+        public static void Build(int id, string name, ref int val, OnValueChanged? onValueChanged = null)
         {
             bool curVal = val > 0;
             bool oldVal = val > 0;
@@ -76,7 +76,7 @@ namespace SingleDocAppFramework.Ui.Properties
             ImGui.PopID();
         }
 
-        public static void BuildSimpleCheckBoxWithUndo(ref int id, ExBool obj, OnValueChanged onValueChanged = null)
+        public static void BuildSimpleCheckBoxWithUndo(ref int id, ExBool obj, OnValueChanged? onValueChanged = null)
         {
             bool oldVal = obj.Val;
             ImGui.PushID(id++);

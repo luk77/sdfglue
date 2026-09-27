@@ -8,6 +8,7 @@ using SingleDocAppCore.Model.BaseTypes;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueCore.Model.Entities;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -56,7 +57,7 @@ namespace SdfGlueCore.Controller
         }
 
 
-        private DataModel                   model_ = null;
+        private DataModel                   model_;
 
 
         public ShaderCodeGenerator(DataModel model)
@@ -64,6 +65,7 @@ namespace SdfGlueCore.Controller
             SetModel(model);
         }
 
+        [MemberNotNull(nameof(model_))]
         public void SetModel(DataModel model)
         {
             model_ = model;
@@ -477,7 +479,7 @@ namespace SdfGlueCore.Controller
                     else
                         sb.AppendFormat ("uniform Material material_{0}      = Material( ", FormatInt(mat.Id));
 
-                    for (int i=0; i<materialDefinition?.MaterialParameters.Count; i++)
+                    for (int i=0; i<materialDefinition.MaterialParameters.Count; i++)
                     {
                         FunctionDefParameter p = materialDefinition.MaterialParameters[i];
                         if (p == null)

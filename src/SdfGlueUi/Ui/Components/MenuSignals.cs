@@ -11,9 +11,9 @@ namespace SdfGlueUi.Ui.Components
 {
     public class MenuSignals
     {
-        public static SignalInstance Build(SignalsCollection signals, SignalInstance oldVal, OnValueChanged onValueChanged = null)
+        public static SignalInstance? Build(SignalsCollection signals, SignalInstance? oldVal, OnValueChanged? onValueChanged = null)
         {
-            SignalInstance selected = null;
+            SignalInstance? selected = null;
             if (ImGui.MenuItem("None"))
             {
                 selected = null;
@@ -44,12 +44,12 @@ namespace SdfGlueUi.Ui.Components
             return oldVal; // no change
         }
 
-        public static SignalInstance BuildPopup(string menuName, SignalsCollection signals, SignalInstance oldVal, OnValueChanged onValueChanged = null)
+        public static SignalInstance? BuildPopup(string menuName, SignalsCollection signals, SignalInstance? oldVal, OnValueChanged? onValueChanged = null)
         {
             if (!ImGui.BeginPopup(menuName))
                 return oldVal;
 
-            SignalInstance inst = Build(signals, oldVal, onValueChanged);
+            SignalInstance? inst = Build(signals, oldVal, onValueChanged);
 
             ImGui.EndPopup();
 

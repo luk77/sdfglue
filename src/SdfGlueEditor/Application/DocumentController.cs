@@ -27,8 +27,9 @@ namespace SdfGlueEditor.Application
         public string GetDocumentDisplayName()
         {
             string projectPath = "<Unnamed project>";
-            if (!String.IsNullOrEmpty(GetModel().ProjectFilePath))
-                projectPath = GetModel().ProjectFilePath;
+            string? filePath = GetModel().ProjectFilePath;
+            if (!String.IsNullOrEmpty(filePath))
+                projectPath = filePath;
 
             return "Project: " + projectPath;
         }
@@ -60,7 +61,7 @@ namespace SdfGlueEditor.Application
                 return;
 
             GetModel().ProjectFilePath = filePath;
-            LoadProjectFromFile(GetModel().ProjectFilePath);
+            LoadProjectFromFile(filePath);
 
             GetModel().SelectedNode = null;
 
@@ -71,10 +72,11 @@ namespace SdfGlueEditor.Application
 
         public void SaveProject()
         {
-            if (!HasProjectFilePath())
+            string? filePath = GetModel().ProjectFilePath;
+            if (String.IsNullOrEmpty(filePath))
                 return;
 
-            SaveProjectToFile(GetModel().ProjectFilePath);
+            SaveProjectToFile(filePath);
 
             ctx_.Window.RefreshWindowTitle();
         }
@@ -86,7 +88,7 @@ namespace SdfGlueEditor.Application
                 return;
 
             GetModel().ProjectFilePath = filePath;
-            SaveProjectToFile(GetModel().ProjectFilePath);
+            SaveProjectToFile(filePath);
 
             ctx_.Window.RefreshWindowTitle();
         }

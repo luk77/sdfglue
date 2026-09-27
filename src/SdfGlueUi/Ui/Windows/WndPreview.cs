@@ -56,7 +56,7 @@ namespace SdfGlueUi.Ui.Windows
 
         public override void Build()
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             BuildWindow(uiMgr.CenterColPosX, uiMgr.BasePosY, uiMgr.PreviewWidth, uiMgr.PreviewHeight, delegate()
             {
@@ -219,7 +219,7 @@ namespace SdfGlueUi.Ui.Windows
 
         public void BuildFullPreview()
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
 //            ImGui.SetNextWindowPos  (new Vector2(0, 0));
 //            ImGui.SetNextWindowSize (new Vector2(uiMgr.MainWindowSizeX, uiMgr.MainWindowSizeY));
@@ -245,7 +245,7 @@ namespace SdfGlueUi.Ui.Windows
 
             BuildWindow(0, 0, uiMgr.MainWindowSizeX, uiMgr.MainWindowSizeY, flags, delegate()
             {
-                RenderPassData renderPass = GetModel().GetRPassDataForPreview();
+                RenderPassData? renderPass = GetModel().GetRPassDataForPreview();
 
                 float marg = 2.0f;
 
@@ -296,10 +296,13 @@ namespace SdfGlueUi.Ui.Windows
                 //ImGui.GetForegroundDrawList().AddCircle( new Vector2(mouseX, mouseY), 10.0f, 0xff0000ff );
                 // << debug
 
-                ImGui.Image((IntPtr)renderPass.GetTextureId(), imgSize
-                    ,new System.Numerics.Vector2(0.0f, 1.0f)
-                    ,new System.Numerics.Vector2(1.0f, 0.0f)
-                    );
+                if (renderPass != null)
+                {
+                    ImGui.Image((IntPtr)renderPass.GetTextureId(), imgSize
+                        ,new System.Numerics.Vector2(0.0f, 1.0f)
+                        ,new System.Numerics.Vector2(1.0f, 0.0f)
+                        );
+                }
 
                 // >> debug
                 //float mX = (mouseX - previewPos_.X) / previewSize_.X;
@@ -331,7 +334,7 @@ namespace SdfGlueUi.Ui.Windows
 
         private void HandleCameraDistanceByMouseWheel()
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             //KeyboardState   input       = currKeyboardState_;
             //MouseState      mouseState  = Mouse.GetCursorState();
@@ -357,7 +360,7 @@ namespace SdfGlueUi.Ui.Windows
 
         private void HandlePanAndRotationByMouse()
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             IUiInput input = uiMgr.ActionsExecutor;
 
@@ -404,7 +407,7 @@ namespace SdfGlueUi.Ui.Windows
 
         private Vector2 CalculateMousePosForShader()
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             float mouseX = (float)uiMgr.ActionsExecutor.GetMouseStateX();
             float mouseY = (float)uiMgr.ActionsExecutor.GetMouseStateY();
@@ -439,7 +442,7 @@ namespace SdfGlueUi.Ui.Windows
 
         private void HandleMovementByWASD(float deltaTime)
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             IUiInput input = uiMgr.ActionsExecutor;
 
@@ -514,10 +517,11 @@ namespace SdfGlueUi.Ui.Windows
         {
             //GetModel().ResetFrameCounterIfNeeded = true;
 
-            if (GetModel().LastSelectedRPass == null)
+            RenderPassData? lastSelectedRPass = GetModel().LastSelectedRPass;
+            if (lastSelectedRPass == null)
                 return;
 
-            if (!GetModel().LastSelectedRPass.AutoResetFrameCounter.Val)
+            if (!lastSelectedRPass.AutoResetFrameCounter.Val)
                 return;
 
             GetModel().ResetFrameCounter();

@@ -15,6 +15,9 @@ namespace SdfGlueUi.Ui.Properties
 {
     class UiFunctionDefinition
     {
+        // Button label for an entity whose definition could not be resolved (e.g. removed definition file)
+        public const string MissingDefinitionLabel = "<missing definition>";
+
         public static void Build(IUiExecutorSdfGlue actionsExec, ref int id, string name, FunctionEntity functionEntity, FunctionDefinitionsSet definitions)
         {
             ImGui.PushID(id++);
@@ -24,11 +27,11 @@ namespace SdfGlueUi.Ui.Properties
 
             ImGui.SetNextItemWidth(-1);
             ImGui.PushID(id++);
-            if (ImGui.Button(functionEntity.Definition.DisplayName, new Vector2(-1, 0)))
+            if (ImGui.Button(functionEntity.Definition?.DisplayName ?? MissingDefinitionLabel, new Vector2(-1, 0)))
             {
                 ImGui.OpenPopup("menu_" + name);
             }
-            FunctionDefinition fd = MenuFunctionDefinition.BuildPopup("menu_" + name, functionEntity, definitions);
+            FunctionDefinition? fd = MenuFunctionDefinition.BuildPopup("menu_" + name, functionEntity, definitions);
             if (fd != null)
             {
                 functionEntity.Definition = fd;

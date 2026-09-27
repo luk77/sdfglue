@@ -29,12 +29,12 @@ namespace SdfGlueUi.Ui.Properties
             float controlWidth = 200.0f;
 
             ImGui.PushID(id++);
-            if (ImGui.Button(functionEntity.Definition.DisplayName, new Vector2(controlWidth, 0)))
+            if (ImGui.Button(functionEntity.Definition?.DisplayName ?? UiFunctionDefinition.MissingDefinitionLabel, new Vector2(controlWidth, 0)))
             {
                 ImGui.OpenPopup("menu_" + name);
             }
             ImGui.PopID();
-            FunctionDefinition fd = MenuFunctionDefinition.BuildPopup("menu_" + name, functionEntity, definitions);
+            FunctionDefinition? fd = MenuFunctionDefinition.BuildPopup("menu_" + name, functionEntity, definitions);
             if (fd != null)
             {
                 functionEntity.Definition = fd;

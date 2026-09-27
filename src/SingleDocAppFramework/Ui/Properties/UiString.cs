@@ -23,7 +23,11 @@ namespace SingleDocAppFramework.Ui.Properties
 
         public static void Build(ref int id, string name, ExString obj)
         {
-            Build(ref id, name, ref obj.Val);
+            // ImGui.InputText does not accept null; keep null until the user types something
+            string val = obj.Val ?? "";
+            Build(ref id, name, ref val);
+            if (obj.Val != null || val.Length > 0)
+                obj.Val = val;
             AddUndoHandler(name, obj);
         }
 

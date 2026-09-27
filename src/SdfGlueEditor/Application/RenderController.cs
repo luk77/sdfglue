@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using SdfGlueCore.Model;
+using SdfGlueCore.Model.DataNodes;
 using SingleDocAppCore.Model.BaseTypes;
 using SingleDocAppFramework.Platform;
 
@@ -68,7 +69,8 @@ namespace SdfGlueEditor.Application
 
         public void SaveImage()
         {
-            if (GetModel().GetRPassDataForPreview() == null)
+            RenderPassData? previewPass = GetModel().GetRPassDataForPreview();
+            if (previewPass == null)
             {
                 Console.WriteLine("No image to export.");
                 return;
@@ -76,7 +78,7 @@ namespace SdfGlueEditor.Application
 
             IntCoords textureSize = GetModel().Config.GetPreviewResolution();
 
-            Bitmap bmp = GetModel().GetRPassDataForPreview().GetFrameAsBitmap(textureSize);
+            Bitmap? bmp = previewPass.GetFrameAsBitmap(textureSize);
             if (bmp == null)
             {
                 Console.WriteLine("Unable to get bitmap data.");
@@ -126,7 +128,7 @@ namespace SdfGlueEditor.Application
                 GetModel().Update(deltaTime);
 
                 // get image
-                Bitmap bmp = GetModel().GetRPassDataForPreview().GetFrameAsBitmap(textureSize);
+                Bitmap? bmp = GetModel().GetRPassDataForPreview()?.GetFrameAsBitmap(textureSize);
                 if (bmp == null)
                 {
                     Console.WriteLine("Unable to get bitmap data.");

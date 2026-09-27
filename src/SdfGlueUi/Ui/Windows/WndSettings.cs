@@ -15,7 +15,7 @@ namespace SdfGlueUi.Ui.Windows
 
         public override void Build()
         {
-            UiManagerSdfGlue uiMgr = uiMgr_ as UiManagerSdfGlue;
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             int materialsPosY = uiMgr.BasePosY + uiMgr.MaterialsHeight + uiMgr.DistanceY;
             BuildWindow(uiMgr.RightColPosX, materialsPosY, uiMgr.RightColWidth, uiMgr.BaseHeight - materialsPosY + 3 * uiMgr.DistanceY, delegate ()

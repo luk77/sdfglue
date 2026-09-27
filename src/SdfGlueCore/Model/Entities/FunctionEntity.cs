@@ -7,6 +7,7 @@ using SingleDocAppCore.Model.BaseTypes;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
 using SingleDocAppCore.Utils;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 using SingleDocAppCore.Model.DataNodes;
 using SdfGlueCore.Model.BaseTypes;
@@ -213,11 +214,13 @@ namespace SdfGlueCore.Model.Entities
             }
         }
 
+        [MemberNotNullWhen(true, nameof(Definition))]
         public bool HasAnyCompilationParameters()
         {
             return Definition?.CompilationParameters.Count > 0;
         }
 
+        [MemberNotNullWhen(true, nameof(Definition))]
         public bool HasAnyParameters()
         {
             return Definition?.Parameters.Count > 0;
