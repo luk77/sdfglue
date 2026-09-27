@@ -1,3 +1,4 @@
+using SingleDocAppCore.Settings;
 using SingleDocAppCore.UndoSystem;
 using SingleDocAppFramework.Input;
 using SingleDocAppFramework.Layouts;
@@ -7,7 +8,7 @@ using SingleDocAppFramework.Ui;
 namespace SingleDocAppFramework
 {
     // Default implementation of IUiExecutorFramework.
-    // Input, layouts, undo/redo, exit, scaling and clipboard are handled here.
+    // Input, layouts, user settings, undo/redo, exit, scaling and clipboard are handled here.
     // Document commands are empty - the application overrides them in its own executor:
     //     class MyAppExecutor : UiExecutorFrameworkBase, IMyAppExecutor   (IMyAppExecutor : IUiExecutorFramework)
     public class UiExecutorFrameworkBase : IUiExecutorFramework
@@ -47,6 +48,22 @@ namespace SingleDocAppFramework
         public virtual void OnSaveCurrentLayout(WindowsVisibilityCollection windowsVisibility)
         {
             window_.OnSaveCurrentLayout(windowsVisibility);
+        }
+
+        // user settings
+        public UserSettingsBase GetUserSettings()
+        {
+            return window_.UserSettings;
+        }
+
+        public virtual void OnSaveUserSettings()
+        {
+            window_.SaveUserSettings();
+        }
+
+        public virtual void OnRestoreDefaultUserSettings()
+        {
+            window_.RestoreDefaultUserSettings();
         }
 
         // application

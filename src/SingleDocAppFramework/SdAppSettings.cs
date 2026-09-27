@@ -18,9 +18,16 @@ namespace SingleDocAppFramework
 
         public  bool                    EnableFrameworkShortcuts = true;    // Ctrl+N/O/S/Z/Y/W, Ctrl+1..0
 
+        public  string                  UserSettingsFile        = "UserSettings.xml";   // stored next to the executable
+
         public string GetDefaultLayoutPath()
         {
             return Path.Combine(LayoutsDirectory, DefaultLayoutFile);
+        }
+
+        public string GetUserSettingsPath()
+        {
+            return Path.Combine(AppContext.BaseDirectory, UserSettingsFile);
         }
     }
 }

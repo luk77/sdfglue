@@ -4,6 +4,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using SingleDocAppCore.Settings;
 using SingleDocAppFramework.Input;
 using SingleDocAppFramework.Layouts;
 using SingleDocAppFramework.Platform;
@@ -28,21 +29,72 @@ namespace SingleDocAppFramework
         private bool                imguiInitialized_           = false;
 
         private SdAppSettings       appSettings_;
+        private UserSettingsBase    userSettings_;
         private IPlatformServices   platform_;
         private float               dpiScaling_                 = 1.0f;
 
-        public SdAppWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings, SdAppSettings appSettings, IPlatformServices platform)
+        // userSettings: UserSettingsBase or an application-specific derived class;
+        // loaded here, so it is ready in the constructor of the derived window
+        public SdAppWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings, SdAppSettings appSettings, UserSettingsBase userSettings, IPlatformServices platform)
             : base(gameWindowSettings, nativeWindowSettings)
 
         {
             appSettings_    = appSettings;
+            userSettings_   = userSettings;
             platform_       = platform;
             dpiScaling_     = platform.ObtainDpiScaling();
+
+            LoadUserSettings();
         }
 
         public SdAppSettings            AppSettings     { get { return appSettings_; } }
+        public UserSettingsBase         UserSettings    { get { return userSettings_; } }
         public IPlatformServices        Platform        { get { return platform_; } }
         public UiExecutorFrameworkBase  Executor        { get { return executor_; } }
+
+        // User settings: defaults, then the file (if present). A missing file is created with defaults,
+        // an invalid one is left untouched (defaults are used).
+        private void LoadUserSettings()
+        {
+            string filePath = appSettings_.GetUserSettingsPath();
+
+            userSettings_.InitDefault();
+
+            if (File.Exists(filePath))
+            {
+                if (userSettings_.LoadFromFile(filePath))
+                    Console.WriteLine("User settings loaded: {0}", filePath);
+                else
+                    Console.WriteLine("WARNING: Default user settings are used");
+            }
+            else
+            {
+                if (userSettings_.SaveToFile(filePath))
+                    Console.WriteLine("User settings file created with default values: {0}", filePath);
+            }
+        }
+
+        public void SaveUserSettings()
+        {
+            string filePath = appSettings_.GetUserSettingsPath();
+
+            if (userSettings_.SaveToFile(filePath))
+                Console.WriteLine("User settings saved: {0}", filePath);
+        }
+
+        // Defaults are set in memory only - saving is explicit
+        public void RestoreDefaultUserSettings()
+        {
+            userSettings_.RestoreDefaults();
+        }
+
+        // Applies settings that are not read directly where they are used.
+        // Called in OnLoad() and every frame, so changes in the settings window take effect immediately.
+        protected virtual void ApplyUserSettings()
+        {
+            //RenderFrequency = userSettings_.UseRenderFrequencyLimit ? userSettings_.RenderFrequencyLimit : 0;
+            UpdateFrequency = userSettings_.UseUpdateFrequencyLimit ? userSettings_.UpdateFrequencyLimit : 0;
+        }
 
         // Factories implemented by the application.
         // Called from OnLoad(), so the derived class may rely on its own OnLoad() initialization
@@ -54,11 +106,13 @@ namespace SingleDocAppFramework
         {
             // Note: derived classes should call base.OnLoad() at the end of their OnLoad()!
 
-            executor_           = CreateExecutor();
+            ApplyUserSettings();
+
+            executor_          = CreateExecutor();
             uiMgr_              = CreateUiManager(executor_);
             uiMgr_.AppSettings  = appSettings_;
 
-            ReinitializeImGuiController(appSettings_.GetDefaultLayoutPath());
+            ReinitializeImGuiController(GetStartupLayoutPath());
 
             // Windows can be moved only by their title bar
             ImGui.GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
@@ -191,6 +245,8 @@ namespace SingleDocAppFramework
         {
             base.OnUpdateFrame(e);
 
+            ApplyUserSettings();
+
             currMouseClientPos_ = this.PointToClient(new Vector2i((int)MouseState.X, (int)MouseState.Y));
 
             if (uiMgr_.AutoLayoutWindows)
@@ -224,7 +280,7 @@ namespace SingleDocAppFramework
         // Additional, user-configurable UI scale (multiplied by the OS DPI scaling)
         protected virtual float GetUiTextScaleFactor()
         {
-            return 1.0f;
+            return userSettings_.UiTextScaleFactor;
         }
 
         private static readonly Keys[] WindowToggleKeys = { Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0 };
@@ -327,6 +383,28 @@ namespace SingleDocAppFramework
             uiMgr_.ApplyLayout(layoutData);
         }
 
+        // Layout remembered in the user settings, or the default one if it is not set or does not exist
+        private string GetStartupLayoutPath()
+        {
+            if (String.IsNullOrEmpty(userSettings_.LayoutFile))
+                return appSettings_.GetDefaultLayoutPath();
+
+            string layoutFilePath = Path.Combine(appSettings_.LayoutsDirectory, userSettings_.LayoutFile);
+            if (!File.Exists(layoutFilePath))
+            {
+                Console.WriteLine("WARNING: Layout from user settings not found: {0}, the default layout is used", layoutFilePath);
+                return appSettings_.GetDefaultLayoutPath();
+            }
+
+            return layoutFilePath;
+        }
+
+        // Remembers the current layout in the user settings (saved together with the other settings)
+        private void SetCurrentLayout(string layoutFilePath)
+        {
+            userSettings_.LayoutFile = Path.GetRelativePath(appSettings_.LayoutsDirectory, layoutFilePath);
+        }
+
         private string? requestedLayoutFilePath_ = null;
         public void OnLoadLayout(string layoutFilePath)
         {
@@ -357,6 +435,8 @@ namespace SingleDocAppFramework
 
             XmlDocument xmlDoc = layoutData.Serialize();
             xmlDoc.Save(filePath);
+
+            SetCurrentLayout(filePath);
         }
 
 
@@ -399,6 +479,7 @@ namespace SingleDocAppFramework
                 return;
             }
 
+            SetCurrentLayout(requestedLayoutFilePath_);
             requestedLayoutFilePath_ = null;
 
 

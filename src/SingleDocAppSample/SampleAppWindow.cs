@@ -1,5 +1,6 @@
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Desktop;
+using SingleDocAppCore.Settings;
 using SingleDocAppFramework;
 using SingleDocAppFramework.Platform;
 using SingleDocAppFramework.Ui;
@@ -9,12 +10,13 @@ namespace SingleDocAppSample
     // Main window of the sample application.
     // Everything generic (ImGui, layouts, menus, shortcuts, undo) comes from SdAppWindow,
     // the application provides only: settings, document, executor, UI manager and 3D content.
+    // User settings (UserSettings.xml next to the exe) use UserSettingsBase directly.
     public class SampleAppWindow : SdAppWindow
     {
         public  TextDocument            Document                = new TextDocument();
 
         public SampleAppWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings, IPlatformServices platform)
-            : base(gameWindowSettings, nativeWindowSettings, CreateAppSettings(), platform)
+            : base(gameWindowSettings, nativeWindowSettings, CreateAppSettings(), new UserSettingsBase(), platform)
         {
         }
 

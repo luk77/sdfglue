@@ -40,6 +40,8 @@ namespace SdfGlueCore.Model
         public static readonly int      NodeIdSignalsCollection     = -4000;
         public static readonly int      NodeIdProjectSettings       = -5000;
 
+        public static readonly float    ConstTimeStep               = 1.0f / 10.0f;
+
         public static readonly int      NumOfPreviews               = 4;
         public static readonly int      NumOfCodeViews              = 4;
 
@@ -74,8 +76,8 @@ namespace SdfGlueCore.Model
         public  TreeNode?               NodeToMoveUp            = null;
         public  TreeNode?               NodeToMoveDown          = null;
 
-        // Global settings
-        public  GlobalConfig            Config                  = new GlobalConfig();
+        // User settings (owned by the application, shared by consecutive models)
+        public  UserSettingsSdfGlue     Config;
 
         // Camera (polar-style)
         public  CameraData              CameraDat               = new CameraData();
@@ -133,14 +135,13 @@ namespace SdfGlueCore.Model
             return version;
         }
 
-        public DataModel() : base(NodeIdDataModel, "Project")
+        public DataModel(UserSettingsSdfGlue config) : base(NodeIdDataModel, "Project")
         {
+            Config              = config;
             ProjSettings        = new ProjectSettings(this);
             //RenderingSysData    = new RenderingData(this); // this is done in InitDefaultData()
 
             ReloadDefinitions();
-
-            Config.InitDefault();
 
             InitDefaultData();
             InitDefaultSdfObjects();
@@ -584,14 +585,14 @@ namespace SdfGlueCore.Model
 
         public void TimeStepBack()
         {
-            CurrentTime -= GlobalConfig.ConstTimeStep;
+            CurrentTime -= ConstTimeStep;
             if (CurrentTime < 0.0)
                 CurrentTime = 0.0;
         }
 
         public void TimeStepForward()
         {
-            CurrentTime += GlobalConfig.ConstTimeStep;
+            CurrentTime += ConstTimeStep;
         }
 
         private void UpdateTime(double deltaTime)

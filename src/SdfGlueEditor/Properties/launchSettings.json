@@ -2,7 +2,7 @@
   "profiles": {
     "SdfGlue": {
       "commandName": "Project",
-      "workingDirectory": "..\\..\\bin"
+      "workingDirectory": "C:\\work_c\\priv_git\\shadertoy\\tools\\SdfGlue\\bin"
     }
   }
 }

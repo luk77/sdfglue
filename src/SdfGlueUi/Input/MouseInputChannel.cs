@@ -35,7 +35,7 @@ namespace SdfGlueUi.Input
 
         public bool IsDragging { get { return isDragging_; } }
 
-        public void Update(bool buttonCurrentState, bool isRequiredKeyPressed, GlobalConfig config, IUiInput input, CameraData cameraData, bool isHovered)
+        public void Update(bool buttonCurrentState, bool isRequiredKeyPressed, UserSettingsSdfGlue config, IUiInput input, CameraData cameraData, bool isHovered)
         {
             bool dragStart              = !prevButtonState_ && buttonCurrentState && isRequiredKeyPressed;
             bool dragEnd                = prevButtonState_ && !buttonCurrentState;
