@@ -19,8 +19,8 @@ float opFiniteRepeatXYZ(inout vec3 p, float spacingX, float spacingY, float spac
     // cell index
     vec3 halfsize = spacing*0.5;
     vec3 c = floor((p + halfsize)/spacing);
-    float cellIndex = c.x + c.y + PI * sin(c.x * c.y) + PI * sin(0.88 + c.x * c.y * c.z);
-    
+    float cellIndex = calculateCellIndex3d(c);
+
     //p = min(p, p - spacing * clamp(round(p / spacing), -repetitions, repetitions));
     p = p - spacing * clamp(round(p / spacing), vec3(0.0), repetitions);
     

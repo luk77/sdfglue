@@ -24,7 +24,7 @@ float opFiniteRepeatCenteredXYZ(inout vec3 p, float spacingX, float spacingY, fl
     vec3 evenCorrection = vec3(1.0);//floor(1.0 + mod(repetitions, 2.0));
     vec3 c = floor((p + evenCorrection * halfsize)/spacing);
     
-    float cellIndex = c.x + c.y + PI * sin(c.x * c.y) + PI * sin(0.88 + c.x * c.y * c.z);
+    float cellIndex = calculateCellIndex3d(c);
 
     p = p - spacing * clamp(round(p / spacing), vec3(0.0), repetitions);
     
