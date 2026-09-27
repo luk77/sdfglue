@@ -41,7 +41,7 @@ namespace SdfGlueEditor.Application
 
         public void NewProject()
         {
-            ctx_.CodeGenerator.SetModel(new DataModel());
+            ctx_.CodeGenerator.SetModel(new DataModel(ctx_.Settings));
 
             ctx_.ReinitializeRenderingSystem();
         }

@@ -77,12 +77,21 @@ namespace SdfGlueUi.Ui
             WndLog wndLog           = new WndLog();
             wndLog.PlacementProvider = () => new WindowRect(CenterColPosX, LogPosY, CenterColWidth, LogHeight);
             WindowLog               = RegisterWindow(wndLog                     , null, false);
-            WindowSettings          = RegisterWindow(new WndSettings()          , null, false);
+            WndSettings wndSettings = new WndSettings();
+            wndSettings.PlacementProvider = GetSettingsPlacement;
+            WindowSettings          = RegisterWindow(wndSettings                , null, false);
             WindowDiagnostics       = RegisterWindow(new WndDiagnostics()       , null, false);
             WindowPlayback          = RegisterWindow(new WndPlayback());
 
 
             SetMainWindowClientSize(mainWindowSizeX, mainWindowSizeY);
+        }
+
+        private WindowRect GetSettingsPlacement()
+        {
+            int materialsPosY = BasePosY + MaterialsHeight + DistanceY;
+
+            return new WindowRect(RightColPosX, materialsPosY, RightColWidth, BaseHeight - materialsPosY + 3 * DistanceY);
         }
 
         // Typed access to the executor passed to the constructor

@@ -13,6 +13,8 @@ namespace SdfGlueCore.Model.DataNodes
 {
     public class CameraData : TreeNode
     {
+        public static readonly float    MinDistanceToTarget = 0.001f;
+
         // serializable
         public  ExVector3               TargetPosition      = new ExVector3(new Vector3(0.0f));
         public  ExFloat                 RotationPitch       = new ExFloatSimple(20.0f);
@@ -118,8 +120,8 @@ namespace SdfGlueCore.Model.DataNodes
 
             val += deltaDistanceToTarget;
 
-            if (val < GlobalConfig.MinDistanceToTarget)
-                val = GlobalConfig.MinDistanceToTarget;
+            if (val < MinDistanceToTarget)
+                val = MinDistanceToTarget;
 
             if (UseSmoothing)
             {
@@ -140,7 +142,7 @@ namespace SdfGlueCore.Model.DataNodes
             DistanceToTargetForSmoothing= DistanceToTarget.Val;
         }
 
-        public void UpdateSmoothing(float deltaTime, GlobalConfig config)
+        public void UpdateSmoothing(float deltaTime, UserSettingsSdfGlue config)
         {
             if (!UseSmoothing)
                 return;

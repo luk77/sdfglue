@@ -17,17 +17,21 @@ namespace SdfGlueEditor.Application
         public  SdAppWindow                 Window;
         public  IPlatformServices           Platform;
 
+        // User settings (loaded by SdAppWindow), shared by consecutive DataModels
+        public  UserSettingsSdfGlue         Settings;
+
         // The code generator owns the current DataModel (replaced on "New project")
         public  ShaderCodeGenerator         CodeGenerator;
 
         // Created in EditorMainWindow.OnLoad() (requires the OpenGL context)
         public  IRenderingSystem            RenderingSystem         = null!;
 
-        public SdfGlueAppContext(SdAppWindow window, IPlatformServices platform)
+        public SdfGlueAppContext(SdAppWindow window, IPlatformServices platform, UserSettingsSdfGlue settings)
         {
             Window          = window;
             Platform        = platform;
-            CodeGenerator   = new ShaderCodeGenerator(new DataModel());
+            Settings        = settings;
+            CodeGenerator   = new ShaderCodeGenerator(new DataModel(Settings));
         }
 
         public DataModel GetModel()

@@ -1,3 +1,4 @@
+using SingleDocAppCore.Settings;
 using SingleDocAppFramework.Input;
 using SingleDocAppFramework.Layouts;
 
@@ -23,6 +24,11 @@ namespace SingleDocAppFramework.Ui
         // layouts
         void    OnLoadLayout        (string layoutFilePath);
         void    OnSaveCurrentLayout (WindowsVisibilityCollection windowsVisibility);
+
+        // user settings
+        UserSettingsBase GetUserSettings            ();
+        void    OnSaveUserSettings                  ();
+        void    OnRestoreDefaultUserSettings        ();     // in memory only
 
         // application
         void    OnExitApp           ();

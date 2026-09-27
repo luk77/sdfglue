@@ -37,7 +37,7 @@ namespace SdfGlueEditor
 
 
         public EditorMainWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings, IPlatformServices platform)
-            : base(gameWindowSettings, nativeWindowSettings, CreateAppSettings(), platform)
+            : base(gameWindowSettings, nativeWindowSettings, CreateAppSettings(), new UserSettingsSdfGlue(), platform)
         {
             // Vsync tests - does not really help with flickering at high frequencies
             //Context.SwapInterval = 1;
@@ -49,7 +49,8 @@ namespace SdfGlueEditor
             Console.WriteLine("OpenGL v.{0}", GL.GetString(StringName.Version));
             Console.WriteLine("-----------------------------------------------------------------------------");
 
-            ctx_                = new SdfGlueAppContext(this, platform);
+            // user settings are already loaded by the base constructor
+            ctx_                = new SdfGlueAppContext(this, platform, (UserSettingsSdfGlue)UserSettings);
 
             fileChangeMonitor_  = new FileChangeMonitor(".", new string[] {"*.xml", "*.glsl", "*.vert", "*.frag", "*.shader"});
         }
@@ -103,11 +104,6 @@ namespace SdfGlueEditor
             return documents_.GetDocumentDisplayName();
         }
 
-        protected override float GetUiTextScaleFactor()
-        {
-            return GetModel().Config.UiTextScaleFactor;
-        }
-
         // framework factories (called from base.OnLoad())
 
         protected override UiExecutorFrameworkBase CreateExecutor()
@@ -131,8 +127,6 @@ namespace SdfGlueEditor
                 GL.Enable(EnableCap.DebugOutput);
             }
 
-            ApplySettings();
-
             ctx_.RenderingSystem = new RenderingSystem();
             ctx_.ReinitializeRenderingSystem();
 
@@ -147,11 +141,8 @@ namespace SdfGlueEditor
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            // Note: UI input and shortcuts are handled in base.OnUpdateFrame()
+            // Note: UI input, shortcuts and user settings (update frequency) are handled in base.OnUpdateFrame()
             base.OnUpdateFrame(e);
-
-            // TODO: temporary: replace with events from the UI
-            ApplySettings();
 
             camera_.RecalculateCamera();
 
@@ -179,7 +170,7 @@ namespace SdfGlueEditor
             if (!IsImGuiInitialized())
                 return;
 
-            double deltaTime = GetModel().UseConstTimeStep ? GlobalConfig.ConstTimeStep : e.Time;
+            double deltaTime = GetModel().UseConstTimeStep ? DataModel.ConstTimeStep : e.Time;
 
             GetModel().Update(deltaTime);
 
@@ -217,12 +208,6 @@ namespace SdfGlueEditor
         public override void OnExitApp()
         {
             base.OnExitApp();
-        }
-
-        private void ApplySettings()
-        {
-            //RenderFrequency = GetModel().Config.UseRenderFrequencyLimit ? GetModel().Config.RenderFrequencyLimit : 0;
-            UpdateFrequency = GetModel().Config.UseUpdateFrequencyLimit ? GetModel().Config.UpdateFrequencyLimit : 0;
         }
 
         // shortcuts
