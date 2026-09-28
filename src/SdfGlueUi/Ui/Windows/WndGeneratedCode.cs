@@ -38,7 +38,7 @@ namespace SdfGlueUi.Ui.Windows
         {
             UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
-            BuildWindow(uiMgr.CenterColPosX, uiMgr.BasePosY, uiMgr.CenterColWidth, uiMgr.BaseHeight, delegate ()
+            BuildWindow(delegate()
             {
                 int id = 1;
                 ImGui.PushID(id++);
@@ -47,9 +47,6 @@ namespace SdfGlueUi.Ui.Windows
                 ImGui.SameLine();
 
                 MenuRenderPass.Build(GetModel(), ref previewMode_, ref selectedPass_);
-
-                if (DataModel.GenCodeCleanup)
-                {
 
                 string[] arrOptions = { 
                     "Full shader"           , // 0
@@ -113,140 +110,6 @@ namespace SdfGlueUi.Ui.Windows
                 //ImGui.Separator();
 
                 InsertScrollableTextPanel( selectedCode );
-
-                } //GenCodeCleanup
-                else
-                {
-                    // Old code preview
-
-                if (selectedPass_ == null)
-                    return;
-
-                if (ImGui.Button("Copy shader to clipboard"))
-                {
-                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCode.FullShader))
-                        uiMgr.ActionsExecutor.CopyTextToClipboard(selectedPass_.LastGenCode.FullShader);
-                }
-
-                if (ImGui.Button("Copy unity shader to clipboard"))
-                {
-                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCodeUnity))
-                        uiMgr.ActionsExecutor.CopyTextToClipboard(selectedPass_.LastGenCodeUnity);
-                }
-
-                ImGui.BeginTabBar("TabsGenCode", ImGuiTabBarFlags.None); 
-
-                if (ImGui.BeginTabItem("Defines"))
-                {
-                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCode.Definitions))
-                    {
-                        // long text display
-                        InsertScrollableTextPanel(selectedPass_.LastGenCode.Definitions);
-                    }
-                    ImGui.EndTabItem();
-                }
-                if (ImGui.BeginTabItem("Materials"))
-                {
-                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCode.Materials))
-                    {
-                        // long text display
-                        InsertScrollableTextPanel(selectedPass_.LastGenCode.Materials);
-                    }
-                    ImGui.EndTabItem();
-                }
-                if (ImGui.BeginTabItem("Includes"))
-                {
-                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCode.Includes))
-                    {
-                        // long text display
-                        InsertScrollableTextPanel(selectedPass_.LastGenCode.Includes);
-                    }
-                    ImGui.EndTabItem();
-                }
-                if (ImGui.BeginTabItem("Distance functions"))
-                {
-                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCode.DistanceFunctions))
-                    {
-                        // long text display
-                        InsertScrollableTextPanel(selectedPass_.LastGenCode.DistanceFunctions);
-                    }
-                    ImGui.EndTabItem();
-                }
-                if (ImGui.BeginTabItem("Mix operators"))
-                {
-                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCode.MixOpFunctions))
-                    {
-                        // long text display
-                        InsertScrollableTextPanel(selectedPass_.LastGenCode.MixOpFunctions);
-                    }
-                    ImGui.EndTabItem();
-                }
-                if (ImGui.BeginTabItem("Position operators"))
-                {
-                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCode.PosOpFunctions))
-                    {
-                        // long text display
-                        InsertScrollableTextPanel(selectedPass_.LastGenCode.PosOpFunctions);
-                    }
-                    ImGui.EndTabItem();
-                }
-                if (ImGui.BeginTabItem("Distance operators"))
-                {
-                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCode.DistOpFunctions))
-                    {
-                        // long text display
-                        InsertScrollableTextPanel(selectedPass_.LastGenCode.DistOpFunctions);
-                    }
-                    ImGui.EndTabItem();
-                }
-                if (ImGui.BeginTabItem("Map uniforms"))
-                {
-                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCode.MapUniforms))
-                    {
-                        // long text display
-                        InsertScrollableTextPanel(selectedPass_.LastGenCode.MapUniforms);
-                    }
-                    ImGui.EndTabItem();
-                }
-                if (ImGui.BeginTabItem("Map function"))
-                {
-                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCode.MapFunction))
-                    {
-                        // long text display
-                        InsertScrollableTextPanel(selectedPass_.LastGenCode.MapFunction);
-                    }
-                    ImGui.EndTabItem();
-                }
-                if (ImGui.BeginTabItem("Materials function"))
-                {
-                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCode.MaterialsFunction))
-                    {
-                        // long text display
-                        InsertScrollableTextPanel(selectedPass_.LastGenCode.MaterialsFunction);
-                    }
-                    ImGui.EndTabItem();
-                }
-                if (ImGui.BeginTabItem("Full shader"))
-                {
-                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCode.FullShader))
-                    {
-                        // long text display
-                        InsertScrollableTextPanel(selectedPass_.LastGenCode.FullShader);
-                    }
-                    ImGui.EndTabItem();
-                }
-                if (ImGui.BeginTabItem("Full Unity shader"))
-                {
-                    if (!String.IsNullOrEmpty(selectedPass_.LastGenCodeUnity))
-                    {
-                        // long text display
-                        InsertScrollableTextPanel(selectedPass_.LastGenCodeUnity);
-                    }
-                    ImGui.EndTabItem();
-                }
-
-                ImGui.EndTabBar();
-                }
             });
         }
 

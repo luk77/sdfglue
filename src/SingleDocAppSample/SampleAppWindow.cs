@@ -35,7 +35,7 @@ namespace SingleDocAppSample
 
         protected override UiManagerBase CreateUiManager(UiExecutorFrameworkBase executor)
         {
-            return new UiManagerSample((ISampleExecutor)executor, ClientSize.X, ClientSize.Y);
+            return new UiManagerSample((ISampleExecutor)executor);
         }
 
         protected override string? GetDocumentDisplayName()

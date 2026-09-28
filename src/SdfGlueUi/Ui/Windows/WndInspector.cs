@@ -32,7 +32,7 @@ namespace SdfGlueUi.Ui.Windows
 
             int index = 1;
 
-            BuildWindow(uiMgr.LeftColPosX, uiMgr.InspectorPosY, uiMgr.LeftColWidth, uiMgr.InspectorHeight, delegate()
+            BuildWindow(delegate()
             {
                 if (selectedNode is DataModel model)
                 {

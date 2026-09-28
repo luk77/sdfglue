@@ -16,7 +16,7 @@ namespace SingleDocAppSample.Windows
 
         public override void Build()
         {
-            BuildWindow(uiMgr_.LeftColPosX, uiMgr_.BasePosY, uiMgr_.LeftColWidth + uiMgr_.CenterColWidth + uiMgr_.DistanceX, uiMgr_.BaseHeight, delegate()
+            BuildWindow(delegate()
             {
                 TextDocument document = SampleExecutor.GetDocument();
 

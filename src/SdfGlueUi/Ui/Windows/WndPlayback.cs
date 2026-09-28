@@ -15,9 +15,7 @@ namespace SdfGlueUi.Ui.Windows
 
         public override void Build()
         {
-            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
-
-            BuildWindow(uiMgr.DistanceX, uiMgr.PlaybackPosY, uiMgr.LeftColWidth, uiMgr.PlaybackHeight, delegate ()
+            BuildWindow(delegate()
             {
                 Vector2 butSize = new Vector2(120, 60);
 

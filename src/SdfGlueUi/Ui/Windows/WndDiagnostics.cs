@@ -16,7 +16,7 @@ namespace SdfGlueUi.Ui.Windows
         {
             UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
-            BuildWindow(uiMgr.CenterColPosX, uiMgr.LogPosY, uiMgr.CenterColWidth, uiMgr.LogHeight, delegate()
+            BuildWindow(delegate()
             {
                 if (ImGui.CollapsingHeader("Rendering", ImGuiTreeNodeFlags.DefaultOpen))
                 {

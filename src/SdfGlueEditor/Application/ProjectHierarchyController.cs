@@ -119,7 +119,9 @@ namespace SdfGlueEditor.Application
 
         public delegate void AssignIdentifiersDelegate(TreeNode node);
 
-        private void OnPasteNode<T>(TreeNode? pasteTarget, AssignIdentifiersDelegate assignIdentifiersDelegate) where T : SerializableNode, new()
+        // xmlNodeName - name of the root XML node written by T.Serialize(); clipboard content of any other type is ignored
+        // insertIndex  - position in pasteTarget children, -1 appends at the end
+        private void OnPasteNode<T>(TreeNode? pasteTarget, int insertIndex, string xmlNodeName, AssignIdentifiersDelegate assignIdentifiersDelegate) where T : SerializableNode, new()
         {
             if (pasteTarget == null)
                 return;
@@ -145,6 +147,10 @@ namespace SdfGlueEditor.Application
             if (xmlNode == null)
                 return;
 
+            // e.g. SdfObject in the clipboard cannot be pasted as RenderPassData
+            if (xmlNode.Name != xmlNodeName)
+                return;
+
             //SdfObject obj = new SdfObject(0, "", null);
             T obj = new T();
             bool result = obj.Deserialize(xmlNode, GetModel());
@@ -159,16 +165,14 @@ namespace SdfGlueEditor.Application
                 assignIdentifiersDelegate(node);
             });
 
-            pasteTarget.AddChild(obj);
+            AddPastedNode(pasteTarget, obj, insertIndex);
 
             if (typeof(T) == typeof(RenderPassData) ||
                 typeof(T) == typeof(RenderingData))
             {
                 if (obj is RenderPassData passData)
                 {
-                    passData.RendererFunc    ?.RefreshDefinitionReference(GetModel().Renderers);
-                    //passData.CameraCtrlFunc  ?.RefreshDefinitionReference(GetModel().CameraControllers);
-                    passData.CameraOperators ?.RefreshDefinitionReference(GetModel().CameraControllers);
+                    passData.RefreshDefinitionReference(GetModel().Renderers, GetModel().BackdropsDefinitions, GetModel().CameraControllers);
                 }
 
                 renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
@@ -181,6 +185,7 @@ namespace SdfGlueEditor.Application
 
             if (typeof(T) == typeof(MaterialInstance))
             {
+                (obj as MaterialInstance)?.RefreshDefinitionReference(GetModel().GetRenderPassForMaterials()?.RendererFunc?.Definition);
                 //GetModel().FixMaterialsReferences();
                 renderingSystem_.ReinitializeShader(codeGenerator_);
             }
@@ -197,16 +202,14 @@ namespace SdfGlueEditor.Application
                 delegate
                 {
                     // redo
-                    pasteTarget.AddChild(obj);
-                    
+                    AddPastedNode(pasteTarget, obj, insertIndex);
+
                     if (typeof(T) == typeof(RenderPassData) ||
                         typeof(T) == typeof(RenderingData))
                     {
                         if (obj is RenderPassData passData)
                         {
-                            passData.RendererFunc    ?.RefreshDefinitionReference(GetModel().Renderers);
-                            //passData.CameraCtrlFunc  ?.RefreshDefinitionReference(GetModel().CameraControllers);
-                            passData.CameraOperators ?.RefreshDefinitionReference(GetModel().CameraControllers);
+                            passData.RefreshDefinitionReference(GetModel().Renderers, GetModel().BackdropsDefinitions, GetModel().CameraControllers);
                         }
 
                         renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
@@ -219,6 +222,7 @@ namespace SdfGlueEditor.Application
 
                     if (typeof(T) == typeof(MaterialInstance))
                     {
+                        (obj as MaterialInstance)?.RefreshDefinitionReference(GetModel().GetRenderPassForMaterials()?.RendererFunc?.Definition);
                         //GetModel().FixMaterialsReferences();
                         renderingSystem_.ReinitializeShader(codeGenerator_);
                     }
@@ -227,9 +231,17 @@ namespace SdfGlueEditor.Application
 
         }
 
+        private static void AddPastedNode(TreeNode pasteTarget, TreeNode node, int insertIndex)
+        {
+            if (insertIndex < 0 || insertIndex >= pasteTarget.GetChildrenCount())
+                pasteTarget.AddChild(node);
+            else
+                pasteTarget.AddChildAtIndex(node, insertIndex);
+        }
+
         public void OnPasteObject(SdfObject? pasteTarget)
         {
-            OnPasteNode<SdfObject>(pasteTarget,
+            OnPasteNode<SdfObject>(pasteTarget, -1, "SdfObject",
             delegate (TreeNode node)
             {
                 node.Id = GetModel().NextAvailableId;
@@ -295,27 +307,73 @@ namespace SdfGlueEditor.Application
 
         public void OnCopyRenderPass(RenderPassData? node)
         {
-            // TODO: to wymaga dokończenia:
-            //OnCopyNode(node);
+            OnCopyNode(node);
         }
 
         public void OnCutRenderPass(RenderPassData? node)
         {
-            // TODO: to wymaga dokończenia:
-            //OnCutNode(node);
+            OnCutNode(node);
         }
 
-        public void OnPasteRenderPass()
+        // Paste position in a flat collection (render passes, materials):
+        // selectedNode is a child of collection - right after it, selectedNode is the collection - at the end (-1),
+        // otherwise - null (nothing to paste)
+        private static int? GetPasteIndexInCollection(TreeNode collection, TreeNode? selectedNode)
         {
-            // TODO: to wymaga dokończenia:
-            // jest crash gdy skopiujemy niekompatybilny obiekt (SdfObject) jako RenderPassData
+            if (selectedNode == collection)
+                return -1;
 
-            //OnPasteNode<RenderPassData>(GetModel().RenderingSysData,
-            //delegate (TreeNode node)
-            //{
-            //    node.Id = GetModel().NextAvailableRenderPassId;
-            //    GetModel().NextAvailableRenderPassId++;
-            //});
+            if (selectedNode != null && selectedNode.Parent == collection)
+                return collection.GetChildrenIndex(selectedNode) + 1;
+
+            return null;
+        }
+
+        // selectedNode: RenderPassData - the pass is pasted right after it (pass order is the rendering order),
+        //               RenderingData  - the pass is appended at the end
+        public void OnPasteRenderPass(TreeNode? selectedNode)
+        {
+            RenderingData renderingData = GetModel().RenderingSysData;
+
+            int? insertIndex = GetPasteIndexInCollection(renderingData, selectedNode);
+            if (insertIndex == null)
+                return;
+
+            OnPasteNode<RenderPassData>(renderingData, insertIndex.Value, "RenderPassData",
+            delegate (TreeNode node)
+            {
+                node.Id = GetModel().NextAvailableRenderPassId;
+                GetModel().NextAvailableRenderPassId++;
+            });
+        }
+
+        public void OnCopyMaterial(MaterialInstance? node)
+        {
+            OnCopyNode(node);
+        }
+
+        public void OnCutMaterial(MaterialInstance? node)
+        {
+            OnCutNode(node);
+        }
+
+        // selectedNode: MaterialInstance    - the material is pasted right after it,
+        //               MaterialsCollection - the material is appended at the end
+        public void OnPasteMaterial(TreeNode? selectedNode)
+        {
+            MaterialsCollection materials = GetModel().Materials;
+
+            int? insertIndex = GetPasteIndexInCollection(materials, selectedNode);
+            if (insertIndex == null)
+                return;
+
+            // Objects reference materials by id, so the pasted material is a new one (new id)
+            OnPasteNode<MaterialInstance>(materials, insertIndex.Value, "Material",
+            delegate (TreeNode node)
+            {
+                node.Id = GetModel().NextAvailableMaterialId;
+                GetModel().NextAvailableMaterialId++;
+            });
         }
 
         public void HandleDeleteNode()
@@ -334,6 +392,11 @@ namespace SdfGlueEditor.Application
                 return;
             int oryginalIndex = oryginalParent.GetChildrenIndex(node);
 
+            // Objects using a deleted material are switched to the default one (FixMaterialsReferences),
+            // so they have to be remembered to restore their material on undo
+            List<SdfObject> materialUsers = (node is MaterialInstance mat) ? FindMaterialUsers(mat.Id) : new List<SdfObject>();
+            int deletedMaterialId = node.Id;
+
             DeleteNodeInternal(node);
 
             // undo/redo support
@@ -341,7 +404,10 @@ namespace SdfGlueEditor.Application
                 delegate
                 {
                     // undo
-                    oryginalParent.AddChildAtIndex(node, oryginalIndex); 
+                    oryginalParent.AddChildAtIndex(node, oryginalIndex);
+
+                    foreach(SdfObject sdfObj in materialUsers)
+                        sdfObj.MaterialId.Val = deletedMaterialId;
 
                     renderingSystem_.ReinitializeShader(codeGenerator_);
 
@@ -356,6 +422,19 @@ namespace SdfGlueEditor.Application
                 }
                 ) );
 
+        }
+
+        private List<SdfObject> FindMaterialUsers(int materialId)
+        {
+            List<SdfObject> users = new List<SdfObject>();
+
+            TreeNode.CallRecursive(GetModel().SdfRoot, delegate(TreeNode node)
+            {
+                if (node is SdfObject sdfObj && (int)sdfObj.MaterialId.Val == materialId)
+                    users.Add(sdfObj);
+            });
+
+            return users;
         }
 
         private bool CanDeleteNode(TreeNode node)
@@ -420,7 +499,7 @@ namespace SdfGlueEditor.Application
             if (node is RenderPassData)
                 renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
 
-            if (node is SdfObject)
+            if (node is SdfObject || node is MaterialInstance)
                 renderingSystem_.ReinitializeShader(codeGenerator_);
 
             // undo/redo support
@@ -433,7 +512,7 @@ namespace SdfGlueEditor.Application
                     if (node is RenderPassData)
                         renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
 
-                    if (node is SdfObject)
+                    if (node is SdfObject || node is MaterialInstance)
                         renderingSystem_.ReinitializeShader(codeGenerator_);
                 },
                 delegate
@@ -444,7 +523,7 @@ namespace SdfGlueEditor.Application
                     if (node is RenderPassData)
                         renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
 
-                    if (node is SdfObject)
+                    if (node is SdfObject || node is MaterialInstance)
                         renderingSystem_.ReinitializeShader(codeGenerator_);
                 }
                 ));
@@ -464,7 +543,7 @@ namespace SdfGlueEditor.Application
             if (node is RenderPassData)
                 renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
 
-            if (node is SdfObject)
+            if (node is SdfObject || node is MaterialInstance)
                 renderingSystem_.ReinitializeShader(codeGenerator_);
 
             // undo/redo support
@@ -477,7 +556,7 @@ namespace SdfGlueEditor.Application
                     if (node is RenderPassData)
                         renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
 
-                    if (node is SdfObject)
+                    if (node is SdfObject || node is MaterialInstance)
                         renderingSystem_.ReinitializeShader(codeGenerator_);
                 },
                 delegate
@@ -488,7 +567,7 @@ namespace SdfGlueEditor.Application
                     if (node is RenderPassData)
                         renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
 
-                    if (node is SdfObject)
+                    if (node is SdfObject || node is MaterialInstance)
                         renderingSystem_.ReinitializeShader(codeGenerator_);
                 }
                 ));

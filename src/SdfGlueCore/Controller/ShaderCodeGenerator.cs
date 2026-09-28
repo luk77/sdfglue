@@ -776,10 +776,7 @@ namespace SdfGlueCore.Controller
             sb.AppendLine("");
             if (isMaterialsBlendingFunction)
             {
-                if (DataModel.MaterialsBlendingEnabled)
-                    sb.AppendFormat("MaterialDesc gen_getMaterial({0} p)", mainVectorType);
-                else
-                    sb.AppendFormat("vec2 gen_getMaterial({0} p)", mainVectorType);
+                sb.AppendFormat("MaterialDesc gen_getMaterial({0} p)", mainVectorType);
             }
             else
             {
@@ -844,21 +841,16 @@ namespace SdfGlueCore.Controller
                 // opakowanie w vec2, materiał
                 if (isMaterialsBlendingFunction)
                 {
-                    if (DataModel.MaterialsBlendingEnabled)
-                    {
-                        string materialObjectName = String.Format("material_{0}", (((int)sdfObj.MaterialId.Val)).ToString(CultureInfo.InvariantCulture));
+                    string materialObjectName = String.Format("material_{0}", (((int)sdfObj.MaterialId.Val)).ToString(CultureInfo.InvariantCulture));
 
-                        // Stare podejście - konstruktor struktury:
-                        //sb.AppendLine(String.Format("    MaterialDesc   obj_{0}         = MaterialDesc(dist_{0}, g_obj_{0}_matId, {1});", nodeId, materialObjectName));
-                        // Bez konstruktora struktury:
-                        sb.AppendLine(String.Format("    MaterialDesc   obj_{0};"                   , nodeId));
-                        sb.AppendLine(String.Format("    obj_{0}.distance    = dist_{0};"           , nodeId));
-                        sb.AppendLine(String.Format("    obj_{0}.materialId  = g_obj_{0}_matId;"    , nodeId));
-                        sb.AppendLine(String.Format("    obj_{0}.cellIndex   = cellIndex_{0};"      , nodeId));
-                        sb.AppendLine(String.Format("    obj_{0}.material    = {1};"                , nodeId, materialObjectName));
-                    }
-                    else
-                        sb.AppendLine(String.Format("    vec2           obj_{0}         = vec2(dist_{0}, g_obj_{0}_matId);", nodeId));
+                    // Stare podejście - konstruktor struktury:
+                    //sb.AppendLine(String.Format("    MaterialDesc   obj_{0}         = MaterialDesc(dist_{0}, g_obj_{0}_matId, {1});", nodeId, materialObjectName));
+                    // Bez konstruktora struktury:
+                    sb.AppendLine(String.Format("    MaterialDesc   obj_{0};"                   , nodeId));
+                    sb.AppendLine(String.Format("    obj_{0}.distance    = dist_{0};"           , nodeId));
+                    sb.AppendLine(String.Format("    obj_{0}.materialId  = g_obj_{0}_matId;"    , nodeId));
+                    sb.AppendLine(String.Format("    obj_{0}.cellIndex   = cellIndex_{0};"      , nodeId));
+                    sb.AppendLine(String.Format("    obj_{0}.material    = {1};"                , nodeId, materialObjectName));
                 }
                 else
                     sb.AppendLine(String.Format("    float      obj_{0}         = dist_{0};", nodeId));

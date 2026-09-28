@@ -7,7 +7,7 @@ namespace SingleDocAppSample
 {
     public class UiManagerSample : UiManagerBase
     {
-        public UiManagerSample(ISampleExecutor executor, int mainWindowSizeX, int mainWindowSizeY)
+        public UiManagerSample(ISampleExecutor executor)
             : base(executor)
         {
             // Window titles are the keys in layout files - do not change them once layouts are saved
@@ -15,8 +15,6 @@ namespace SingleDocAppSample
             RegisterWindow(new WndStats(), "Info");
             RegisterWindow(new WndLog(), "Info", false);
             RegisterWindow(new WndUserSettingsBase(), "Info", false);
-
-            SetMainWindowClientSize(mainWindowSizeX, mainWindowSizeY);
         }
 
         public ISampleExecutor SampleExecutor { get { return (ISampleExecutor)Executor; } }

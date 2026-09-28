@@ -27,7 +27,7 @@ namespace SdfGlueUi.Ui.Windows
         {
             UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
-            BuildWindow(uiMgr.DistanceX, uiMgr.BasePosY, uiMgr.LeftColWidth, uiMgr.ExplorerHeight, delegate()
+            BuildWindow(delegate()
             {
                 //Debug_BuildTestTree();
 
@@ -155,6 +155,8 @@ namespace SdfGlueUi.Ui.Windows
 
                         ImGui.EndMenu();
                     }
+                    ImGui.Separator();
+                    if (ImGui.MenuItem("Paste"      , "CTRL+V"      ))  { pasteRequest_ = true; pasteActionSelectedNode_ = node; pasteAsChild_ = false; ImGui.CloseCurrentPopup(); }
 
                     clickedNode = node;
 
@@ -196,6 +198,8 @@ namespace SdfGlueUi.Ui.Windows
 
                         ImGui.CloseCurrentPopup(); 
                     }
+                    ImGui.Separator();
+                    if (ImGui.MenuItem("Paste"      , "CTRL+V"      ))  { pasteRequest_ = true; pasteActionSelectedNode_ = node; pasteAsChild_ = false; ImGui.CloseCurrentPopup(); }
 
                     clickedNode = node;
 
@@ -208,10 +212,10 @@ namespace SdfGlueUi.Ui.Windows
                 {
                     if (ImGui.MenuItem("Delete"     , "DEL"         ))  { uiMgr.ActionsExecutor.OnDeleteNode           (node); ImGui.CloseCurrentPopup(); }
                     ImGui.Separator();
-                    //if (ImGui.MenuItem("Cut"        , "CTRL+X"      ))  { uiMgr.ActionsExecutor.OnCutMaterial          (node as MaterialInstance); ImGui.CloseCurrentPopup(); }
-                    //if (ImGui.MenuItem("Copy"       , "CTRL+C"      ))  { uiMgr.ActionsExecutor.OnCopyMaterial         (node as MaterialInstance); ImGui.CloseCurrentPopup(); }
-                    //if (ImGui.MenuItem("Paste"      , "CTRL+V"      ))  { uiMgr.ActionsExecutor.OnPasteMaterial        (node as MaterialInstance); ImGui.CloseCurrentPopup(); }
-                    //ImGui.Separator();
+                    if (ImGui.MenuItem("Cut"        , "CTRL+X"      ))  { uiMgr.ActionsExecutor.OnCutMaterial          (node as MaterialInstance); ImGui.CloseCurrentPopup(); }
+                    if (ImGui.MenuItem("Copy"       , "CTRL+C"      ))  { uiMgr.ActionsExecutor.OnCopyMaterial         (node as MaterialInstance); ImGui.CloseCurrentPopup(); }
+                    if (ImGui.MenuItem("Paste"      , "CTRL+V"      ))  { pasteRequest_ = true; pasteActionSelectedNode_ = node; pasteAsChild_ = false; ImGui.CloseCurrentPopup(); }
+                    ImGui.Separator();
                     if (ImGui.MenuItem("Move up"    , "CTRL+UP"     ))  { uiMgr.ActionsExecutor.OnMoveNodeUp           (node); ImGui.CloseCurrentPopup(); }
                     if (ImGui.MenuItem("Move down"  , "CTRL+DOWN"   ))  { uiMgr.ActionsExecutor.OnMoveNodeDown         (node); ImGui.CloseCurrentPopup(); }
 
@@ -353,23 +357,33 @@ namespace SdfGlueUi.Ui.Windows
                 // Cut, copy, paste
                 if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.X))
                 {
-                    uiMgr.ActionsExecutor.OnCutObject(GetModel().SelectedNode as SdfObject);
+                    if (GetModel().SelectedNode is RenderPassData)
+                        uiMgr.ActionsExecutor.OnCutRenderPass(GetModel().SelectedNode as RenderPassData);
+                    else if (GetModel().SelectedNode is MaterialInstance)
+                        uiMgr.ActionsExecutor.OnCutMaterial(GetModel().SelectedNode as MaterialInstance);
+                    else
+                        uiMgr.ActionsExecutor.OnCutObject(GetModel().SelectedNode as SdfObject);
                 }
                 if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.C))
                 {
-                    uiMgr.ActionsExecutor.OnCopyObject(GetModel().SelectedNode as SdfObject);
+                    if (GetModel().SelectedNode is RenderPassData)
+                        uiMgr.ActionsExecutor.OnCopyRenderPass(GetModel().SelectedNode as RenderPassData);
+                    else if (GetModel().SelectedNode is MaterialInstance)
+                        uiMgr.ActionsExecutor.OnCopyMaterial(GetModel().SelectedNode as MaterialInstance);
+                    else
+                        uiMgr.ActionsExecutor.OnCopyObject(GetModel().SelectedNode as SdfObject);
                 }
                 if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.V))
                 {
                     if (isShiftKeyDown)
                     {
                         // Pasting with shift adds object as child
-                        TryToPasteObject(GetModel().SelectedNode as SdfObject, true);
+                        TryToPasteObject(GetModel().SelectedNode, true);
                     }
                     else
                     {
                         // We prefer to add object as sibling (to parent if it exist)
-                        TryToPasteObject(GetModel().SelectedNode as SdfObject, false);
+                        TryToPasteObject(GetModel().SelectedNode, false);
                     }
                 }
 
@@ -415,9 +429,16 @@ namespace SdfGlueUi.Ui.Windows
                 }
             }
 
-            if (selectedNode is RenderPassData)
+            // Render pass is pasted after the selected pass, or at the end when the rendering node is selected
+            if (selectedNode is RenderPassData || selectedNode is RenderingData)
             {
-                uiMgr.ActionsExecutor.OnPasteRenderPass();
+                uiMgr.ActionsExecutor.OnPasteRenderPass(selectedNode);
+            }
+
+            // Material is pasted after the selected material, or at the end when the materials node is selected
+            if (selectedNode is MaterialInstance || selectedNode is MaterialsCollection)
+            {
+                uiMgr.ActionsExecutor.OnPasteMaterial(selectedNode);
             }
         }
     }

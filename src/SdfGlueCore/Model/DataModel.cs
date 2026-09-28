@@ -25,13 +25,9 @@ namespace SdfGlueCore.Model
         //public static readonly int      VersionMajor                = 0;
         //public static readonly int      VersionMinor                = 378;
 
-        public static readonly bool     MaterialsBlendingEnabled    = true;
         public static readonly bool     UseCameraControllers        = true;
         public static readonly bool     ImportOldMaterials          = false;
         public static readonly bool     UseSignals                  = false;//true;
-        public static readonly bool     UseMultiplePreviews         = true;
-        public static readonly bool     UseMultipleCodeViews        = true;
-        public static readonly bool     GenCodeCleanup              = true;
 
         public static readonly int      NodeIdDataModel             = -10000;
         public static readonly int      NodeIdRenderingData         = -1000;
@@ -567,10 +563,7 @@ namespace SdfGlueCore.Model
 
         public RenderPassData? GetRPassDataForPreview()
         {
-            if (UseMultiplePreviews)
-                return GetFinalRPass();
-
-            return Config.PreviewLastSelectedPass ? LastSelectedRPass : GetFinalRPass();
+            return GetFinalRPass();
         }
 
         public void ResetFrameCounter()

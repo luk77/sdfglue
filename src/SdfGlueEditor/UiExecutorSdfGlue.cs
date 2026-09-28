@@ -68,6 +68,10 @@ namespace SdfGlueEditor
         public void OnAddRenderPass     (RenderingData? parent, FunctionDefinition definition) { hierarchy_.OnAddRenderPass(parent, definition); }
         public void OnCutRenderPass     (RenderPassData? node)                              { hierarchy_.OnCutRenderPass(node);                 }
         public void OnCopyRenderPass    (RenderPassData? node)                              { hierarchy_.OnCopyRenderPass(node);                }
-        public void OnPasteRenderPass   ()                                                  { hierarchy_.OnPasteRenderPass();                   }
+        public void OnPasteRenderPass   (TreeNode? selectedNode)                            { hierarchy_.OnPasteRenderPass(selectedNode);       }
+
+        public void OnCutMaterial       (MaterialInstance? node)                            { hierarchy_.OnCutMaterial(node);                   }
+        public void OnCopyMaterial      (MaterialInstance? node)                            { hierarchy_.OnCopyMaterial(node);                  }
+        public void OnPasteMaterial     (TreeNode? selectedNode)                            { hierarchy_.OnPasteMaterial(selectedNode);         }
     }
 }
