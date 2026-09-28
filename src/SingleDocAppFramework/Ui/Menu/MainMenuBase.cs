@@ -8,7 +8,7 @@ namespace SingleDocAppFramework.Ui.Menu
     //   File    - New, Open, Save, Save as, [BuildFileMenuExtras], Exit
     //   Edit    - Undo, Redo, [BuildEditMenuExtras]
     //   [BuildAppMenus]  - application-specific menus (e.g. Tools)
-    //   View    - windows visibility (grouped by view group), [BuildViewMenuExtras], Auto layout, ImGui demo
+    //   View    - windows visibility (grouped by view group), [BuildViewMenuExtras], ImGui demo
     //   Layouts - Load layout, Save current layout
     // The application derives from this class and overrides the Build*Extras / BuildAppMenus hooks.
     public class MainMenuBase
@@ -119,13 +119,11 @@ namespace SingleDocAppFramework.Ui.Menu
             ImGui.Separator();
             BuildViewMenuExtras();
 
-            ImGui.Checkbox("Auto layout windows", ref uiMgr_.AutoLayoutWindows);
-
             ImGui.Separator();
             ImGui.Checkbox("ImGui demo", ref uiMgr_.ShowImGuiDemoWindow);
         }
 
-        // Items after the windows list, before "Auto layout windows"
+        // Items after the windows list, before "ImGui demo" (followed by a separator)
         protected virtual void BuildViewMenuExtras()
         {
         }

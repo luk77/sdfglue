@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 using ImGuiNET;
 using SdfGlueCore.Model.DataNodes;
+using SingleDocAppCore.Model.DataNodes;
 using SingleDocAppFramework.Ui.Components;
 using SingleDocAppFramework.Ui.Menu;
 
@@ -46,12 +47,33 @@ namespace SdfGlueUi.Ui
 
         protected override void BuildEditMenuExtras()
         {
-            SdfObject? selectedObject = ExecutorSdfGlue.GetModel().SelectedNode as SdfObject;
+            TreeNode? selectedNode = ExecutorSdfGlue.GetModel().SelectedNode;
 
             ImGui.Separator();
-            if (ImGui.MenuItem("Cut", "CTRL+X"))    { ExecutorSdfGlue.OnCutObject   (selectedObject); }
-            if (ImGui.MenuItem("Copy", "CTRL+C"))   { ExecutorSdfGlue.OnCopyObject  (selectedObject); }
-            if (ImGui.MenuItem("Paste", "CTRL+V"))  { ExecutorSdfGlue.OnPasteObject (selectedObject); }
+            if (selectedNode is RenderPassData || selectedNode is RenderingData)
+            {
+                RenderPassData? selectedPass = selectedNode as RenderPassData;
+
+                if (ImGui.MenuItem("Cut", "CTRL+X", false, selectedPass != null))   { ExecutorSdfGlue.OnCutRenderPass   (selectedPass); }
+                if (ImGui.MenuItem("Copy", "CTRL+C", false, selectedPass != null))  { ExecutorSdfGlue.OnCopyRenderPass  (selectedPass); }
+                if (ImGui.MenuItem("Paste", "CTRL+V"))                              { ExecutorSdfGlue.OnPasteRenderPass (selectedNode); }
+            }
+            else if (selectedNode is MaterialInstance || selectedNode is MaterialsCollection)
+            {
+                MaterialInstance? selectedMaterial = selectedNode as MaterialInstance;
+
+                if (ImGui.MenuItem("Cut", "CTRL+X", false, selectedMaterial != null))   { ExecutorSdfGlue.OnCutMaterial     (selectedMaterial); }
+                if (ImGui.MenuItem("Copy", "CTRL+C", false, selectedMaterial != null))  { ExecutorSdfGlue.OnCopyMaterial    (selectedMaterial); }
+                if (ImGui.MenuItem("Paste", "CTRL+V"))                                  { ExecutorSdfGlue.OnPasteMaterial   (selectedNode); }
+            }
+            else
+            {
+                SdfObject? selectedObject = selectedNode as SdfObject;
+
+                if (ImGui.MenuItem("Cut", "CTRL+X"))    { ExecutorSdfGlue.OnCutObject   (selectedObject); }
+                if (ImGui.MenuItem("Copy", "CTRL+C"))   { ExecutorSdfGlue.OnCopyObject  (selectedObject); }
+                if (ImGui.MenuItem("Paste", "CTRL+V"))  { ExecutorSdfGlue.OnPasteObject (selectedObject); }
+            }
         }
 
         protected override void BuildAppMenus()

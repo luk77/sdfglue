@@ -32,28 +32,19 @@ namespace SingleDocAppFramework.Ui
             return 220.0f + bonus * 120.0f;
         }
 
-        protected void BuildWindow(int sizeX, int sizeY, BuildContent buildContent)
+        // Window position and size come from the layout (imgui ini settings) and docking
+        protected void BuildWindow(BuildContent buildContent)
         {
-            BuildWindow(0, 0, sizeX, sizeY, buildContent);
+            BuildWindow(ImGuiWindowFlags.None, buildContent);
         }
 
-        protected void BuildWindow(int posX, int posY, int sizeX, int sizeY, BuildContent buildContent)
-        {
-            BuildWindow(posX, posY, sizeX, sizeY, ImGuiWindowFlags.None, buildContent);
-        }
-
-        //private void BuildWindow(ref bool isShown, string title, int posX, int posY, int sizeX, int sizeY, BuildContent buildContent)
-        protected void BuildWindow(int posX, int posY, int sizeX, int sizeY, ImGuiWindowFlags flags, BuildContent buildContent)
+        protected void BuildWindow(ImGuiWindowFlags flags, BuildContent buildContent)
         {
             if (!IsVisible)
                 return;
 
             IsFocused = false;
 
-            ImGuiCond constraints = uiMgr_.AutoLayoutWindows ? ImGuiCond.Always : ImGuiCond.FirstUseEver;
-
-            ImGui.SetNextWindowPos  (new Vector2(posX, posY), constraints);
-            ImGui.SetNextWindowSize (new Vector2(sizeX,sizeY), constraints);
             ImGui.SetNextWindowSizeConstraints(new Vector2(340.0f, 100.0f), new Vector2(float.MaxValue, float.MaxValue));
 
             if (!ImGui.Begin(Title, ref IsVisible, flags))

@@ -58,7 +58,7 @@ namespace SdfGlueUi.Ui.Windows
         {
             UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
-            BuildWindow(uiMgr.CenterColPosX, uiMgr.BasePosY, uiMgr.PreviewWidth, uiMgr.PreviewHeight, delegate()
+            BuildWindow(delegate()
             {
                 DataModel model = GetModel();
 
@@ -83,69 +83,50 @@ namespace SdfGlueUi.Ui.Windows
                 }
                 ImGui.PopID();
 
-                if (DataModel.UseMultiplePreviews)
-                {
-                    //ImGui.SameLine();
-                    //ImGui.Separator();
+                //ImGui.SameLine();
+                //ImGui.Separator();
 
-                    ImGui.PushID(id++);
-                    ImGui.SameLine();
-                    ImGui.Text(" Pass:");
-                    ImGui.PopID();
+                ImGui.PushID(id++);
+                ImGui.SameLine();
+                ImGui.Text(" Pass:");
+                ImGui.PopID();
 
-                    ImGui.SameLine();
+                ImGui.SameLine();
 
-                    ImGui.PushID(id++);
-                    MenuRenderPass.Build(GetModel(), ref previewMode_, ref selectedPass_);
-                    ImGui.PopID();
-                }
+                ImGui.PushID(id++);
+                MenuRenderPass.Build(GetModel(), ref previewMode_, ref selectedPass_);
+                ImGui.PopID();
 
                 //ImGui.SameLine();
                 //ImGui.Separator();
 
-                if (DataModel.UseMultiplePreviews)
-                {
-                    ImGui.SameLine();
-                    ImGui.Checkbox("Keep aspect ratio", ref constAspectRatio_);
-                }
-                else
-                {
-                    ImGui.SameLine();
-                    ImGui.Checkbox("Keep aspect ratio", ref GetModel().Config.ConstAspectRatioPreview);
-
-                    ImGui.SameLine();
-                    ImGui.Checkbox("Show last selected pass", ref GetModel().Config.PreviewLastSelectedPass);
-                }
+                ImGui.SameLine();
+                ImGui.Checkbox("Keep aspect ratio", ref constAspectRatio_);
 
 
 
-                RenderPassData? renderPass = GetModel().GetRPassDataForPreview();
+                //if (!GetModel().Config.PreviewLastSelectedPass)
+                //{
+                //    List<TreeNode> passesList = GetModel().RenderingSysData.Children.ToList();
+                //
+                //    if (selectedPassIndex_ >= 0 && selectedPassIndex_ < passesList.Count-1)
+                //        renderPass = passesList[selectedPassIndex_] as RenderPassData;
+                //}
 
-                if (DataModel.UseMultiplePreviews)
-                {
-                    //if (!GetModel().Config.PreviewLastSelectedPass)
-                    //{
-                    //    List<TreeNode> passesList = GetModel().RenderingSysData.Children.ToList();
-                    //    
-                    //    if (selectedPassIndex_ >= 0 && selectedPassIndex_ < passesList.Count-1)
-                    //        renderPass = passesList[selectedPassIndex_] as RenderPassData;
-                    //}
+                //if (previewMode_ == MenuRenderPass.PreviewMode.LastSelectedPass)
+                //{
+                //    renderPass = GetModel().LastSelectedRPass;
+                //}
+                //else if (previewMode_ == MenuRenderPass.PreviewMode.FinalPass)
+                //{
+                //    renderPass = GetModel().GetFinalRPass();
+                //}
+                //else
+                //{
+                //    renderPass = selectedPass_;
+                //}
 
-                    //if (previewMode_ == MenuRenderPass.PreviewMode.LastSelectedPass)
-                    //{
-                    //    renderPass = GetModel().LastSelectedRPass;
-                    //}
-                    //else if (previewMode_ == MenuRenderPass.PreviewMode.FinalPass)
-                    //{
-                    //    renderPass = GetModel().GetFinalRPass();
-                    //}
-                    //else
-                    //{
-                    //    renderPass = selectedPass_;
-                    //}
-
-                    renderPass = selectedPass_;
-                }
+                RenderPassData? renderPass = selectedPass_;
 
                 if (renderPass != null)
                 {
@@ -166,8 +147,7 @@ namespace SdfGlueUi.Ui.Windows
                         System.Numerics.Vector2 imgSizeOrg = imgSize;
                         imgSize -= margin;
 
-                        bool constAspectRatio = DataModel.UseMultiplePreviews ? constAspectRatio_ : GetModel().Config.ConstAspectRatioPreview;
-                        if (constAspectRatio)
+                        if (constAspectRatio_)
                         {
                             //Vector2 destRatioVec = new Vector2(1.6f, 0.9f);
                             Vector2 destRatioVec = new Vector2(imgSize.X, imgSize.Y);
@@ -243,7 +223,10 @@ namespace SdfGlueUi.Ui.Windows
                                     | ImGuiWindowFlags.NoScrollbar
                                     | ImGuiWindowFlags.NoCollapse;
 
-            BuildWindow(0, 0, uiMgr.MainWindowSizeX, uiMgr.MainWindowSizeY, flags, delegate()
+            ImGui.SetNextWindowPos  (new Vector2(0, 0), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize (new Vector2(uiMgr.MainWindowSizeX, uiMgr.MainWindowSizeY), ImGuiCond.FirstUseEver);
+
+            BuildWindow(flags, delegate()
             {
                 RenderPassData? renderPass = GetModel().GetRPassDataForPreview();
 
@@ -260,8 +243,7 @@ namespace SdfGlueUi.Ui.Windows
                 System.Numerics.Vector2 imgSizeOrg = imgSize;
                 imgSize -= margin;
 
-                bool constAspectRatio = DataModel.UseMultiplePreviews ? constAspectRatio_ : GetModel().Config.ConstAspectRatioPreview;
-                if (constAspectRatio)
+                if (constAspectRatio_)
                 {
                     //Vector2 destRatioVec = new Vector2(1.6f, 0.9f);
                     Vector2 destRatioVec = new Vector2(imgSize.X, imgSize.Y);

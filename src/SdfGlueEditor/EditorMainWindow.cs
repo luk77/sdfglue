@@ -113,7 +113,7 @@ namespace SdfGlueEditor
 
         protected override UiManagerBase CreateUiManager(UiExecutorFrameworkBase executor)
         {
-            return new UiManagerSdfGlue((IUiExecutorSdfGlue)executor, ClientSize.X, ClientSize.Y);
+            return new UiManagerSdfGlue((IUiExecutorSdfGlue)executor);
         }
 
         // lifecycle

@@ -249,17 +249,10 @@ namespace SingleDocAppFramework
 
             currMouseClientPos_ = this.PointToClient(new Vector2i((int)MouseState.X, (int)MouseState.Y));
 
-            if (uiMgr_.AutoLayoutWindows)
-            {
-                uiMgr_.SetMainWindowClientSize(this.ClientSize.X, this.ClientSize.Y);
-            }
-            else
-            {
-                // this is required when docking for proper positioning of preview image
-                uiMgr_.WindowsScaling   = GetWindowsScaling();
-                uiMgr_.MainWindowSizeX  = this.ClientSize.X;
-                uiMgr_.MainWindowSizeY  = this.ClientSize.Y;
-            }
+            // this is required when docking for proper positioning of preview image
+            uiMgr_.WindowsScaling   = GetWindowsScaling();
+            uiMgr_.MainWindowSizeX  = this.ClientSize.X;
+            uiMgr_.MainWindowSizeY  = this.ClientSize.Y;
 
             ImGui.GetIO().FontGlobalScale = GetWindowsScaling();
 

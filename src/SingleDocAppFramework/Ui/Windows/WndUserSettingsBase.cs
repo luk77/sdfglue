@@ -14,10 +14,6 @@ namespace SingleDocAppFramework.Ui.Windows
     // (the protected Build*Settings helpers draw the sections of UserSettingsBase).
     public class WndUserSettingsBase : UiWindowBase
     {
-        // Optional initial placement (used on first use or with "Auto layout windows");
-        // by default the window is placed in the right column
-        public  Func<WindowRect>?       PlacementProvider       = null;
-
         // Title is a key in layout files - do not change it
         public override string Title => "Settings";
 
@@ -25,9 +21,7 @@ namespace SingleDocAppFramework.Ui.Windows
 
         public override void Build()
         {
-            WindowRect rect = PlacementProvider != null ? PlacementProvider() : GetDefaultPlacement();
-
-            BuildWindow(rect.PosX, rect.PosY, rect.SizeX, rect.SizeY, delegate()
+            BuildWindow(delegate()
             {
                 BuildToolbar();
 
@@ -94,11 +88,6 @@ namespace SingleDocAppFramework.Ui.Windows
 
                 EndPropertyGrid();
             }
-        }
-
-        private WindowRect GetDefaultPlacement()
-        {
-            return new WindowRect(uiMgr_.RightColPosX, uiMgr_.BasePosY, uiMgr_.RightColWidth, uiMgr_.BaseHeight);
         }
     }
 }

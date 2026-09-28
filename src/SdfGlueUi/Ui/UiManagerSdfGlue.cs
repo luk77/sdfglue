@@ -16,115 +16,37 @@ namespace SdfGlueUi.Ui
         public  const string            ViewGroupPreviews       = "Previews";
         public  const string            ViewGroupCode           = "Code";
 
-        public  int                     ExplorerHeight          = 0;
-        public  int                     InspectorPosY           = 0;
-        public  int                     InspectorHeight         = 0;
-        public  int                     PlaybackHeight          = 0;
-        public  int                     PlaybackPosY            = 0;
-        public  int                     PreviewWidth            = 0;
-        public  int                     PreviewHeight           = 0;
-        public  int                     MaterialsHeight         = 0;
-        public  int                     RenderParamsPosY        = 0;
-        public  int                     RenderParamsHeight      = 0;
-        public  int                     LogPosY                 = 0;
-        public  int                     LogHeight               = 0;
-
         public  bool                    EnabledDemoMode         = false;
 
         private bool                    fullPreviewMode_        = false;
 
         private WndPreview              WindowPreview;
-        private UiWindowBase            WindowExplorer;
-        private UiWindowBase            WindowInspector;
-        private UiWindowBase            WindowGeneratedCode;
-        private UiWindowBase            WindowLog;
-        private UiWindowBase            WindowSettings;
-        private UiWindowBase            WindowDiagnostics;
-        private UiWindowBase            WindowPlayback;
 
-        public UiManagerSdfGlue(IUiExecutorSdfGlue uiActionsExecutor, int mainWindowSizeX, int mainWindowSizeY)
+        public UiManagerSdfGlue(IUiExecutorSdfGlue uiActionsExecutor)
             : base(uiActionsExecutor)
         {
-            if (DataModel.UseMultiplePreviews)
+            // The first preview is the main one (the only one visible on start, used by full preview mode)
+            WindowPreview           = new WndPreview("Preview 1");
+            RegisterWindow(WindowPreview, ViewGroupPreviews, true);
+            for(int i=1; i<DataModel.NumOfPreviews; i++)
             {
-                // The first preview is the main one (the only one visible on start, used by full preview mode)
-                WindowPreview           = new WndPreview("Preview 1");
-                RegisterWindow(WindowPreview, ViewGroupPreviews, true);
-                for(int i=1; i<DataModel.NumOfPreviews; i++)
-                {
-                    RegisterWindow(new WndPreview(String.Format("Preview {0}", i+1)), ViewGroupPreviews, false);
-                }
+                RegisterWindow(new WndPreview(String.Format("Preview {0}", i+1)), ViewGroupPreviews, false);
             }
-            else
+            RegisterWindow(new WndExplorer());
+            RegisterWindow(new WndInspector());
+            RegisterWindow(new WndGeneratedCode("Code view 1"), ViewGroupCode, false);
+            for(int i=1; i<DataModel.NumOfCodeViews; i++)
             {
-                WindowPreview           = new WndPreview("Preview");
-                RegisterWindow(WindowPreview);
+                RegisterWindow(new WndGeneratedCode(String.Format("Code view {0}", i+1)), ViewGroupCode, false);
             }
-            WindowExplorer          = RegisterWindow(new WndExplorer());
-            WindowInspector         = RegisterWindow(new WndInspector());
-            if (DataModel.UseMultipleCodeViews)
-            {
-                WindowGeneratedCode     = RegisterWindow(new WndGeneratedCode("Code view 1"), ViewGroupCode, false);
-                for(int i=1; i<DataModel.NumOfCodeViews; i++)
-                {
-                    RegisterWindow(new WndGeneratedCode(String.Format("Code view {0}", i+1)), ViewGroupCode, false);
-                }
-            }
-            else
-            {
-                WindowGeneratedCode     = RegisterWindow(new WndGeneratedCode("Generated Code"), null, false);
-            }
-            WndLog wndLog           = new WndLog();
-            wndLog.PlacementProvider = () => new WindowRect(CenterColPosX, LogPosY, CenterColWidth, LogHeight);
-            WindowLog               = RegisterWindow(wndLog                     , null, false);
-            WndSettings wndSettings = new WndSettings();
-            wndSettings.PlacementProvider = GetSettingsPlacement;
-            WindowSettings          = RegisterWindow(wndSettings                , null, false);
-            WindowDiagnostics       = RegisterWindow(new WndDiagnostics()       , null, false);
-            WindowPlayback          = RegisterWindow(new WndPlayback());
-
-
-            SetMainWindowClientSize(mainWindowSizeX, mainWindowSizeY);
-        }
-
-        private WindowRect GetSettingsPlacement()
-        {
-            int materialsPosY = BasePosY + MaterialsHeight + DistanceY;
-
-            return new WindowRect(RightColPosX, materialsPosY, RightColWidth, BaseHeight - materialsPosY + 3 * DistanceY);
+            RegisterWindow(new WndLog()                 , null, false);
+            RegisterWindow(new WndSettings()            , null, false);
+            RegisterWindow(new WndDiagnostics()         , null, false);
+            RegisterWindow(new WndPlayback());
         }
 
         // Typed access to the executor passed to the constructor
         public IUiExecutorSdfGlue ActionsExecutor { get { return (IUiExecutorSdfGlue)Executor; } }
-
-        public override void SetMainWindowClientSize(int mainWindowSizeX, int mainWindowSizeY)
-        {
-            base.SetMainWindowClientSize(mainWindowSizeX, mainWindowSizeY);
-
-            //bool previewExpandWidth = !(WindowMaterials.IsVisible || WindowSceneInspector.IsVisible);
-            bool previewExpandWidth = true;//!(WindowMaterials.IsVisible);
-            //bool previewExpandHeight = !(WindowRendererParams.IsVisible || WindowLog.IsVisible || WindowDiagnostics.IsVisible);
-            bool previewExpandHeight = !(WindowLog.IsVisible || WindowDiagnostics.IsVisible);
-
-            //WindowsScaling      = UiManager.GetWindowsScaling();
-            WindowsScaling      = ActionsExecutor.GetWindowsScaling();
-
-
-            ExplorerHeight      = (int)(0.35 * MainWindowSizeY);
-            PlaybackHeight      = (int)(0.16 * MainWindowSizeY);
-            InspectorPosY       = BasePosY + ExplorerHeight + DistanceY;
-            InspectorHeight     = MainWindowSizeY - ExplorerHeight - PlaybackHeight - 4 * DistanceY - MenuHeight;
-            PlaybackPosY        = InspectorPosY + InspectorHeight + DistanceY;
-            LogPosY             = PlaybackPosY;
-            LogHeight           = PlaybackHeight;
-            PreviewWidth        = previewExpandWidth ? (CenterColWidth + RightColWidth + DistanceX) : CenterColWidth;
-            PreviewHeight       = previewExpandHeight ? BaseHeight : (int)(BaseHeight - PlaybackHeight - DistanceY);
-            MaterialsHeight     = (int)(MainWindowSizeY * 0.5);
-            RenderParamsPosY    = BasePosY + PreviewHeight + DistanceY;
-            RenderParamsHeight  = 0;//(WindowLog.IsVisible || WindowDiagnostics.IsVisible) ? ((int)(MainWindowSizeY * 0.2)) : (MainWindowSizeY - PreviewHeight - 3 * DistanceY - MenuHeight);
-            //LogPosY             = RenderParamsPosY + RenderParamsHeight + DistanceY;
-            //LogHeight           = MainWindowSizeY - PreviewHeight - RenderParamsHeight - 4 * DistanceY - MenuHeight;
-        }
 
         public void SetFullPreviewMode(bool fullPreviewMode)
         {

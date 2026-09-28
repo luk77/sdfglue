@@ -13,7 +13,7 @@ namespace SingleDocAppSample.Windows
 
         public override void Build()
         {
-            BuildWindow(uiMgr_.RightColPosX, uiMgr_.BasePosY, uiMgr_.RightColWidth, uiMgr_.BaseHeight / 3, delegate()
+            BuildWindow(delegate()
             {
                 string text = SampleExecutor.GetDocument().GetText();
 

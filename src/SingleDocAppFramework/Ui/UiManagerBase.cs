@@ -9,19 +9,7 @@ namespace SingleDocAppFramework.Ui
         public  float                   WindowsScaling          = 1.0f;
         public  int                     MainWindowSizeX         = 0;
         public  int                     MainWindowSizeY         = 0;
-        public  int                     MenuHeight              = 0;
-        public  int                     DistanceX               = 0;
-        public  int                     DistanceY               = 0;
-        public  int                     BasePosY                = 0;
-        public  int                     BaseHeight              = 0;
-        public  int                     LeftColWidth            = 0;
-        public  int                     RightColWidth           = 0;
-        public  int                     CenterColWidth          = 0;
-        public  int                     LeftColPosX             = 0;
-        public  int                     CenterColPosX           = 0;
-        public  int                     RightColPosX            = 0;
 
-        public  bool                    AutoLayoutWindows       = false;//true;
         public  bool                    ShowImGuiDemoWindow     = false;
 
         public  SdAppSettings           AppSettings             = new SdAppSettings();    // set by SdAppWindow
@@ -123,26 +111,6 @@ namespace SingleDocAppFramework.Ui
             {
                 wnd.HandleInput(deltaTime);
             }
-        }
-
-        public virtual void SetMainWindowClientSize(int mainWindowSizeX, int mainWindowSizeY)
-        {
-            MainWindowSizeX     = mainWindowSizeX;
-            MainWindowSizeY     = mainWindowSizeY;
-
-            MenuHeight          = (int)(12.0f * WindowsScaling);//(0.02 * MainWindowSizeY * );
-            DistanceX           = (int)(0.005 * MainWindowSizeX);
-            DistanceY           = DistanceX;
-            BasePosY            = MenuHeight + DistanceY;
-            BaseHeight          = MainWindowSizeY - MenuHeight - 2 * DistanceY;
-
-            LeftColWidth        = (int)(0.25 * MainWindowSizeX);
-            RightColWidth       = (int)(0.25 * MainWindowSizeX);
-            CenterColWidth      = MainWindowSizeX - LeftColWidth - RightColWidth - 4 * DistanceX;
-
-            LeftColPosX         = DistanceX;
-            CenterColPosX       = LeftColWidth + 2 * DistanceX;
-            RightColPosX        = MainWindowSizeX - RightColWidth - DistanceX;
         }
 
         // Override to provide an application-specific main menu (derived from MainMenuBase)
