@@ -24,11 +24,31 @@ namespace SdfGlueUi.Ui.Windows
     {
         public override string Title => "Details";
 
+        // Property grids of the selected node have IDs depending on the node (see BeginNodePropertyGrid)
+        private string nodeScopeId_ = "";
+
+        // Widgets in the grid get IDs depending on the selected node: ImGui applies the text of a deactivated
+        // InputText (also Drag* in text input mode) to the widget with the same ID submitted in the next frame -
+        // after clicking another node that would be the other node's widget. Collapsing headers and columns
+        // (outside the pushed ID) keep one state for all nodes.
+        private void BeginNodePropertyGrid(float firstColumnWidth)
+        {
+            BeginPropertyGrid(firstColumnWidth);
+            ImGui.PushID(nodeScopeId_);
+        }
+
+        private void EndNodePropertyGrid()
+        {
+            ImGui.PopID();
+            EndPropertyGrid();
+        }
+
         public override void Build()
         {
             UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             TreeNode? selectedNode = GetModel().SelectedNode;
+            nodeScopeId_ = selectedNode != null ? String.Format("{0}:{1}", selectedNode.GetType().Name, selectedNode.Id) : "";
 
             int index = 1;
 
@@ -38,10 +58,10 @@ namespace SdfGlueUi.Ui.Windows
                 {
                     if (ImGui.CollapsingHeader("Project settings", ImGuiTreeNodeFlags.DefaultOpen))
                     {
-                        BeginPropertyGrid(GetDefaultFirstColumnWidth());
+                        BeginNodePropertyGrid(GetDefaultFirstColumnWidth());
                         UiBool.Build(ref index, "Fix all objects"         , model.ProjSettings.FixAllObjects   , uiMgr.ActionsExecutor.OnRebuildShader);
                         UiBool.Build(ref index, "Use 4d (experimental)"   , model.ProjSettings.Use4d           , uiMgr.ActionsExecutor.OnRebuildShader);
-                        EndPropertyGrid();
+                        EndNodePropertyGrid();
                     }
                 }
                 else if (selectedNode is SdfObject selectedSdfNode)
@@ -49,7 +69,7 @@ namespace SdfGlueUi.Ui.Windows
                     ImGui.Separator();
                     ImGui.Text(selectedSdfNode.Name.Val);
 
-                    BeginPropertyGrid(GetDefaultFirstColumnWidth());
+                    BeginNodePropertyGrid(GetDefaultFirstColumnWidth());
 
                     int index = 1;
 
@@ -79,7 +99,7 @@ namespace SdfGlueUi.Ui.Windows
 
                         UiFloatWithSignal.Build(ref index, "Blending"      , selectedSdfNode.BlendFactor, 0.01f, LimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals);
                     }
-                    EndPropertyGrid();
+                    EndNodePropertyGrid();
 
                     if (!isFixed)
                     {
@@ -93,14 +113,14 @@ namespace SdfGlueUi.Ui.Windows
                             if (ImGui.CollapsingHeader("Material", ImGuiTreeNodeFlags.DefaultOpen))
                             //if (ImGui.CollapsingHeader("Material", ref openedGroupMaterial_))
                             {
-                                BeginPropertyGrid(GetDefaultFirstColumnWidth());
+                                BeginNodePropertyGrid(GetDefaultFirstColumnWidth());
 
                                 // Material Id
                                 BuildPropertyMaterial(index++, "Material", selectedSdfNode);
 
                                 UiFloatWithSignal.Build(ref index, "Material Blending"      , selectedSdfNode.MaterialBlendFactor, 0.01f, LimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals);
 
-                                EndPropertyGrid();
+                                EndNodePropertyGrid();
                             }
                             ImGui.PopID();
                         //}
@@ -124,13 +144,13 @@ namespace SdfGlueUi.Ui.Windows
 
                     if (ImGui.CollapsingHeader("Ray marching settings", ImGuiTreeNodeFlags.DefaultOpen))
                     {
-                        BeginPropertyGrid(firstColumnWidth);
+                        BeginNodePropertyGrid(firstColumnWidth);
 
                         UiInt   .Build(ref index, "Max number of steps"   , ref GetModel().MarchingMaxSteps  , 0.1f);
                         UiFloat .Build(ref index, "Minimum distance"      , ref GetModel().MarchingMinDist   , 0.1f);
                         UiFloat .Build(ref index, "Maximum distance"      , ref GetModel().MarchingMaxDist    , 0.1f);
 
-                        EndPropertyGrid();
+                        EndNodePropertyGrid();
                     }
                 }
                 else if (selectedNode is RenderPassData passData)
@@ -140,7 +160,7 @@ namespace SdfGlueUi.Ui.Windows
                     ImGui.PushID(index++);
                     if (ImGui.CollapsingHeader("Common render pass parameters", ImGuiTreeNodeFlags.DefaultOpen))
                     {
-                        BeginPropertyGrid(GetDefaultFirstColumnWidth());
+                        BeginNodePropertyGrid(GetDefaultFirstColumnWidth());
 
                         // renderer
                         UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Pass type", passData.RendererFunc, GetModel().Renderers);
@@ -162,7 +182,7 @@ namespace SdfGlueUi.Ui.Windows
 
                         UiBool.Build(ref index, "Auto reset frame counter"    , passData.AutoResetFrameCounter);
 
-                        EndPropertyGrid();
+                        EndNodePropertyGrid();
                     }
                     ImGui.PopID();
 
@@ -174,7 +194,7 @@ namespace SdfGlueUi.Ui.Windows
                         ImGui.PushID(index++);
                         if (ImGui.CollapsingHeader(string.Format("Backdrop"), ImGuiTreeNodeFlags.DefaultOpen))
                         {
-                            BeginPropertyGrid(GetDefaultFirstColumnWidth());
+                            BeginNodePropertyGrid(GetDefaultFirstColumnWidth());
 
                             UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Backdrop type", passData.BackdropFunc, GetModel().BackdropsDefinitions);
 
@@ -184,7 +204,7 @@ namespace SdfGlueUi.Ui.Windows
                                 BuildPropertiesForParameters(ref index, passData.BackdropFunc);
                             }
 
-                            EndPropertyGrid();
+                            EndNodePropertyGrid();
                         }
                         ImGui.PopID();
                     }
@@ -204,12 +224,12 @@ namespace SdfGlueUi.Ui.Windows
                         ImGui.PushID(index++);
                         if (ImGui.CollapsingHeader(string.Format("'{0}' compilation parameters", passData.RendererFunc.Definition.DisplayName), ImGuiTreeNodeFlags.DefaultOpen))
                         {
-                            BeginPropertyGrid(GetDefaultFirstColumnWidth());
+                            BeginNodePropertyGrid(GetDefaultFirstColumnWidth());
 
                             BuildPropertiesForCompilationParameters(ref index, passData.RendererFunc, uiMgr.ActionsExecutor.OnRebuildShader);
                             //ImGui.Separator();
 
-                            EndPropertyGrid();
+                            EndNodePropertyGrid();
                         }
                         ImGui.PopID();
                     }
@@ -221,12 +241,12 @@ namespace SdfGlueUi.Ui.Windows
                             ImGui.PushID(index++);
                             if (ImGui.CollapsingHeader(string.Format("'{0}' realtime parameters", passData.RendererFunc.Definition.DisplayName), ImGuiTreeNodeFlags.DefaultOpen))
                             {
-                                BeginPropertyGrid(GetDefaultFirstColumnWidth());
+                                BeginNodePropertyGrid(GetDefaultFirstColumnWidth());
 
                                 BuildPropertiesForParameters(ref index, passData.RendererFunc);
                                 //ImGui.Separator();
 
-                                EndPropertyGrid();
+                                EndNodePropertyGrid();
                             }
                             ImGui.PopID();
                         }
@@ -236,7 +256,7 @@ namespace SdfGlueUi.Ui.Windows
                 {
                     float firstColumnWidth = GetDefaultFirstColumnWidth();
 
-                    BeginPropertyGrid(firstColumnWidth);
+                    BeginNodePropertyGrid(firstColumnWidth);
 
                     int index = 0;
 
@@ -250,13 +270,13 @@ namespace SdfGlueUi.Ui.Windows
                         BuildPropertiesForMaterialParameters(ref index, mat.MaterialProps);
                     }
 
-                    EndPropertyGrid();
+                    EndNodePropertyGrid();
 
                 }
                 else if (selectedNode is SignalOscillator obj)
                 {
                     float firstColumnWidth = GetDefaultFirstColumnWidth();
-                    BeginPropertyGrid(firstColumnWidth);
+                    BeginNodePropertyGrid(firstColumnWidth);
 
                     int index = 0;
                     UiFloat.Build(ref index, "Amplitude", obj.Amplitude   , 0.001f);
@@ -264,7 +284,7 @@ namespace SdfGlueUi.Ui.Windows
                     UiFloat.Build(ref index, "Offset X" , obj.OffsetX     , 0.001f);
                     UiFloat.Build(ref index, "Offset Y" , obj.OffsetY     , 0.001f);
 
-                    EndPropertyGrid();
+                    EndNodePropertyGrid();
                 }
                 else
                 {
@@ -289,7 +309,7 @@ namespace SdfGlueUi.Ui.Windows
             int indexForMoveUp      = -1;
             int indexForMoveDown    = -1;
 
-            BeginPropertyGrid(GetDefaultFirstColumnWidth());
+            BeginNodePropertyGrid(GetDefaultFirstColumnWidth());
 
             List<OperatorEntity> opList = opCollection.Operators;
             for(int i=0; i<opList.Count; i++)
@@ -412,7 +432,7 @@ namespace SdfGlueUi.Ui.Windows
                     ));
             }
 
-            EndPropertyGrid();
+            EndNodePropertyGrid();
             ImGui.PopID(); // Pop the header id pushed at the start
         }
 
@@ -490,30 +510,26 @@ namespace SdfGlueUi.Ui.Windows
             ImGui.Text(name);
             ImGui.NextColumn();
 
+            // The button is shown also for a missing material (invalid MaterialId), so the reference can be fixed from the UI
             MaterialInstance? oldMat = GetModel().FindMaterialById((int)sdfObj.MaterialId.Val);
-            if (oldMat != null)
+            string buttonLabel = oldMat?.Name.Val ?? String.Format("<missing material {0}>", (int)sdfObj.MaterialId.Val);
+
+            ImGui.SetNextItemWidth(-1);
+            if (ImGui.Button(buttonLabel, new Vector2(-1, 0)))
             {
-                ImGui.SetNextItemWidth(-1);
-                if (ImGui.Button(oldMat.Name.Val, new Vector2(-1, 0)))
-                {
-                    ImGui.OpenPopup("menu_" + name);
-                }
-
-                MaterialInstance? newMat = MenuMaterials.BuildPopup("menu_" + name, GetModel().Materials);
-                ImGui.NextColumn();
-
-                if (newMat != null && newMat != oldMat)
-                {
-                    sdfObj.MaterialId.Val = newMat.Id;
-                    //Console.WriteLine("Undo save: {0}: {1}", name, sdfObj.MaterialId.Val);
-                    UndoManager.Instance.SaveAction(new ActionFloat(sdfObj.MaterialId, uiMgr.ActionsExecutor.OnRebuildShader));
-
-                    uiMgr.ActionsExecutor.OnRebuildShader();
-                }
+                ImGui.OpenPopup("menu_" + name);
             }
-            else
+
+            MaterialInstance? newMat = MenuMaterials.BuildPopup("menu_" + name, GetModel().Materials);
+            ImGui.NextColumn();
+
+            if (newMat != null && newMat != oldMat)
             {
-                ImGui.NextColumn();
+                sdfObj.MaterialId.Val = newMat.Id;
+                //Console.WriteLine("Undo save: {0}: {1}", name, sdfObj.MaterialId.Val);
+                UndoManager.Instance.SaveAction(new ActionFloat(sdfObj.MaterialId, uiMgr.ActionsExecutor.OnRebuildShader));
+
+                uiMgr.ActionsExecutor.OnRebuildShader();
             }
 
             ImGui.PopID(); // balance push

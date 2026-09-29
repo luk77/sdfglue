@@ -166,7 +166,7 @@ namespace SdfGlueCore.Controller
             if (commonFunctIndex == -1)
                 return shaderSource;
 
-            generatedCode = renderPassData.CollectIncludes(model_);
+            generatedCode = renderPassData.CollectIncludes(model_, sbErrors);
 
             shaderSource = shaderSource.Replace(tag, generatedCode);
 
@@ -353,7 +353,7 @@ namespace SdfGlueCore.Controller
                         continue;
                     //object paramVal = renderPassData.RendererFunc.CompilationParametersValues[p.ParameterName].GetValueAsObject();
                     //int paramValAsInt = (int)paramVal;
-                    ISimpleType? paramVal = renderPassData?.RendererFunc?.CompilationParametersValues[p.ParameterName];
+                    ISimpleType? paramVal = renderPassData?.RendererFunc?.CompilationParametersValues[p.ParameterKey];
                     sb.AppendLine(String.Format("#define {0}                  ({1})", p.ParameterName, paramVal?.FormatAsStringForUniform()));
                 }
             }
@@ -487,7 +487,7 @@ namespace SdfGlueCore.Controller
                         if (p.ParameterName == null)
                             continue;
                         bool isLast = i == materialDefinition.MaterialParameters.Count-1;
-                        ISimpleType paramVal = mat.MaterialProps.ParametersValues[p.ParameterName];
+                        ISimpleType paramVal = mat.MaterialProps.ParametersValues[p.ParameterKey];
                         sb.Append(paramVal.FormatAsStringForUniform());
                         if (!isLast)
                             sb.Append(", ");
@@ -529,7 +529,7 @@ namespace SdfGlueCore.Controller
                         if (p.ParameterName == null)
                             continue;
 
-                        ISimpleType paramVal = mat.MaterialProps.ParametersValues[p.ParameterName];
+                        ISimpleType paramVal = mat.MaterialProps.ParametersValues[p.ParameterKey];
                         string paramValAsString = paramVal.FormatAsStringForUniform();
                         sb.AppendLine(String.Format("    material_{0}.{1}     = {2};", matId, p.ParameterName, paramValAsString));
                     }
@@ -984,7 +984,7 @@ namespace SdfGlueCore.Controller
                         fullNameId = String.Format("g_obj_{0}_{1}{2}_{3}"      , nodeId, functionEntity.ParamPrefix, entityIndex + 1, p.ParameterName);
                 }
 
-                ISimpleType paramVal = functionEntity.ParametersValues[p.ParameterName];
+                ISimpleType paramVal = functionEntity.ParametersValues[p.ParameterKey];
                 AppendUniformCode(sb, isFixed, p.Type, fullNameId, paramVal);
             }
         }

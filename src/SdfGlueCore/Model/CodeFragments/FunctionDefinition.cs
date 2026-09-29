@@ -40,6 +40,7 @@ namespace SdfGlueCore.Model.CodeFragments
     public class FunctionDefinition
     {
         public          int                                 ComboIndex;
+        public          string?                             FilePath;                   // file the definition was loaded from
         public          string?                             DisplayName;
         public          string?                             GroupName;
         public          string?                             FunctionName;
@@ -151,14 +152,27 @@ namespace SdfGlueCore.Model.CodeFragments
             return true;
         }
 
-        public void CollectIncludeNames(Dictionary<string, string> includeNames)
+        // Adds the code of the includes used by this definition (include name -> code).
+        // A missing/unreadable include is reported in sbErrors (the pass is then not rendered) instead of throwing.
+        public void CollectIncludeNames(Dictionary<string, string> includeNames, System.Text.StringBuilder sbErrors)
         {
             foreach (string name in IncludeNames)
             {
                 if (includeNames.ContainsKey(name))
                     continue;
 
-                string code = File.ReadAllText("Includes/" + name, System.Text.Encoding.UTF8);
+                string code;
+                try
+                {
+                    code = File.ReadAllText("Includes/" + name, System.Text.Encoding.UTF8);
+                }
+                catch (Exception ex)
+                {
+                    string error = String.Format("ERROR: Cannot read include file '{0}' used by function '{1}': {2}", name, FunctionName, ex.Message);
+                    sbErrors.AppendLine(error);
+                    Console.WriteLine(error);
+                    code = ""; // added anyway, so the error is reported once
+                }
                 includeNames.Add(name, code);
             }
         }

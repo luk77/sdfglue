@@ -218,10 +218,17 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             string shaderFrag = File.ReadAllText(pathShaderFrag_);
             shaderFrag = codeGenerator.ModifyFragShaderSource(sbErrors, shaderFrag, passData_.LastGenCode, false, passData_);
 
-            shader_.Reinitialize(sbErrors, shaderVert, shaderFrag, passData_.Name.Val ?? "");
-            shader_.Use();
+            bool compiled = shader_.Reinitialize(sbErrors, shaderVert, shaderFrag, passData_.Name.Val ?? "");
+            if (!compiled && sbErrors.Length == 0)
+                sbErrors.Append("Shader compilation failed.");
 
             passData_.LastErrors = sbErrors.ToString();
+
+            // without a valid program there are no attribute locations (-1) - the pass is not rendered anyway (LastErrors)
+            if (!compiled)
+                return;
+
+            shader_.Use();
 
             GL.BindVertexArray(vertexArrayObject_);
 
@@ -235,13 +242,20 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             int vertexDataTexCoordOffset    = 3 * sizeof(float);   // texture coordinates start after position data (3 floats for position)
             int vertexDataTexCoordSize      = 2;                   // 2 floats for texture coordinates
 
+            // location is -1 when the attribute is not used by the shader (optimized out)
             int vertexLocation = shader_.GetAttribLocation("inPosition");
-            GL.EnableVertexAttribArray(vertexLocation);
-            GL.VertexAttribPointer(vertexLocation, vertexDataPositionSize, VertexAttribPointerType.Float, false, vertexDataSize, vertexDataPositionOffset);
+            if (vertexLocation >= 0)
+            {
+                GL.EnableVertexAttribArray(vertexLocation);
+                GL.VertexAttribPointer(vertexLocation, vertexDataPositionSize, VertexAttribPointerType.Float, false, vertexDataSize, vertexDataPositionOffset);
+            }
 
             int texCoordLocation = shader_.GetAttribLocation("inUvCoord");
-            GL.EnableVertexAttribArray(texCoordLocation);
-            GL.VertexAttribPointer(texCoordLocation, vertexDataTexCoordSize, VertexAttribPointerType.Float, false, vertexDataSize, vertexDataTexCoordOffset);
+            if (texCoordLocation >= 0)
+            {
+                GL.EnableVertexAttribArray(texCoordLocation);
+                GL.VertexAttribPointer(texCoordLocation, vertexDataTexCoordSize, VertexAttribPointerType.Float, false, vertexDataSize, vertexDataTexCoordOffset);
+            }
         }
 
         public bool IsAbleToRender()
@@ -362,7 +376,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
                         continue;
 
                     string uniformFullName = String.Format("{0}{1}", materialPrefix, p.ParameterName);
-                    ISimpleType paramVal = mat.MaterialProps.ParametersValues[p.ParameterName];
+                    ISimpleType paramVal = mat.MaterialProps.ParametersValues[p.ParameterKey];
                     SetShaderParameterByType(paramVal, uniformFullName);
                 }
             }
@@ -487,54 +501,52 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
                         fullNameId = String.Format("g_obj_{0}_{1}{2}_{3}"      , nodeId, functionEntity.ParamPrefix, opEntityIndex + 1, p.ParameterName);
                 }
 
-                ISimpleType paramVal = functionEntity.ParametersValues[p.ParameterName];
+                ISimpleType paramVal = functionEntity.ParametersValues[p.ParameterKey];
                 SetShaderParameterByType(paramVal, fullNameId);
             }
         }
 
 
-        public Bitmap GetFrameAsBitmap(IntCoords textureSize)
+        // Returns a copy of the pass texture (the caller owns the Bitmap and should dispose it).
+        // The size is taken from the texture itself, so the buffer always matches the data written by GL.
+        public Bitmap? GetFrameAsBitmap()
         {
-            byte[] pixels = new byte[textureSize.X * textureSize.Y * 4];
-            int stride = textureSize.X * 4;
+            if (windowFrameBufferTexture_ == 0)
+                return null;
 
-            //texture.Bind();
             GL.BindTexture(TextureTarget.Texture2D, windowFrameBufferTexture_);
+            GL.GetTexLevelParameter(TextureTarget.Texture2D, 0, GetTextureParameter.TextureWidth , out int width );
+            GL.GetTexLevelParameter(TextureTarget.Texture2D, 0, GetTextureParameter.TextureHeight, out int height);
+            if (width <= 0 || height <= 0)
+            {
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                return null;
+            }
 
-            // To dziwne, ale trzeba użyć formatu PixelFormat.Bgr...
-            //GL.GetTexImage<byte>(TextureTarget.Texture2D, 0, (PixelFormat)PixelInternalFormat.Rgba, PixelType.UnsignedByte, pixels);
+            int     rowSize = width * 4;
+            byte[]  pixels  = new byte[rowSize * height];
+
+            // To dziwne, ale trzeba użyć formatu PixelFormat.Bgra (kolejność bajtów jak w Format32bppArgb)
+            GL.PixelStore(PixelStoreParameter.PackAlignment, 4);
             GL.GetTexImage<byte>(TextureTarget.Texture2D, 0, PixelFormat.Bgra, PixelType.UnsignedByte, pixels);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
 
-            // konwerja rgb -> bgr
-            //int pixelIndex = 0;
-            //byte offR = 0;
-            //byte offG = 0;
-            //byte offB = 0;
-            //byte offA = 0;
-            //for(int y=0; y<textureSize.Y; y++)
-            //{
-            //    for(int x=0; x<textureSize.X; x++)
-            //    {
-            //        pixelIndex = x + textureSize.X * y;
-            //        offR = pixels[pixelIndex * 4 + 0];
-            //        offG = pixels[pixelIndex * 4 + 1];
-            //        offB = pixels[pixelIndex * 4 + 2];
-            //        offA = pixels[pixelIndex * 4 + 3];
-            //        pixels[pixelIndex * 4 + 0] = offB;
-            //        pixels[pixelIndex * 4 + 1] = offG;
-            //        pixels[pixelIndex * 4 + 2] = offR;
-            //        pixels[pixelIndex * 4 + 3] = offA;
-            //    }
-            //}
-
-            IntPtr pixelAddress = Marshal.UnsafeAddrOfPinnedArrayElement(pixels, 0);
-
-            Bitmap bmp = new Bitmap(textureSize.X, textureSize.Y, stride, 
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb, pixelAddress);
-            bmp.RotateFlip(RotateFlipType.Rotate180FlipX);
-            //System.Drawing.Imaging.BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height),
-            //    System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
-            //IntPtr ptr = data.Scan0;
+            // The Bitmap owns its memory (pixels are copied), rows are flipped vertically (GL origin is bottom-left)
+            Bitmap bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            System.Drawing.Imaging.BitmapData data = bmp.LockBits(new Rectangle(0, 0, width, height),
+                System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            try
+            {
+                for (int y=0; y<height; y++)
+                {
+                    IntPtr destRow = IntPtr.Add(data.Scan0, (height - 1 - y) * data.Stride);
+                    Marshal.Copy(pixels, y * rowSize, destRow, rowSize);
+                }
+            }
+            finally
+            {
+                bmp.UnlockBits(data);
+            }
 
             return bmp;
         }

@@ -14,6 +14,7 @@ using SingleDocAppCore.Model.BaseTypes;
 using System.Drawing;
 using System.Text;
 using System.Xml;
+using TreeNode = SingleDocAppCore.Model.DataNodes.TreeNode;
 
 namespace SdfGlueCore.Model.DataNodes
 {
@@ -89,12 +90,12 @@ namespace SdfGlueCore.Model.DataNodes
             return RenderingPass.GetTextureId();
         }
 
-        public Bitmap? GetFrameAsBitmap(IntCoords textureSize)
+        public Bitmap? GetFrameAsBitmap()
         {
             if (RenderingPass == null)
                 return null;
 
-            return RenderingPass.GetFrameAsBitmap(textureSize);
+            return RenderingPass.GetFrameAsBitmap();
         }
 
         public void RefreshDefinitionReference(FunctionDefinitionsSet renderers, FunctionDefinitionsSet backdrops, FunctionDefinitionsSet cameraControllers)
@@ -120,20 +121,33 @@ namespace SdfGlueCore.Model.DataNodes
 //            }
 //        }
 
-        public string CollectIncludes(DataModel model)
+        // Code of the includes used by this pass: renderer, backdrop and - for the primary pass -
+        // camera operators and functions used in the SDF tree (not all loaded definitions)
+        public string CollectIncludes(DataModel model, StringBuilder sbErrors)
         {
             IncludesCollection includes = new IncludesCollection();
 
-            RendererFunc?.Definition?.CollectIncludeNames(includes);
-            BackdropFunc?.Definition?.CollectIncludeNames(includes);
+            RendererFunc?.Definition?.CollectIncludeNames(includes, sbErrors);
+            BackdropFunc?.Definition?.CollectIncludeNames(includes, sbErrors);
 
             if (IsPrimaryPass)
             {
-                model.BackdropsDefinitions    .CollectIncludeNames(includes);
-                model.SdfDefinitions          .CollectIncludeNames(includes);
-                model.MixOpDefinitions        .CollectIncludeNames(includes);
-                model.PositionOpDefinitions   .CollectIncludeNames(includes);
-                model.DistanceOpDefinitions   .CollectIncludeNames(includes);
+                foreach (OperatorEntity op in CameraOperators.Operators)
+                    op.Definition?.CollectIncludeNames(includes, sbErrors);
+
+                TreeNode.CallRecursive(model.SdfRoot, delegate(TreeNode node)
+                {
+                    SdfObject? sdfObj = node as SdfObject;
+                    if (sdfObj == null)
+                        return;
+
+                    sdfObj.FunctionSdf  .Definition?.CollectIncludeNames(includes, sbErrors);
+                    sdfObj.FunctionMixOp.Definition?.CollectIncludeNames(includes, sbErrors);
+                    foreach (OperatorEntity op in sdfObj.PositionOperators.Operators)
+                        op.Definition?.CollectIncludeNames(includes, sbErrors);
+                    foreach (OperatorEntity op in sdfObj.DistanceOperators.Operators)
+                        op.Definition?.CollectIncludeNames(includes, sbErrors);
+                });
             }
 
             StringBuilder sb = new StringBuilder(20000);
@@ -156,6 +170,8 @@ namespace SdfGlueCore.Model.DataNodes
 
         public override void ResetPrevVal()
         {
+            base.ResetPrevVal();
+
             Enabled              .ResetPrevVal();
             IsFixed              .ResetPrevVal();
             ClearOnEveryFrame    .ResetPrevVal();

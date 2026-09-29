@@ -1,6 +1,7 @@
 using ImGuiNET;
 using SingleDocAppFramework.Layouts;
 using SingleDocAppFramework.Ui.Menu;
+using SingleDocAppFramework.Ui.Properties;
 
 namespace SingleDocAppFramework.Ui
 {
@@ -134,7 +135,10 @@ namespace SingleDocAppFramework.Ui
             }
 
             if (SubmitOverrideUI())
+            {
+                UndoEditTracker.EndFrame();
                 return;
+            }
 
             BuildImGuiDemoWindow();
 
@@ -145,6 +149,9 @@ namespace SingleDocAppFramework.Ui
 
             foreach(UiWindowBase wnd in allWindows_)
                 wnd.Build();
+
+            // an edited widget which was not submitted in this frame (e.g. selection changed) saves its undo action
+            UndoEditTracker.EndFrame();
         }
 
         private void BuildImGuiDemoWindow()

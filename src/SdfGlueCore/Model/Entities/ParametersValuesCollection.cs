@@ -9,13 +9,35 @@ using SingleDocAppCore.Utils;
 using System.Xml;
 using SingleDocAppCore.Model.DataNodes;
 using SdfGlueCore.Model.BaseTypes;
+using SdfGlueCore.Model.CodeFragments;
 
 namespace SdfGlueCore.Model.Entities
 {
     //public class ParametersValuesCollection : Dictionary<string, object> { }
     //public class ParametersValuesCollection : Dictionary<string, ISimpleType> { }
+    // Keys are "type:name" (e.g. "vec3:radius", see FunctionDefParameter.ParameterKey) - build them only with MakeKey().
+    // In the project file the name and the type are stored in separate attributes (<PValue name="radius" type="vec3">).
     public class ParametersValuesCollection : Dictionary<string, ISimpleType>
     {
+        private const char KeySeparator = ':';
+
+        public static string MakeKey(SdfParamType type, string parameterName)
+        {
+            return MakeKey(FunctionDefParameter.SdfTypeToString(type), parameterName);
+        }
+
+        private static string MakeKey(string typeName, string parameterName)
+        {
+            return typeName + KeySeparator + parameterName;
+        }
+
+        // Returns the parameter name part of the key
+        public static string GetParameterName(string key)
+        {
+            int separatorIndex = key.IndexOf(KeySeparator);
+            return separatorIndex >= 0 ? key.Substring(separatorIndex + 1) : key;
+        }
+
         internal void Deserialize(XmlNode nodeParametersValues, TreeNode? parentObject)
         {
             XmlNodeList? paramsList = nodeParametersValues.SelectNodes("PValue");
@@ -29,16 +51,19 @@ namespace SdfGlueCore.Model.Entities
                 if ((paramName == null) || (paramType == null))
                     continue;
 
+                string paramKey = MakeKey(paramType, paramName);
+
                 // Logika jest taka:
                 // Przed wczytaniem w ParametersValues są defaultowe parametry zgodne z obecną definicją.
-                // Przy wczycie uzupełniamy wszystko o ile jest zgodność typów. 
-                // Jeśli typy się nie zgadzają, to znaczy że definicja uległa zmianie i lepiej taki parametr pominąć (zostawiając default).
+                // Przy wczycie uzupełniamy wszystko o ile jest zgodność typów.
+                // Klucz zawiera typ, więc wartość o innym typie niż w definicji (definicja uległa zmianie)
+                // trafia pod inny klucz jako parametr nadmiarowy, a default zostaje.
                 // Wczytujemy także nadmiarowe parametry, które są np. pozostałością po dynamicznej zmianie typu obiektu.
                 // Dzięki temu jak ktoś wróci do starego typu to będzie miał stare dane ustawione.
                 bool canLoad = false;
-                if (this.ContainsKey(paramName))
+                if (this.ContainsKey(paramKey))
                 {
-                    Type currParamValueType = this[paramName].GetValueType();
+                    Type currParamValueType = this[paramKey].GetValueType();
                     if (((paramType == "float") && (currParamValueType == typeof(float)))                   ||
                         ((paramType == "int")   && (currParamValueType == typeof(int)))                     ||
                         ((paramType == "vec2")  && (currParamValueType == typeof(System.Numerics.Vector2))) ||
@@ -68,31 +93,31 @@ namespace SdfGlueCore.Model.Entities
                     {
                         float readVal = 0.0f;
                         XmlUtils.TryParseFloat(nodeParam.InnerText, ref readVal);
-                        this[paramName] = new ExFloatWithSignal(readVal);
+                        this[paramKey] = new ExFloatWithSignal(readVal);
                     }
                     else if ((paramType == "int"))
                     {
                         int readVal = 0;
                         XmlUtils.TryParseInt(nodeParam.InnerText, ref readVal);
-                        this[paramName] = new ExInt(readVal);
+                        this[paramKey] = new ExInt(readVal);
                     }
                     else if ((paramType == "vec2"))
                     {
                         System.Numerics.Vector2 readVal = System.Numerics.Vector2.Zero;
                         XmlUtils.TryParseVector2(nodeParam.InnerText, ref readVal);
-                        this[paramName] = new ExVector2(readVal);
+                        this[paramKey] = new ExVector2(readVal);
                     }
                     else if ((paramType == "vec3"))
                     {
                         System.Numerics.Vector3 readVal = System.Numerics.Vector3.Zero;
                         XmlUtils.TryParseVector3(nodeParam.InnerText, ref readVal);
-                        this[paramName] = new ExVector3(readVal);
+                        this[paramKey] = new ExVector3(readVal);
                     }
                     else if ((paramType == "vec4"))
                     {
                         System.Numerics.Vector4 readVal = System.Numerics.Vector4.Zero;
                         XmlUtils.TryParseVector4(nodeParam.InnerText, ref readVal);
-                        this[paramName] = new ExVector4(readVal);
+                        this[paramKey] = new ExVector4(readVal);
                     }
                 }
             }
@@ -109,35 +134,35 @@ namespace SdfGlueCore.Model.Entities
                 {
                     ExFloat val = (ExFloat)param;
                     XmlElement nodeParam = XmlUtils.AddNodeFloat(xmlDoc, nodeParametersValues, "PValue"    , val.Val);
-                    XmlUtils.AddAtributeString(nodeParam, "name", keyVal.Key);
+                    XmlUtils.AddAtributeString(nodeParam, "name", GetParameterName(keyVal.Key));
                     XmlUtils.AddAtributeString(nodeParam, "type", "float");
                 }
                 else if (param.GetType() == typeof(ExInt))
                 {
                     ExInt val = (ExInt)param;
                     XmlElement nodeParam = XmlUtils.AddNodeInt(xmlDoc, nodeParametersValues, "PValue"    , val.Val);
-                    XmlUtils.AddAtributeString(nodeParam, "name", keyVal.Key);
+                    XmlUtils.AddAtributeString(nodeParam, "name", GetParameterName(keyVal.Key));
                     XmlUtils.AddAtributeString(nodeParam, "type", "int");
                 }
                 else if (param.GetType() == typeof(ExVector2))
                 {
                     ExVector2 val = (ExVector2)param;
                     XmlElement nodeParam = XmlUtils.AddNodeVector2(xmlDoc, nodeParametersValues, "PValue"    , val.Val);
-                    XmlUtils.AddAtributeString(nodeParam, "name", keyVal.Key);
+                    XmlUtils.AddAtributeString(nodeParam, "name", GetParameterName(keyVal.Key));
                     XmlUtils.AddAtributeString(nodeParam, "type", "vec2");
                 }
                 else if (param.GetType() == typeof(ExVector3))
                 {
                     ExVector3 val = (ExVector3)param;
                     XmlElement nodeParam = XmlUtils.AddNodeVector3(xmlDoc, nodeParametersValues, "PValue"    , val.Val);
-                    XmlUtils.AddAtributeString(nodeParam, "name", keyVal.Key);
+                    XmlUtils.AddAtributeString(nodeParam, "name", GetParameterName(keyVal.Key));
                     XmlUtils.AddAtributeString(nodeParam, "type", "vec3");
                 }
                 else if (param.GetType() == typeof(ExVector4))
                 {
                     ExVector4 val = (ExVector4)param;
                     XmlElement nodeParam = XmlUtils.AddNodeVector4(xmlDoc, nodeParametersValues, "PValue"    , val.Val);
-                    XmlUtils.AddAtributeString(nodeParam, "name", keyVal.Key);
+                    XmlUtils.AddAtributeString(nodeParam, "name", GetParameterName(keyVal.Key));
                     XmlUtils.AddAtributeString(nodeParam, "type", "vec4");
                 }
                 else

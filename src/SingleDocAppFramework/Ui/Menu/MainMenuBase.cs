@@ -8,8 +8,9 @@ namespace SingleDocAppFramework.Ui.Menu
     //   File    - New, Open, Save, Save as, [BuildFileMenuExtras], Exit
     //   Edit    - Undo, Redo, [BuildEditMenuExtras]
     //   [BuildAppMenus]  - application-specific menus (e.g. Tools)
-    //   View    - windows visibility (grouped by view group), [BuildViewMenuExtras], ImGui demo
+    //   View    - windows visibility (grouped by view group), [BuildViewMenuExtras]
     //   Layouts - Load layout, Save current layout
+    //   Development - only in development mode (--devel): [BuildDevelopmentMenuExtras], ImGui demo
     // The application derives from this class and overrides the Build*Extras / BuildAppMenus hooks.
     public class MainMenuBase
     {
@@ -48,6 +49,11 @@ namespace SingleDocAppFramework.Ui.Menu
             if (ImGui.BeginMenu("Layouts"))
             {
                 BuildLayoutsMenu();
+                ImGui.EndMenu();
+            }
+            if (uiMgr_.AppSettings.DevelopmentMode && ImGui.BeginMenu("Development"))
+            {
+                BuildDevelopmentMenu();
                 ImGui.EndMenu();
             }
 
@@ -118,13 +124,24 @@ namespace SingleDocAppFramework.Ui.Menu
 
             ImGui.Separator();
             BuildViewMenuExtras();
+        }
+
+        // Items after the windows list
+        protected virtual void BuildViewMenuExtras()
+        {
+        }
+
+        // Development (only in development mode)
+        protected virtual void BuildDevelopmentMenu()
+        {
+            BuildDevelopmentMenuExtras();
 
             ImGui.Separator();
             ImGui.Checkbox("ImGui demo", ref uiMgr_.ShowImGuiDemoWindow);
         }
 
-        // Items after the windows list, before "ImGui demo" (followed by a separator)
-        protected virtual void BuildViewMenuExtras()
+        // Application development tools, before "ImGui demo" (followed by a separator)
+        protected virtual void BuildDevelopmentMenuExtras()
         {
         }
 

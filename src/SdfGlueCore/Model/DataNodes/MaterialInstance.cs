@@ -35,6 +35,8 @@ namespace SdfGlueCore.Model.DataNodes
 
         public override void ResetPrevVal()
         {
+            base.ResetPrevVal();
+
             IsFixed         .ResetPrevVal();
 
             MaterialProps.ResetPrevVal();

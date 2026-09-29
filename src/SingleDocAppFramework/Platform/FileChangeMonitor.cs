@@ -8,13 +8,19 @@ namespace SingleDocAppFramework.Platform
     // Monitors file changes in a directory (recursively).
     // FileSystemWatcher events arrive on another thread, so instead of an event there is
     // a flag polled once per frame (ConsumeChange) - we want at most one reaction per frame.
+    // quietPeriodMs - the change is reported only when no further change came for this time
+    // (an editor saving a file raises several events, and the file may be read in the middle of saving).
     public class FileChangeMonitor : IDisposable
     {
         private FileSystemWatcher?      watcher_                = null;
         private volatile bool           changeDetected_         = false;
+        private long                    lastChangeTicks_        = 0;    // Environment.TickCount64 of the last event
+        private int                     quietPeriodMs_;
 
-        public FileChangeMonitor(string pathToFolder, string[] filters)
+        public FileChangeMonitor(string pathToFolder, string[] filters, int quietPeriodMs = 0)
         {
+            quietPeriodMs_ = quietPeriodMs;
+
             watcher_ = new FileSystemWatcher(pathToFolder);
 
             watcher_.NotifyFilter = NotifyFilters.Attributes
@@ -45,8 +51,17 @@ namespace SingleDocAppFramework.Platform
             if (!changeDetected_)
                 return false;
 
+            if (Environment.TickCount64 - Interlocked.Read(ref lastChangeTicks_) < quietPeriodMs_)
+                return false;
+
             changeDetected_ = false;
             return true;
+        }
+
+        private void SetChangeDetected()
+        {
+            Interlocked.Exchange(ref lastChangeTicks_, Environment.TickCount64);
+            changeDetected_ = true;
         }
 
         public void Dispose()
@@ -63,12 +78,12 @@ namespace SingleDocAppFramework.Platform
             if (e.ChangeType != WatcherChangeTypes.Changed)
                 return;
 
-            changeDetected_ = true;
+            SetChangeDetected();
         }
 
         private void OnCreatedDeletedRenamed(object sender, FileSystemEventArgs e)
         {
-            changeDetected_ = true;
+            SetChangeDetected();
         }
 
         private void OnError(object sender, ErrorEventArgs e)

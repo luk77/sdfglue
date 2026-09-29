@@ -8,6 +8,7 @@ using SingleDocAppCore.Utils;
 using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 using SdfGlueCore.Model.BaseTypes;
+using SdfGlueCore.Model.Entities;
 using SingleDocAppCore.Model;
 
 namespace SdfGlueCore.Model.CodeFragments
@@ -29,24 +30,19 @@ namespace SdfGlueCore.Model.CodeFragments
         public          bool                            EditInDegrees;
         public          ParamEditorType                 EditorType;
 
-        // Klucz do używania w słownikach wartości parametrów
-        // Na razie jest to to samo co ParameterName, ale docelowo powinien zawierać także typ parametru.
-        // Dzięki temu uniknie się problemów przy dynamicznych zmianach funkcji,
-        // gdy parametr ma tą samą nazwę, ale typ się nie zgadza.
-        //public string ParameterNameKey
-        //{
-        //    get
-        //    {
-        //        //return ParameterName;
-        //        return Type.ToString() + "_" + ParameterName;
-        //    }
-        //}
+        // Key used in the parameter values dictionaries (ParametersValuesCollection), e.g. "vec3:radius".
+        // It contains the type, so after changing the function of an entity a parameter with the same name,
+        // but a different type (e.g. float/vec3 'offset') gets its own value instead of reusing an incompatible one.
+        // ParameterName stays a plain name, because it is used as an identifier in the generated code.
+        // Empty if ParameterName is null (such parameters are skipped everywhere).
+        public          string                          ParameterKey { get; private set; } = "";
 
         internal bool Deserialize(XmlNode node)
         {
             Type            = LoadParameterType(node, "type");
             DisplayName     = XmlUtils.LoadAttributeAsString(node, "displayName"    , null);
             ParameterName   = XmlUtils.LoadAttributeAsString(node, "parameterName"  , null);
+            ParameterKey    = ParameterName != null ? ParametersValuesCollection.MakeKey(Type, ParameterName) : "";
             //DefaultVal      = XmlUtils.LoadAttributeAsFloat (node, "default"        , 0.0f);
             MinVal          = XmlUtils.LoadAttributeAsFloat (node, "min"            , 0.0f);
             MaxVal          = XmlUtils.LoadAttributeAsFloat (node, "max"            , 0.0f);

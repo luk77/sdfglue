@@ -20,6 +20,7 @@ namespace SdfGlueEditor
             //Thread.Sleep(20000);
 
             SdAppLaunchOptions options = new SdAppLaunchOptions();
+            options.ParseCommandLine(args);
             options.APIVersion              = new Version(3, 3);
             options.WindowSizeFactor        = 0.9f;
             options.RedirectConsoleToLog    = true;

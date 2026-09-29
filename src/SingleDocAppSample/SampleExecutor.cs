@@ -32,11 +32,17 @@ namespace SingleDocAppSample
 
         public override void OnNewDocument()
         {
+            if (!ConfirmDiscardChanges())
+                return;
+
             SetDocument(new TextDocument());
         }
 
         public override void OnOpenDocument()
         {
+            if (!ConfirmDiscardChanges())
+                return;
+
             string? filePath = window_.Platform.OpenFileDialog(window_.AppSettings.DocumentFileFilter);
             if (String.IsNullOrEmpty(filePath))
                 return;
@@ -58,6 +64,7 @@ namespace SingleDocAppSample
                 return;
 
             GetDocument().Save(GetDocument().FilePath!);
+            UndoManager.Instance.MarkSavePoint();
             window_.RefreshWindowTitle();
         }
 
@@ -68,6 +75,7 @@ namespace SingleDocAppSample
                 return;
 
             GetDocument().Save(filePath);
+            UndoManager.Instance.MarkSavePoint();
             window_.RefreshWindowTitle();
         }
 

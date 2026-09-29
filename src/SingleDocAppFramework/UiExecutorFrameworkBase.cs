@@ -28,6 +28,34 @@ namespace SingleDocAppFramework
         public virtual void OnSaveDocumentAs    ()                  { }
         public virtual bool CanSaveDocument     ()                  { return false; }
 
+        // Unsaved changes are tracked by UndoManager: the application calls UndoManager.Instance.MarkSavePoint()
+        // after a successful save and ClearAll() after new/open.
+        public virtual bool IsDocumentModified()
+        {
+            return UndoManager.Instance.IsModified;
+        }
+
+        // Asks whether to save unsaved changes before they are discarded (new/open document, exit).
+        // Returns false if the operation should be cancelled (Cancel, or the document was not saved).
+        public virtual bool ConfirmDiscardChanges()
+        {
+            if (!IsDocumentModified())
+                return true;
+
+            DialogAnswer answer = window_.Platform.AskYesNoCancel(window_.AppSettings.AppName, "The document has unsaved changes.\n\nSave them?");
+            if (answer == DialogAnswer.Cancel)
+                return false;
+            if (answer == DialogAnswer.No)
+                return true;
+
+            if (CanSaveDocument())
+                OnSaveDocument();
+            else
+                OnSaveDocumentAs();
+
+            return !IsDocumentModified();
+        }
+
         // undo / redo
         public virtual void OnUndo()
         {

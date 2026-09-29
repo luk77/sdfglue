@@ -39,6 +39,7 @@ namespace SdfGlueUi.Ui
         void OnCopyRenderPass       (RenderPassData? node);
         void OnPasteRenderPass      (TreeNode? selectedNode);
 
+        void OnAddNewMaterial       ();
         void OnCutMaterial          (MaterialInstance? node);
         void OnCopyMaterial         (MaterialInstance? node);
         void OnPasteMaterial        (TreeNode? selectedNode);

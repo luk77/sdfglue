@@ -98,7 +98,8 @@ namespace SdfGlueUi.Ui.Windows
 
 
             //string displayName = String.Format("[{0}] {1}", node.Id, node.Name);
-            string displayName = node.Name.Val ?? "";
+            // an empty label would leave no clickable area of the tree node
+            string displayName = String.IsNullOrEmpty(node.Name.Val) ? "<no name>" : node.Name.Val;
             ImGui.PushID(id++);
             node.IsExpanded = ImGui.TreeNodeEx(node.Id.ToString(), flags, displayName);
             if (node is SdfObject)
@@ -193,8 +194,7 @@ namespace SdfGlueUi.Ui.Windows
                 {
                     if (ImGui.MenuItem("Add new material"     , ""))
                     {
-                        GetModel().AddNewMaterial("New material " + GetModel().NextAvailableMaterialId);
-                        uiMgr.ActionsExecutor.OnRebuildShader();
+                        uiMgr.ActionsExecutor.OnAddNewMaterial();
 
                         ImGui.CloseCurrentPopup(); 
                     }

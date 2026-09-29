@@ -16,11 +16,7 @@ namespace SingleDocAppFramework.Ui.Properties
         public static void Build(ref int id, string name, ExBool obj, OnValueChanged? onValueChanged = null)
         {
             Build(ref id, name, ref obj.Val, onValueChanged);
-            if (ImGui.IsItemDeactivatedAfterEdit())
-            {
-                //Console.WriteLine("Undo save: {0}: {1}", name, obj.Val);
-                UndoManager.Instance.SaveAction(new ActionBool(obj, onValueChanged));
-            }
+            UndoEditTracker.HandleLastItem(() => !obj.PrevVal.Equals(obj.Val), () => new ActionBool(obj, onValueChanged));
         }
 
         public static void Build(ref int id, string name, ref bool val, OnValueChanged? onValueChanged = null)
@@ -47,11 +43,7 @@ namespace SingleDocAppFramework.Ui.Properties
         public static void Build(int id, string name, ExInt obj, OnValueChanged? onValueChanged = null)
         {
             Build(id, name, ref obj.Val, onValueChanged);
-            if (ImGui.IsItemDeactivatedAfterEdit())
-            {
-                //Console.WriteLine("Undo save: {0}: {1}", name, obj.Val);
-                UndoManager.Instance.SaveAction(new ActionInt(obj, onValueChanged));
-            }
+            UndoEditTracker.HandleLastItem(() => !obj.PrevVal.Equals(obj.Val), () => new ActionInt(obj, onValueChanged));
         }
 
         // Checkbox operating on an int value (0/1)
@@ -82,11 +74,7 @@ namespace SingleDocAppFramework.Ui.Properties
             ImGui.PushID(id++);
             ImGui.Checkbox("", ref obj.Val);
             ImGui.PopID();
-            if (ImGui.IsItemDeactivatedAfterEdit())
-            {
-                //Console.WriteLine("Undo save: SimpleCheckBox: {0}", obj.Val);
-                UndoManager.Instance.SaveAction(new ActionBool(obj, onValueChanged));
-            }
+            UndoEditTracker.HandleLastItem(() => obj.PrevVal != obj.Val, () => new ActionBool(obj, onValueChanged));
             if (oldVal != obj.Val)
             {
                 if (onValueChanged != null)

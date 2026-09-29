@@ -25,6 +25,8 @@ namespace SdfGlueCore.Model.DataNodes
 
         public override void ResetPrevVal()
         {
+            base.ResetPrevVal();
+
             FixAllObjects.ResetPrevVal();
             Use4d.ResetPrevVal();
         }

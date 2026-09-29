@@ -51,6 +51,7 @@ namespace SdfGlueCore.Model.DataNodes
 
         public override void ResetPrevVal()
         {
+            base.ResetPrevVal();
         }
 
         public override void Serialize(XmlDocument xmlDoc, XmlNode parent)
