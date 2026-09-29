@@ -185,6 +185,8 @@ namespace SdfGlueCore.Model.DataNodes
 
         public override void ResetPrevVal()
         {
+            base.ResetPrevVal();
+
             TargetPosition      .ResetPrevVal();
             RotationPitch       .ResetPrevVal();
             RotationYaw         .ResetPrevVal();

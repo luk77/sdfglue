@@ -22,7 +22,8 @@ namespace SdfGlueEditor.Application
             documents_ = documents;
         }
 
-        public void Update(double deltaTime, bool enabled)
+        // enabled is turned off when the user cancels discarding unsaved changes
+        public void Update(double deltaTime, ref bool enabled)
         {
             if (!enabled)
                 return;
@@ -31,13 +32,25 @@ namespace SdfGlueEditor.Application
 
             if (demoModeTimer_ > projectDemoDuration_)
             {
-                demoModeTimer_ -= projectDemoDuration_;
+                // reset (not decrement) - the question about unsaved changes may block for a long time
+                demoModeTimer_ = 0.0;
+
+                if (!documents_.ConfirmDiscardChanges())
+                {
+                    Console.WriteLine("Demo mode disabled (unsaved changes)");
+                    enabled = false;
+                    return;
+                }
+
                 LoadRandomProject(ExamplesDirectory, ProjectSearchPattern);
             }
         }
 
         private void LoadRandomProject(string rootPath, string searchPattern)
         {
+            if (!Directory.Exists(rootPath))
+                return;
+
             string[] files = Directory.GetFiles(rootPath, searchPattern, SearchOption.AllDirectories);
             if (files.Length == 0)
                 return;
@@ -46,7 +59,7 @@ namespace SdfGlueEditor.Application
             string path = files[rndIndex];
 
             Console.WriteLine("Loading project: {0}", path);
-            documents_.OpenProject(path);
+            documents_.LoadProject(path, false);
         }
     }
 }

@@ -44,7 +44,7 @@ namespace SdfGlueUi.Ui
                     continue;
 
                 // compilation params ignorują typ - to zawsze jest checkbox
-                ExInt? exObj = paramsValuesCollection[param.ParameterName] as ExInt;
+                ExInt? exObj = paramsValuesCollection[param.ParameterKey] as ExInt;
                 if (exObj == null)
                     continue;
                 UiBool.Build(index++, param.DisplayName ?? param.ParameterName, exObj, onValueChanged );
@@ -97,7 +97,7 @@ namespace SdfGlueUi.Ui
 //                else 
                 if (param.Type == SdfParamType.Float)
                 {
-                    ExFloat? exObj = paramsValuesCollection[param.ParameterName] as ExFloat;
+                    ExFloat? exObj = paramsValuesCollection[param.ParameterKey] as ExFloat;
                     if (exObj == null)
                         continue;
 
@@ -136,7 +136,7 @@ namespace SdfGlueUi.Ui
                 }
                 else if (param.Type == SdfParamType.Int)
                 {
-                    ExInt? exObj = paramsValuesCollection[param.ParameterName] as ExInt;
+                    ExInt? exObj = paramsValuesCollection[param.ParameterKey] as ExInt;
                     if (exObj == null)
                         continue;
                     //int valI = exObj.Val;
@@ -168,7 +168,7 @@ namespace SdfGlueUi.Ui
                 }
                 else if (param.Type == SdfParamType.Vec2)
                 {
-                    ExVector2? exObj = paramsValuesCollection[param.ParameterName] as ExVector2;
+                    ExVector2? exObj = paramsValuesCollection[param.ParameterKey] as ExVector2;
                     if (exObj == null)
                         continue;
                     Vector2 valV = exObj.Val;
@@ -184,7 +184,7 @@ namespace SdfGlueUi.Ui
                 }
                 else if (param.Type == SdfParamType.Vec3)
                 {
-                    ExVector3? exObj = paramsValuesCollection[param.ParameterName] as ExVector3;
+                    ExVector3? exObj = paramsValuesCollection[param.ParameterKey] as ExVector3;
                     if (exObj == null)
                         continue;
                     Vector3 valV = exObj.Val;
@@ -205,7 +205,7 @@ namespace SdfGlueUi.Ui
                 }
                 else if (param.Type == SdfParamType.Vec4)
                 {
-                    ExVector4? exObj = paramsValuesCollection[param.ParameterName] as ExVector4;
+                    ExVector4? exObj = paramsValuesCollection[param.ParameterKey] as ExVector4;
                     if (exObj == null)
                         continue;
                     Vector4 valV = exObj.Val;

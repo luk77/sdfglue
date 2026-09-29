@@ -3,6 +3,13 @@ using OpenTK.Windowing.Desktop;
 
 namespace SingleDocAppFramework.Platform
 {
+    public enum DialogAnswer
+    {
+        Yes,
+        No,
+        Cancel,
+    }
+
     // OS-dependent services. The implementation is provided by the application
     // (e.g. SingleDocAppPlatformWin.WinPlatformServices) or DefaultPlatformServices is used.
     public interface IPlatformServices
@@ -15,5 +22,10 @@ namespace SingleDocAppFramework.Platform
         string?     OpenFileDialog              (FileFilter filter, string? initialDirectory = null);
         string?     SaveFileDialog              (FileFilter filter, string? initialDirectory = null);
         string?     SelectFolderDialog          ();
+
+        // Modal message boxes
+        void            ShowErrorMessage        (string title, string message);
+        bool            AskOkCancel             (string title, string message);
+        DialogAnswer    AskYesNoCancel          (string title, string message);
     }
 }

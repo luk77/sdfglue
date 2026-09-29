@@ -14,11 +14,7 @@ namespace SingleDocAppFramework.Ui.Properties
     {
         public static void AddUndoHandler(string name, ExString obj)
         {
-            if (ImGui.IsItemDeactivatedAfterEdit())
-            {
-                //Console.WriteLine("Undo save: {0}: {1}", name, obj.Val);
-                UndoManager.Instance.SaveAction(new ActionString(obj));
-            }
+            UndoEditTracker.HandleLastItem(() => obj.PrevVal != obj.Val, () => new ActionString(obj));
         }
 
         public static void Build(ref int id, string name, ExString obj)

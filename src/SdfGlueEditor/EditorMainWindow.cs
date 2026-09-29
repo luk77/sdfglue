@@ -52,7 +52,7 @@ namespace SdfGlueEditor
             // user settings are already loaded by the base constructor
             ctx_                = new SdfGlueAppContext(this, platform, (UserSettingsSdfGlue)UserSettings);
 
-            fileChangeMonitor_  = new FileChangeMonitor(".", new string[] {"*.xml", "*.glsl", "*.vert", "*.frag", "*.shader"});
+            fileChangeMonitor_  = new FileChangeMonitor(".", new string[] {"*.xml", "*.glsl", "*.vert", "*.frag", "*.shader"}, 300);
         }
 
         private static SdAppSettings CreateAppSettings()
@@ -155,7 +155,7 @@ namespace SdfGlueEditor
                 }
             }
 
-            demoMode_.Update(e.Time, GetUiManager().EnabledDemoMode);
+            demoMode_.Update(e.Time, ref GetUiManager().EnabledDemoMode);
         }
 
         protected override void OnRender3d()
@@ -198,7 +198,7 @@ namespace SdfGlueEditor
             base.OnUnload();
         }
 
-        // If a confirmation on exit is needed, add it both in OnClosing() and OnExitApp()
+        // Confirmation of unsaved changes on exit is done by SdAppWindow (OnClosing() and OnExitApp())
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);

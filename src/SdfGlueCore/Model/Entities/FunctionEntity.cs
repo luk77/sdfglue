@@ -142,15 +142,17 @@ namespace SdfGlueCore.Model.Entities
             dir[Definition.FunctionName] = codeToAdd;
         }
 
-        public bool SetParameterVec3(string paramId, System.Numerics.Vector3 paramVal, bool force = false)
+        public bool SetParameterVec3(string paramName, System.Numerics.Vector3 paramVal, bool force = false)
         {
-            return SetParameter<ExVector3, System.Numerics.Vector3>(ParametersValues, paramId, paramVal, force);
+            string paramKey = ParametersValuesCollection.MakeKey(SdfParamType.Vec3, paramName);
+            return SetParameter<ExVector3, System.Numerics.Vector3>(ParametersValues, paramKey, paramVal, force);
         }
 
-        public bool SetParameterFloat(string paramId, float paramVal, bool force = false)
+        public bool SetParameterFloat(string paramName, float paramVal, bool force = false)
         {
-            //return SetParameter<ExFloat, float>(ParametersValues, paramId, paramVal, force);
-            return SetParameter<ExFloatWithSignal, float>(ParametersValues, paramId, paramVal, force);
+            string paramKey = ParametersValuesCollection.MakeKey(SdfParamType.Float, paramName);
+            //return SetParameter<ExFloat, float>(ParametersValues, paramKey, paramVal, force);
+            return SetParameter<ExFloatWithSignal, float>(ParametersValues, paramKey, paramVal, force);
         }
 
 //        public bool SetMaterialParameterVec3(string paramId, System.Numerics.Vector3 paramVal, bool force = false)
@@ -193,15 +195,16 @@ namespace SdfGlueCore.Model.Entities
         }
 
 
-        public ISimpleType? GetParameter(string paramId)
+        public ISimpleType? GetParameter(SdfParamType paramType, string paramName)
         {
             if (ParametersValues == null)
                 return null;
 
-            if (!ParametersValues.ContainsKey(paramId))
+            string paramKey = ParametersValuesCollection.MakeKey(paramType, paramName);
+            if (!ParametersValues.ContainsKey(paramKey))
                 return null;
 
-            return ParametersValues[paramId];
+            return ParametersValues[paramKey];
         }
 
         public virtual void ResetPrevVal()

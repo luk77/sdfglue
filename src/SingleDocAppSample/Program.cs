@@ -12,6 +12,7 @@ namespace SingleDocAppSample
         static void Main(string[] args)
         {
             SdAppLaunchOptions options = new SdAppLaunchOptions();
+            options.ParseCommandLine(args);
             options.WindowSizeFactor = 0.7f;
 
             IPlatformServices platform = new WinPlatformServices();

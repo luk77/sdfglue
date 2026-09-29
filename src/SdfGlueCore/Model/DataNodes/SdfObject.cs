@@ -54,13 +54,13 @@ namespace SdfGlueCore.Model.DataNodes
 
             OperatorEntity opTransform = PositionOperators.CreateNewEntity();
             opTransform.DefinitionName.Val = "opTranslate";
-            opTransform.ParametersValues["offset"] = new ExVector3(Vector3.Zero);
+            opTransform.SetParameterVec3("offset", Vector3.Zero, true);
             opTransform.Enabled.Val = false;
             PositionOperators.Operators.Add(opTransform);
 
             OperatorEntity opRotation = PositionOperators.CreateNewEntity();
             opRotation.DefinitionName.Val = "opRotate";
-            opRotation.ParametersValues["rotation"] = new ExVector3(Vector3.Zero);
+            opRotation.SetParameterVec3("rotation", Vector3.Zero, true);
             opRotation.Enabled.Val = false;
             PositionOperators.Operators.Add(opRotation);
         }
@@ -222,7 +222,7 @@ namespace SdfGlueCore.Model.DataNodes
             if (opTranslate == null)
                 return Vector3.Zero;
 
-            ExVector3? exObj = opTranslate.GetParameter("offset") as ExVector3;
+            ExVector3? exObj = opTranslate.GetParameter(SdfParamType.Vec3, "offset") as ExVector3;
             if (exObj == null)
                 return Vector3.Zero;
 
@@ -236,6 +236,7 @@ namespace SdfGlueCore.Model.DataNodes
             {
                 // default material - first on list
                 MaterialId.Val = model.Materials.GetChildrenAt(0).Id;
+                MaterialId.ResetPrevVal(); // changed outside of undo - the next undo action must not restore the invalid id
             }
         }
 
@@ -263,6 +264,8 @@ namespace SdfGlueCore.Model.DataNodes
 
         public override void ResetPrevVal()
         {
+            base.ResetPrevVal();
+
             IsFixed                 .ResetPrevVal();
             UseInDistanceFunction   .ResetPrevVal();
             UseInMaterialsFunction  .ResetPrevVal();

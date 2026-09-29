@@ -11,7 +11,8 @@ namespace SdfGlueCore.AbstractRenderer
     public interface IRenderingPass
     {
         int GetTextureId();
-        Bitmap GetFrameAsBitmap(IntCoords textureSize);
+        // Copy of the current frame (the caller disposes it), null if there is no frame
+        Bitmap? GetFrameAsBitmap();
         //void ResetFrameCounter();
     }
 }

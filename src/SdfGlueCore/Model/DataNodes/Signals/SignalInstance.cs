@@ -18,6 +18,7 @@ namespace SdfGlueCore.Model.DataNodes.Signals
 
         public override void ResetPrevVal()
         {
+            base.ResetPrevVal();
         }
 
         public float GetCurrentValue()

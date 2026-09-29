@@ -27,6 +27,7 @@ namespace SingleDocAppFramework
         protected UiExecutorFrameworkBase   executor_           = null!;
 
         private bool                imguiInitialized_           = false;
+        private bool                titleDocumentModified_      = false;
 
         private SdAppSettings       appSettings_;
         private UserSettingsBase    userSettings_;
@@ -128,7 +129,7 @@ namespace SingleDocAppFramework
             base.OnLoad();
         }
 
-        // Window title: "<app title><extra info>, <document name>"
+        // Window title: "<app title><extra info>, <document name>[*]" (* - unsaved changes)
         public void RefreshWindowTitle()
         {
             string title = GetAppTitle() + GetTitleExtraInfo();
@@ -137,7 +138,18 @@ namespace SingleDocAppFramework
             if (!String.IsNullOrEmpty(documentName))
                 title += ", " + documentName;
 
+            titleDocumentModified_ = executor_ != null && executor_.IsDocumentModified();
+            if (titleDocumentModified_)
+                title += "*";
+
             Title = title;
+        }
+
+        // The modified state changes with every edit/undo/redo, so the title is checked every frame
+        private void RefreshWindowTitleIfModifiedChanged()
+        {
+            if (executor_.IsDocumentModified() != titleDocumentModified_)
+                RefreshWindowTitle();
         }
 
         protected virtual string GetAppTitle()
@@ -263,6 +275,8 @@ namespace SingleDocAppFramework
                 HandleFrameworkShortcuts();
                 HandleAppShortcuts();
             }
+
+            RefreshWindowTitleIfModifiedChanged();
         }
 
         public float GetWindowsScaling()
@@ -528,16 +542,26 @@ namespace SingleDocAppFramework
             }
         }
 
+        // Closing the window (Alt+F4, close button) - asks about unsaved changes
         protected override void OnClosing(CancelEventArgs e)
         {
+            if (executor_ != null && !executor_.ConfirmDiscardChanges())
+            {
+                e.Cancel = true;
+                return;
+            }
+
             base.OnClosing(e);
 
             ShutdownImGui();
         }
 
-        // called from the "Exit" menu item
+        // called from the "Exit" menu item - asks about unsaved changes
         public virtual void OnExitApp()
         {
+            if (!executor_.ConfirmDiscardChanges())
+                return;
+
             ShutdownImGui();
 
             Environment.Exit(0);

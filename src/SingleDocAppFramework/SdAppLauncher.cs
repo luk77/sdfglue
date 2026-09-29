@@ -27,6 +27,21 @@ namespace SingleDocAppFramework
         public  bool                    CatchMainLoopExceptions = false;
         public  string                  LogFilePath             = "log.txt";
         public  string                  ErrorLogFilePath        = "errorlog.txt";
+
+        // Development mode (command line: --devel) - shows the "Development" main menu (SdAppSettings.DevelopmentMode)
+        public  bool                    DevelopmentMode         = false;
+
+        public const string             ArgDevelopmentMode      = "--devel";
+
+        // Applies the framework command line options; other arguments are ignored (left to the application)
+        public void ParseCommandLine(string[] args)
+        {
+            foreach (string arg in args)
+            {
+                if (String.Equals(arg, ArgDevelopmentMode, StringComparison.OrdinalIgnoreCase))
+                    DevelopmentMode = true;
+            }
+        }
     }
 
     // Creates and runs the application window
@@ -46,6 +61,7 @@ namespace SingleDocAppFramework
                 {
                     using (SdAppWindow wnd = createWindow(gameWindowSettings, nativeWindowSettings))
                     {
+                        ApplyOptionsToWindow(options, wnd);
                         wnd.Run();
                     }
 
@@ -63,11 +79,18 @@ namespace SingleDocAppFramework
             {
                 using (SdAppWindow wnd = createWindow(gameWindowSettings, nativeWindowSettings))
                 {
+                    ApplyOptionsToWindow(options, wnd);
                     wnd.Run();
                 }
             }
 
             AppLog.Restore();
+        }
+
+        // Called before Run() - the UI is created later (OnLoad)
+        private static void ApplyOptionsToWindow(SdAppLaunchOptions options, SdAppWindow wnd)
+        {
+            wnd.AppSettings.DevelopmentMode = options.DevelopmentMode;
         }
 
         private static NativeWindowSettings CreateNativeWindowSettings(SdAppLaunchOptions options, IPlatformServices platform)

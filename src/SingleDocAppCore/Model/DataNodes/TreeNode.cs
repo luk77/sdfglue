@@ -85,30 +85,34 @@ namespace SingleDocAppCore.Model.DataNodes
             children_.Remove(obj);
         }
 
-        public void MoveChildUp(TreeNode obj)
+        // Returns false if the child was not moved (not found or already first)
+        public bool MoveChildUp(TreeNode obj)
         {
             if (!children_.Contains(obj))
-                return;
+                return false;
 
             int index = children_.IndexOf(obj);
             if (index == 0)
-                return;
+                return false;
 
             children_.RemoveAt(index);
             children_.Insert(index-1, obj);
+            return true;
         }
 
-        public void MoveChildDown(TreeNode obj)
+        // Returns false if the child was not moved (not found or already last)
+        public bool MoveChildDown(TreeNode obj)
         {
             if (!children_.Contains(obj))
-                return;
+                return false;
 
             int index = children_.IndexOf(obj);
             if (index == children_.Count-1)
-                return;
+                return false;
 
             children_.RemoveAt(index);
             children_.Insert(index+1, obj);
+            return true;
         }
 
         public delegate void RecursiveAction(TreeNode node);
@@ -152,6 +156,11 @@ namespace SingleDocAppCore.Model.DataNodes
                 action(node);
         }
 
-        public abstract void ResetPrevVal();
+        // Sets PrevVal = Val of the node values (after load/paste - the base for the next undo action).
+        // Derived classes reset their own values and must call base.ResetPrevVal() (Name).
+        public virtual void ResetPrevVal()
+        {
+            Name.ResetPrevVal();
+        }
     }
 }

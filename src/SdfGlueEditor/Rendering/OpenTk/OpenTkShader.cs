@@ -34,54 +34,59 @@ namespace SdfGlueEditor.Rendering.OpenTk
 
         public bool Reinitialize(StringBuilder sbErrors, string shaderSourceVert, string shaderSourceFrag, string shaderPassName)
         {
+            // GL objects created here - on any error they are deleted in 'finally' (the program only if it was not stored)
+            int vertexShader    = 0;
+            int fragmentShader  = 0;
+            int program         = 0;
+
             try
             {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
                 ReleaseProgram();
+                uniformLocations_ = new Dictionary<string, int>();
 
                 // Compile vertex shader
-                int vertexShader = GL.CreateShader(ShaderType.VertexShader);
+                vertexShader = GL.CreateShader(ShaderType.VertexShader);
                 GL.ShaderSource(vertexShader, shaderSourceVert);
                 bool success = CompileShader(vertexShader);
                 if (!success)
                 {
-                    string error = GL.GetShaderInfoLog(vertexShader);
-                    sbErrors.Append(error);
-                    Console.WriteLine(error);
+                    AppendError(sbErrors, GL.GetShaderInfoLog(vertexShader), "Vertex shader compilation failed.");
                     return false;
                 }
 
                 // Compile fragment shader
-                int fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
+                fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
                 GL.ShaderSource(fragmentShader, shaderSourceFrag);
                 success = CompileShader(fragmentShader);
                 if (!success)
                 {
-                    string error = GL.GetShaderInfoLog(fragmentShader);
-                    sbErrors.Append(error);
-                    Console.WriteLine(error);
+                    AppendError(sbErrors, GL.GetShaderInfoLog(fragmentShader), "Fragment shader compilation failed.");
                     return false;
                 }
 
                 // Merge vertex and fragment shaders into single program:
 
                 // Create empty program
-                programHandle_ = GL.CreateProgram();
+                program = GL.CreateProgram();
 
                 // Attach shaders to program
-                GL.AttachShader(programHandle_, vertexShader);
-                GL.AttachShader(programHandle_, fragmentShader);
+                GL.AttachShader(program, vertexShader);
+                GL.AttachShader(program, fragmentShader);
 
                 // Link program
-                GL.LinkProgram(programHandle_);
-                GL.GetProgram(programHandle_, GetProgramParameterName.LinkStatus, out var code);
+                GL.LinkProgram(program);
+                GL.GetProgram(program, GetProgramParameterName.LinkStatus, out var code);
+
+                // Release resources (shaders are not needed after linking)
+                GL.DetachShader(program, vertexShader);
+                GL.DetachShader(program, fragmentShader);
+
                 if (code != (int)All.True)
                 {
-                    string error = GL.GetProgramInfoLog(programHandle_);
-                    sbErrors.Append(error);
-                    Console.WriteLine(error);
+                    AppendError(sbErrors, GL.GetProgramInfoLog(program), "Shader program linking failed.");
                     return false;
                 }
 
@@ -93,17 +98,8 @@ namespace SdfGlueEditor.Rendering.OpenTk
                 //GL.GetProgramBinary(programHandle_, ...
 
 
-                // Release resources
-                GL.DetachShader(programHandle_, vertexShader);
-                GL.DetachShader(programHandle_, fragmentShader);
-                GL.DeleteShader(fragmentShader);
-                GL.DeleteShader(vertexShader);
-
-
                 // Store uniforms locations
-                uniformLocations_ = new Dictionary<string, int>();
-
-                GL.GetProgram(programHandle_, GetProgramParameterName.ActiveUniforms, out var numberOfUniforms);
+                GL.GetProgram(program, GetProgramParameterName.ActiveUniforms, out var numberOfUniforms);
 
                 for (int i = 0; i < numberOfUniforms; i++)
                 {
@@ -111,24 +107,51 @@ namespace SdfGlueEditor.Rendering.OpenTk
                     ActiveUniformType uniformType = ActiveUniformType.Float;
 
                     // Get the name
-                    string key = GL.GetActiveUniform(programHandle_, i, out uniformSize, out uniformType);
+                    string key = GL.GetActiveUniform(program, i, out uniformSize, out uniformType);
 
                     // Get the location
-                    int location = GL.GetUniformLocation(programHandle_, key);
+                    int location = GL.GetUniformLocation(program, key);
 
                     // Add to the dictionary.
                     uniformLocations_.Add(key, location);
                 }
+
+                // success - the program is owned by this object from now on
+                programHandle_  = program;
+                program         = 0;
 
                 Debug.WriteLine("Shader for '{0}' compiled in {1} ms. Uniforms: {2}", shaderPassName, (int)sw.Elapsed.TotalMilliseconds, numberOfUniforms);
             }
             catch(Exception ex)
             {
                 sbErrors.Append(ex.ToString());
+                uniformLocations_ = new Dictionary<string, int>();
                 return false;
+            }
+            finally
+            {
+                if (program != 0)
+                    GL.DeleteProgram(program);
+                if (fragmentShader != 0)
+                    GL.DeleteShader(fragmentShader);
+                if (vertexShader != 0)
+                    GL.DeleteShader(vertexShader);
             }
 
             return true;
+        }
+
+        public bool IsValid()
+        {
+            return programHandle_ != 0;
+        }
+
+        // GL info log can be empty - the error text must not be, because an empty error list means "able to render"
+        private static void AppendError(StringBuilder sbErrors, string infoLog, string defaultMessage)
+        {
+            string error = String.IsNullOrWhiteSpace(infoLog) ? defaultMessage : infoLog;
+            sbErrors.Append(error);
+            Console.WriteLine(error);
         }
 
         private static bool CompileShader(int shader)

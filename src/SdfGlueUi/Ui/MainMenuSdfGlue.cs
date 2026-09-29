@@ -83,13 +83,17 @@ namespace SdfGlueUi.Ui
                 if (ImGui.MenuItem("Reload SDF Definitions", "CTRL+E"))         { ExecutorSdfGlue.OnReloadSdfDefinitions(); }
                 if (ImGui.MenuItem("Compile shader", "CTRL+R, CTRL+ENTER"))     { ExecutorSdfGlue.OnRebuildShader(); }
                 if (ImGui.MenuItem("Reset frame counter", ""))                  { ExecutorSdfGlue.OnResetFrameCounter(); }
-                if (ImGui.MenuItem("Batch process all projects", ""))           { ExecutorSdfGlue.OnBatchProcessAllProjects(); }
 
                 ImGui.Separator();
                 ImGui.Checkbox("Demo mode", ref uiMgrSdfGlue_.EnabledDemoMode);
 
                 ImGui.EndMenu();
             }
+        }
+
+        protected override void BuildDevelopmentMenuExtras()
+        {
+            if (ImGui.MenuItem("Batch process all projects", ""))               { ExecutorSdfGlue.OnBatchProcessAllProjects(); }
         }
 
         protected override void BuildViewMenuExtras()

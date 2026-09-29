@@ -124,6 +124,26 @@ namespace SingleDocAppPlatformWin
             return null;
         }
 
+        public void ShowErrorMessage(string title, string message)
+        {
+            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        public bool AskOkCancel(string title, string message)
+        {
+            return MessageBox.Show(message, title, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK;
+        }
+
+        public DialogAnswer AskYesNoCancel(string title, string message)
+        {
+            switch (MessageBox.Show(message, title, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning))
+            {
+                case DialogResult.Yes:  return DialogAnswer.Yes;
+                case DialogResult.No:   return DialogAnswer.No;
+                default:                return DialogAnswer.Cancel;
+            }
+        }
+
         private static void SetupFileDialog(FileDialog dlg, FileFilter filter, string? initialDirectory)
         {
             dlg.Filter              = String.Format("{0} ({1})|{1}|All files (*.*)|*.*", filter.Description, filter.Pattern);

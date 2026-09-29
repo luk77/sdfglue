@@ -180,6 +180,8 @@ namespace SdfGlueEditor.Application
 
             if (typeof(T) == typeof(SdfObject))
             {
+                // the object may come from another project or refer to a deleted material
+                GetModel().FixMaterialsReferences(obj);
                 renderingSystem_.ReinitializeShader(codeGenerator_);
             }
 
@@ -189,6 +191,13 @@ namespace SdfGlueEditor.Application
                 //GetModel().FixMaterialsReferences();
                 renderingSystem_.ReinitializeShader(codeGenerator_);
             }
+
+            // PrevVal of the deserialized values = current values, otherwise the first edit of the pasted node
+            // would save an undo action back to the constructor defaults
+            TreeNode.CallRecursive(obj, delegate(TreeNode node)
+            {
+                node.ResetPrevVal();
+            });
 
             GetModel().ImportantNodeToSelect = obj;
 
@@ -217,6 +226,7 @@ namespace SdfGlueEditor.Application
 
                     if (typeof(T) == typeof(SdfObject))
                     {
+                        GetModel().FixMaterialsReferences(obj);
                         renderingSystem_.ReinitializeShader(codeGenerator_);
                     }
 
@@ -345,6 +355,35 @@ namespace SdfGlueEditor.Application
                 node.Id = GetModel().NextAvailableRenderPassId;
                 GetModel().NextAvailableRenderPassId++;
             });
+        }
+
+        public void OnAddNewMaterial()
+        {
+            MaterialInstance newMat = GetModel().AddNewMaterial("New material " + GetModel().NextAvailableMaterialId);
+            RefreshAddedMaterial(newMat);
+
+            GetModel().ImportantNodeToSelect = newMat;
+
+            // undo/redo support
+            UndoManager.Instance.SaveAction(new ActionDelegates(
+                delegate
+                {
+                    // undo
+                    DeleteNodeInternal(newMat);
+                },
+                delegate
+                {
+                    // redo
+                    GetModel().Materials.AddChild(newMat);
+                    RefreshAddedMaterial(newMat);
+                }
+                ));
+        }
+
+        private void RefreshAddedMaterial(MaterialInstance mat)
+        {
+            mat.RefreshDefinitionReference(GetModel().GetRenderPassForMaterials()?.RendererFunc?.Definition);
+            renderingSystem_.ReinitializeShader(codeGenerator_);
         }
 
         public void OnCopyMaterial(MaterialInstance? node)
@@ -494,7 +533,10 @@ namespace SdfGlueEditor.Application
 
             if (node.Parent == null)
                 return;
-            node.Parent.MoveChildUp(node);
+
+            // first node - nothing to move, so nothing to undo either
+            if (!node.Parent.MoveChildUp(node))
+                return;
 
             if (node is RenderPassData)
                 renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
@@ -538,7 +580,10 @@ namespace SdfGlueEditor.Application
 
             if (node.Parent == null)
                 return;
-            node.Parent.MoveChildDown(node);
+
+            // last node - nothing to move, so nothing to undo either
+            if (!node.Parent.MoveChildDown(node))
+                return;
 
             if (node is RenderPassData)
                 renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());

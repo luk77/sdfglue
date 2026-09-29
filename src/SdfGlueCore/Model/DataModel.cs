@@ -131,13 +131,19 @@ namespace SdfGlueCore.Model
             return version;
         }
 
-        public DataModel(UserSettingsSdfGlue config) : base(NodeIdDataModel, "Project")
+        // definitionsSource: model whose function definitions are shared instead of being reloaded from disk
+        // (e.g. a project loaded into a new model). Note: the undo stack is not cleared here - the model
+        // may be a temporary one; the application clears it when the model becomes the current document.
+        public DataModel(UserSettingsSdfGlue config, DataModel? definitionsSource = null) : base(NodeIdDataModel, "Project")
         {
             Config              = config;
             ProjSettings        = new ProjectSettings(this);
             //RenderingSysData    = new RenderingData(this); // this is done in InitDefaultData()
 
-            ReloadDefinitions();
+            if (definitionsSource != null)
+                ShareDefinitions(definitionsSource);
+            else
+                ReloadDefinitions();
 
             InitDefaultData();
             InitDefaultSdfObjects();
@@ -174,9 +180,7 @@ namespace SdfGlueCore.Model
         [MemberNotNull(nameof(RenderingSysData))]
         private void InitDefaultData()
         {
-            SingleDocAppCore.UndoSystem.UndoManager.Instance.ClearAll();
-
-            NextAvailableId             = 1;
+            NextAvailableId            = 1;
             NextAvailableMaterialId     = 1;
             NextAvailableSignalId       = 1;
             NextAvailableRenderPassId   = 1;
@@ -263,7 +267,7 @@ namespace SdfGlueCore.Model
             SdfRoot.BlendFactor.Val     = 0.0f;
 
             box.FunctionSdf.DefinitionName.Val  = "sdBox";
-            box.FunctionSdf.ParametersValues["dim"] = new ExVector3(new System.Numerics.Vector3(0.5f, 0.5f, 0.5f));
+            box.FunctionSdf.SetParameterVec3("dim", new System.Numerics.Vector3(0.5f, 0.5f, 0.5f), true);
             box.BlendFactor.Val     = 0.5f;
 
             box.MaterialId.Val = 2;//"Material 2"
@@ -296,10 +300,28 @@ namespace SdfGlueCore.Model
             DistanceOpDefinitions   .Reload("Functions/DistanceOperators/");
         }
 
+        // Definitions do not depend on the project, so the sets can be shared
+        // (Reload() on one model refreshes them for all models sharing them)
+        private void ShareDefinitions(DataModel source)
+        {
+            Renderers               = source.Renderers;
+            BackdropsDefinitions    = source.BackdropsDefinitions;
+            CameraControllers       = source.CameraControllers;
+            SdfDefinitions          = source.SdfDefinitions;
+            MixOpDefinitions        = source.MixOpDefinitions;
+            PositionOpDefinitions   = source.PositionOpDefinitions;
+            DistanceOpDefinitions   = source.DistanceOpDefinitions;
+        }
 
+
+        // Returns false if the project could not be loaded - the model is then in an undefined state
+        // (load into a new DataModel and use it only on success)
         public bool Deserialize(XmlDocument xmlDoc)
         {
             InitDefaultData();
+
+            // the object tree must come from the file (see the check at the end)
+            SdfRoot = null;
 
             // TODO: na razie można tak zrobić - dopóki nie ma serializacji/deserializacji render passów
             RenderPassData? renderPassForMaterials = GetRenderPassForMaterials();
@@ -493,7 +515,9 @@ namespace SdfGlueCore.Model
 
         // funkcja usuwa referencje na nieistniejące materiały
         // (jest to potrzebne np. po usunięciu materiału, lub po załadowaniu starego pliku)
-        public void FixMaterialsReferences()
+        // Objects referring to a non-existing material get the first material.
+        // root - subtree to fix (e.g. a pasted object), null = whole SDF tree
+        public void FixMaterialsReferences(TreeNode? root = null)
         {
             if (Materials?.GetChildrenCount() == 0)
             {
@@ -501,7 +525,7 @@ namespace SdfGlueCore.Model
                 return;
             }
 
-            TreeNode.CallRecursive(SdfRoot, delegate(TreeNode node)
+            TreeNode.CallRecursive(root ?? SdfRoot, delegate(TreeNode node)
             {
                 SdfObject? sdfObj = node as SdfObject;
                 sdfObj?.FixMaterialReference(this);
@@ -628,6 +652,7 @@ namespace SdfGlueCore.Model
 
         public override void ResetPrevVal()
         {
+            base.ResetPrevVal();
         }
 
         public void ResetPrevValRecursive()

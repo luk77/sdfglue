@@ -20,6 +20,8 @@ namespace SingleDocAppFramework
 
         public  string                  UserSettingsFile        = "UserSettings.xml";   // stored next to the executable
 
+        public  bool                    DevelopmentMode         = false;    // "Development" main menu; set by SdAppLauncher (--devel)
+
         public string GetDefaultLayoutPath()
         {
             return Path.Combine(LayoutsDirectory, DefaultLayoutFile);

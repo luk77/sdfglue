@@ -38,6 +38,7 @@ namespace SdfGlueEditor.Application
 
             model.ReloadDefinitions();
             model.RefreshDefinitions();
+            model.RefreshMaterialDefinition();  // materials refer to the renderer definition (<MaterialDefinition>)
 
             CompileShader();
         }
@@ -76,9 +77,7 @@ namespace SdfGlueEditor.Application
                 return;
             }
 
-            IntCoords textureSize = GetModel().Config.GetPreviewResolution();
-
-            Bitmap? bmp = previewPass.GetFrameAsBitmap(textureSize);
+            using Bitmap? bmp = previewPass.GetFrameAsBitmap();
             if (bmp == null)
             {
                 Console.WriteLine("Unable to get bitmap data.");
@@ -89,7 +88,7 @@ namespace SdfGlueEditor.Application
             if (String.IsNullOrEmpty(filePath))
                 return;
 
-            bmp.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
+            SaveImageToFile(bmp, filePath);
         }
 
         public void ExportAnimation()
@@ -99,8 +98,6 @@ namespace SdfGlueEditor.Application
                 Console.WriteLine("No image to export.");
                 return;
             }
-
-            IntCoords textureSize = GetModel().Config.GetPreviewResolution();
 
             string? baseDir = ctx_.Platform.SelectFolderDialog();
             if (String.IsNullOrEmpty(baseDir))
@@ -128,16 +125,32 @@ namespace SdfGlueEditor.Application
                 GetModel().Update(deltaTime);
 
                 // get image
-                Bitmap? bmp = GetModel().GetRPassDataForPreview()?.GetFrameAsBitmap(textureSize);
+                using Bitmap? bmp = GetModel().GetRPassDataForPreview()?.GetFrameAsBitmap();
                 if (bmp == null)
                 {
                     Console.WriteLine("Unable to get bitmap data.");
                     break;
                 }
 
-                // save image
+                // save image (stop on the first error instead of reporting it for every frame)
                 string filePath = Path.Combine(baseDir, String.Format("frame_{0}.png", f.ToString("D8")));
+                if (!SaveImageToFile(bmp, filePath))
+                    break;
+            }
+        }
+
+        private bool SaveImageToFile(Bitmap bmp, string filePath)
+        {
+            try
+            {
                 bmp.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: Cannot save image: {0}. {1}", filePath, ex.Message);
+                ctx_.Platform.ShowErrorMessage("Save image", String.Format("Cannot save image:\n{0}\n\n{1}", filePath, ex.Message));
+                return false;
             }
         }
     }

@@ -16,11 +16,7 @@ namespace SingleDocAppFramework.Ui.Properties
         public static void Build(ref int id, string name, ExVector3 obj)
         {
             Build(ref id, name, ref obj.Val);
-            if (ImGui.IsItemDeactivatedAfterEdit())
-            {
-                //Console.WriteLine("Undo save: {0}: {1}", name, obj.Val);
-                UndoManager.Instance.SaveAction(new ActionVector3(obj));
-            }
+            UndoEditTracker.HandleLastItem(() => !obj.PrevVal.Equals(obj.Val), () => new ActionVector3(obj));
         }
 
         public static void Build(ref int id, string name, ref Vector3 val)

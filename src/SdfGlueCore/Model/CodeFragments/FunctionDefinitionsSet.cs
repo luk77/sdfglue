@@ -34,22 +34,52 @@ namespace SdfGlueCore.Model.CodeFragments
         {
             string[] files = Directory.GetFiles(functionsDirectory, "*.xml", SearchOption.AllDirectories);
 
+            // Hot reload: a file which cannot be loaded now (e.g. caught in the middle of saving by a text editor,
+            // or with a typo) keeps its previously loaded version, so objects do not lose their definition.
+            Dictionary<string, FunctionDefinition> previousDefinitions = new Dictionary<string, FunctionDefinition>();
+            foreach(FunctionDefinition d in definitions_)
+            {
+                if (d.FilePath != null)
+                    previousDefinitions[d.FilePath] = d;
+            }
+
             definitions_    = new List<FunctionDefinition>();
             groups_         = new SortedDictionary<string, FunctionDefGroup>();
 
             int comboIndex = 0;
 
+            // functionName -> file path. Projects refer to definitions by functionName only (FindDefinitionByName),
+            // so a duplicate could never be selected reliably - it is skipped (the first loaded one is kept).
+            Dictionary<string, string> loadedNames = new Dictionary<string, string>();
+
             foreach(string filePath in files)
             {
-                XmlDocument xmlDoc = new XmlDocument();
                 try
                 {
-                    xmlDoc.Load(filePath);
+                    FunctionDefinition? def = LoadDefinition(filePath, out string? errorMessage);
+                    if (def == null)
+                    {
+                        if (previousDefinitions.TryGetValue(filePath, out FunctionDefinition? previousDef))
+                        {
+                            Console.WriteLine("WARNING: Cannot load function definition {0} ({1}). The previously loaded version is used.", filePath, errorMessage);
+                            def = previousDef;
+                        }
+                        else
+                        {
+                            Console.WriteLine("WARNING: Cannot load function definition {0} ({1}).", filePath, errorMessage);
+                            continue;
+                        }
+                    }
 
-                    FunctionDefinition def = new FunctionDefinition();
-                    bool success = def.Deserialize(xmlDoc);
-                    if (!success)
-                        continue;
+                    if (def.FunctionName != null)
+                    {
+                        if (loadedNames.TryGetValue(def.FunctionName, out string? firstFilePath))
+                        {
+                            Console.WriteLine("WARNING: Duplicated functionName \"{0}\" in {1} (already defined in {2}). The definition is ignored.", def.FunctionName, filePath, firstFilePath);
+                            continue;
+                        }
+                        loadedNames[def.FunctionName] = filePath;
+                    }
 
                     def.ComboIndex = comboIndex;
                     comboIndex++;
@@ -74,6 +104,32 @@ namespace SdfGlueCore.Model.CodeFragments
                 {
                     Console.WriteLine("WARNING: " + ex.ToString());
                 }
+            }
+        }
+
+        // Returns null (with the reason) if the file cannot be read or is not a valid definition
+        private static FunctionDefinition? LoadDefinition(string filePath, out string? errorMessage)
+        {
+            try
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(filePath);
+
+                FunctionDefinition def = new FunctionDefinition();
+                if (!def.Deserialize(xmlDoc))
+                {
+                    errorMessage = "missing FuncDef or Code node";
+                    return null;
+                }
+
+                def.FilePath = filePath;
+                errorMessage = null;
+                return def;
+            }
+            catch(Exception ex)
+            {
+                errorMessage = ex.Message;
+                return null;
             }
         }
 
@@ -126,11 +182,11 @@ namespace SdfGlueCore.Model.CodeFragments
             return null;
         }
 
-        public void CollectIncludeNames(Dictionary<string, string> includeNames)
+        public void CollectIncludeNames(Dictionary<string, string> includeNames, System.Text.StringBuilder sbErrors)
         {
             foreach(FunctionDefinition d in definitions_)
             {
-                d.CollectIncludeNames(includeNames);
+                d.CollectIncludeNames(includeNames, sbErrors);
             }
         }
     }
