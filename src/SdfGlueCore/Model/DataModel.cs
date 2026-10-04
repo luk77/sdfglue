@@ -131,6 +131,16 @@ namespace SdfGlueCore.Model
             return version;
         }
 
+        // Version for display (window title). CI builds set InformationalVersion, e.g. "1.1.6.12-pr9+a1b2c3d"
+        // for pull request builds; local builds fall back to the assembly version.
+        // Do not use it in saved files - GetAppVersion() is the numeric version stored in projects.
+        public static string GetAppDisplayVersion()
+        {
+            String? version = Assembly.GetExecutingAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+
+            return String.IsNullOrEmpty(version) ? GetAppVersion() : version;
+        }
+
         // definitionsSource: model whose function definitions are shared instead of being reloaded from disk
         // (e.g. a project loaded into a new model). Note: the undo stack is not cleared here - the model
         // may be a temporary one; the application clears it when the model becomes the current document.

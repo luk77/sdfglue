@@ -83,7 +83,7 @@ namespace SdfGlueEditor
             debugVersion = true;
 #endif
 
-            return String.Format("{0} v.{1} {2}", AppSettings.AppName, DataModel.GetAppVersion(), debugVersion ? " (debug)" : "");
+            return String.Format("{0} v.{1} {2}", AppSettings.AppName, DataModel.GetAppDisplayVersion(), debugVersion ? " (debug)" : "");
         }
 
         protected override string GetAppTitle()

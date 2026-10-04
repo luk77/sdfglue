@@ -1,6 +1,9 @@
 <Project>
   <PropertyGroup>
     <Version>1.1.6</Version>
+    <!-- Do not append "+<git commit hash>" to InformationalVersion (shown in the window title);
+         CI sets InformationalVersion explicitly for pull request builds -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <!-- Treat nullable reference type warnings (CS86xx) as errors -->
     <WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
   </PropertyGroup>
