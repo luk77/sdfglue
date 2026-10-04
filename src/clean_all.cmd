@@ -1,4 +1,4 @@
-SET "MSBUILD_EXE=C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
+SET "MSBUILD_EXE=C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe"
 SET "SOLUTION=SdfGlue.sln"
 
 :: Clean debug

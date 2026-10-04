@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <Version>1.1.5</Version>
+    <Version>1.1.6</Version>
     <!-- Treat nullable reference type warnings (CS86xx) as errors -->
     <WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
   </PropertyGroup>
