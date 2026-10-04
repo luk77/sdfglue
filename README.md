@@ -59,7 +59,7 @@ The project is heavily inspired by **Shadertoy** and the work of its community. 
 
 # Requirements
 - **Operating System**: Windows (tested on Windows 11)
-- **.NET:** .NET 8.0 SDK (Windows-only)  
+- **.NET:** .NET 10 Desktop Runtime to run, .NET 10 SDK to build (Windows-only)  
 - **Graphics API**: OpenGL 3.3 or higher
 - **GPU**: A graphics card with OpenGL 3.3 support (integrated GPUs may work, but were not extensively tested)
 
@@ -67,7 +67,7 @@ The project is heavily inspired by **Shadertoy** and the work of its community. 
 
 
 # Building from source
-To build the application, you need **Visual Studio 2022**.
+To build the application, you need **Visual Studio 2026** (or the .NET 10 SDK: ```dotnet build src/SdfGlue.sln```).
 
 Simply clone the repository, open the solution (```src/SdfGlue.sln```) in Visual Studio, and build it.
 
@@ -80,6 +80,13 @@ To automate the build and file copying process, you can use the provided script:
 To run the application directly from Visual Studio:
 - set **SdfGlueEditor** as the *Startup Project*
 - set the *Working Directory* for the **SdfGlueEditor** project to the ```bin/``` folder
+
+
+### Test builds for pull requests
+Every commit pushed to a pull request is built automatically (```.github/workflows/pr-build.yml```).
+The build is attached to the workflow run as a downloadable artifact, and a comment in the pull request links to the latest build
+(with a list of previous ones). The version in the window title identifies the build, e.g. ```1.1.6.12-pr9+a1b2c3d```
+(pull request number and commit). Downloading requires signing in to GitHub; artifacts expire after 14 days.
 
 
 # Credits
