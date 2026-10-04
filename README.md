@@ -82,6 +82,13 @@ To run the application directly from Visual Studio:
 - set the *Working Directory* for the **SdfGlueEditor** project to the ```bin/``` folder
 
 
+### Test builds for pull requests
+Every commit pushed to a pull request is built automatically (```.github/workflows/pr-build.yml```).
+The build is attached to the workflow run as a downloadable artifact, and a comment in the pull request links to the latest build
+(with a list of previous ones). The version in the window title identifies the build, e.g. ```1.1.6.12-pr9+a1b2c3d```
+(pull request number and commit). Downloading requires signing in to GitHub; artifacts expire after 14 days.
+
+
 # Credits
 **SdfGlue** is created and maintained by [Łukasz Lesicki](https://github.com/luk77).
 
