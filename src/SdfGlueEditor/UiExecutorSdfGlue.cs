@@ -6,6 +6,7 @@
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
+using SdfGlueCore.Model.DataNodes.Signals;
 using SdfGlueEditor.Application;
 using SdfGlueUi.Ui;
 using SingleDocAppFramework;
@@ -74,5 +75,10 @@ namespace SdfGlueEditor
         public void OnCutMaterial       (MaterialInstance? node)                            { hierarchy_.OnCutMaterial(node);                   }
         public void OnCopyMaterial      (MaterialInstance? node)                            { hierarchy_.OnCopyMaterial(node);                  }
         public void OnPasteMaterial     (TreeNode? selectedNode)                            { hierarchy_.OnPasteMaterial(selectedNode);         }
+
+        public void OnAddNewSignal      ()                                                  { hierarchy_.OnAddNewSignal();                      }
+        public void OnCutSignal         (SignalInstance? node)                              { hierarchy_.OnCutSignal(node);                     }
+        public void OnCopySignal        (SignalInstance? node)                              { hierarchy_.OnCopySignal(node);                    }
+        public void OnPasteSignal       (TreeNode? selectedNode)                            { hierarchy_.OnPasteSignal(selectedNode);           }
     }
 }

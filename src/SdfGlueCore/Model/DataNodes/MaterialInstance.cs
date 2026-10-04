@@ -28,6 +28,12 @@ namespace SdfGlueCore.Model.DataNodes
             MaterialProps.Definition  = definition;
         }
 
+        // A material with a parameter driven by a signal is always passed as a uniform (even if it is fixed)
+        public bool HasSignalBindings()
+        {
+            return Signals.SignalBinding.HasBoundParameters(MaterialProps.ParametersValues);
+        }
+
         internal string GetUniqueDisplayName()
         {
             return String.Format("[{0}] {1}", Id, Name.Val);

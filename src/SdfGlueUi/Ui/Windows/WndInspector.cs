@@ -20,7 +20,7 @@ using SingleDocAppCore.Model;
 
 namespace SdfGlueUi.Ui.Windows
 {
-    public class WndInspector : UiWindowSdfGlue
+    public partial class WndInspector : UiWindowSdfGlue
     {
         public override string Title => "Details";
 
@@ -97,7 +97,7 @@ namespace SdfGlueUi.Ui.Windows
                         UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Mix operator", selectedSdfNode.FunctionMixOp, GetModel().MixOpDefinitions);
                         BuildPropertiesForParameters(ref index, selectedSdfNode.FunctionMixOp);
 
-                        UiFloatWithSignal.Build(ref index, "Blending"      , selectedSdfNode.BlendFactor, 0.01f, LimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals);
+                        UiFloatWithSignal.Build(ref index, "Blending"      , selectedSdfNode.BlendFactor, 0.01f, LimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals, uiMgr.ActionsExecutor.OnRebuildShader);
                     }
                     EndNodePropertyGrid();
 
@@ -118,7 +118,7 @@ namespace SdfGlueUi.Ui.Windows
                                 // Material Id
                                 BuildPropertyMaterial(index++, "Material", selectedSdfNode);
 
-                                UiFloatWithSignal.Build(ref index, "Material Blending"      , selectedSdfNode.MaterialBlendFactor, 0.01f, LimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals);
+                                UiFloatWithSignal.Build(ref index, "Material Blending"      , selectedSdfNode.MaterialBlendFactor, 0.01f, LimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals, uiMgr.ActionsExecutor.OnRebuildShader);
 
                                 EndNodePropertyGrid();
                             }
@@ -273,18 +273,10 @@ namespace SdfGlueUi.Ui.Windows
                     EndNodePropertyGrid();
 
                 }
-                else if (selectedNode is SignalOscillator obj)
+                else if (selectedNode is SignalInstance signal)
                 {
-                    float firstColumnWidth = GetDefaultFirstColumnWidth();
-                    BeginNodePropertyGrid(firstColumnWidth);
-
                     int index = 0;
-                    UiFloat.Build(ref index, "Amplitude", obj.Amplitude   , 0.001f);
-                    UiFloat.Build(ref index, "Frequency", obj.Frequency   , 0.001f);
-                    UiFloat.Build(ref index, "Offset X" , obj.OffsetX     , 0.001f);
-                    UiFloat.Build(ref index, "Offset Y" , obj.OffsetY     , 0.001f);
-
-                    EndNodePropertyGrid();
+                    BuildEditorForSignal(ref index, signal);
                 }
                 else
                 {

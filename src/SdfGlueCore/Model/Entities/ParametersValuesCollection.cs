@@ -10,6 +10,7 @@ using System.Xml;
 using SingleDocAppCore.Model.DataNodes;
 using SdfGlueCore.Model.BaseTypes;
 using SdfGlueCore.Model.CodeFragments;
+using SdfGlueCore.Model.DataNodes.Signals;
 
 namespace SdfGlueCore.Model.Entities
 {
@@ -93,7 +94,9 @@ namespace SdfGlueCore.Model.Entities
                     {
                         float readVal = 0.0f;
                         XmlUtils.TryParseFloat(nodeParam.InnerText, ref readVal);
-                        this[paramKey] = new ExFloatWithSignal(readVal);
+                        ExFloatWithSignal exObj = new ExFloatWithSignal(readVal);
+                        SignalBinding.DeserializeBinding(nodeParam, exObj);
+                        this[paramKey] = exObj;
                     }
                     else if ((paramType == "int"))
                     {
@@ -136,6 +139,7 @@ namespace SdfGlueCore.Model.Entities
                     XmlElement nodeParam = XmlUtils.AddNodeFloat(xmlDoc, nodeParametersValues, "PValue"    , val.Val);
                     XmlUtils.AddAtributeString(nodeParam, "name", GetParameterName(keyVal.Key));
                     XmlUtils.AddAtributeString(nodeParam, "type", "float");
+                    SignalBinding.SerializeBinding(nodeParam, val);
                 }
                 else if (param.GetType() == typeof(ExInt))
                 {

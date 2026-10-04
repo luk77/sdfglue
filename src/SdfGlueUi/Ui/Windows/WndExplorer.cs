@@ -10,6 +10,7 @@ using SdfGlueUi.Ui.Components;
 using SdfGlueUi.Ui.Properties;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
+using SdfGlueCore.Model.DataNodes.Signals;
 using SingleDocAppCore.Model.DataNodes;
 using SingleDocAppFramework.Ui.Properties;
 
@@ -224,6 +225,42 @@ namespace SdfGlueUi.Ui.Windows
                     ImGui.EndPopup();
                 }
             }
+            else if (node is SignalsCollection)
+            {
+                if (ImGui.BeginPopupContextItem())
+                {
+                    if (ImGui.MenuItem("Add new signal"     , ""))
+                    {
+                        uiMgr.ActionsExecutor.OnAddNewSignal();
+
+                        ImGui.CloseCurrentPopup();
+                    }
+                    ImGui.Separator();
+                    if (ImGui.MenuItem("Paste"      , "CTRL+V"      ))  { pasteRequest_ = true; pasteActionSelectedNode_ = node; pasteAsChild_ = false; ImGui.CloseCurrentPopup(); }
+
+                    clickedNode = node;
+
+                    ImGui.EndPopup();
+                }
+            }
+            else if (node is SignalInstance)
+            {
+                if (ImGui.BeginPopupContextItem())
+                {
+                    if (ImGui.MenuItem("Delete"     , "DEL"         ))  { uiMgr.ActionsExecutor.OnDeleteNode           (node); ImGui.CloseCurrentPopup(); }
+                    ImGui.Separator();
+                    if (ImGui.MenuItem("Cut"        , "CTRL+X"      ))  { uiMgr.ActionsExecutor.OnCutSignal            (node as SignalInstance); ImGui.CloseCurrentPopup(); }
+                    if (ImGui.MenuItem("Copy"       , "CTRL+C"      ))  { uiMgr.ActionsExecutor.OnCopySignal           (node as SignalInstance); ImGui.CloseCurrentPopup(); }
+                    if (ImGui.MenuItem("Paste"      , "CTRL+V"      ))  { pasteRequest_ = true; pasteActionSelectedNode_ = node; pasteAsChild_ = false; ImGui.CloseCurrentPopup(); }
+                    ImGui.Separator();
+                    if (ImGui.MenuItem("Move up"    , "CTRL+UP"     ))  { uiMgr.ActionsExecutor.OnMoveNodeUp           (node); ImGui.CloseCurrentPopup(); }
+                    if (ImGui.MenuItem("Move down"  , "CTRL+DOWN"   ))  { uiMgr.ActionsExecutor.OnMoveNodeDown         (node); ImGui.CloseCurrentPopup(); }
+
+                    clickedNode = node;
+
+                    ImGui.EndPopup();
+                }
+            }
             //ImGui.PopID();
 
             if (ImGui.IsItemClicked())
@@ -361,6 +398,8 @@ namespace SdfGlueUi.Ui.Windows
                         uiMgr.ActionsExecutor.OnCutRenderPass(GetModel().SelectedNode as RenderPassData);
                     else if (GetModel().SelectedNode is MaterialInstance)
                         uiMgr.ActionsExecutor.OnCutMaterial(GetModel().SelectedNode as MaterialInstance);
+                    else if (GetModel().SelectedNode is SignalInstance)
+                        uiMgr.ActionsExecutor.OnCutSignal(GetModel().SelectedNode as SignalInstance);
                     else
                         uiMgr.ActionsExecutor.OnCutObject(GetModel().SelectedNode as SdfObject);
                 }
@@ -370,6 +409,8 @@ namespace SdfGlueUi.Ui.Windows
                         uiMgr.ActionsExecutor.OnCopyRenderPass(GetModel().SelectedNode as RenderPassData);
                     else if (GetModel().SelectedNode is MaterialInstance)
                         uiMgr.ActionsExecutor.OnCopyMaterial(GetModel().SelectedNode as MaterialInstance);
+                    else if (GetModel().SelectedNode is SignalInstance)
+                        uiMgr.ActionsExecutor.OnCopySignal(GetModel().SelectedNode as SignalInstance);
                     else
                         uiMgr.ActionsExecutor.OnCopyObject(GetModel().SelectedNode as SdfObject);
                 }
@@ -439,6 +480,12 @@ namespace SdfGlueUi.Ui.Windows
             if (selectedNode is MaterialInstance || selectedNode is MaterialsCollection)
             {
                 uiMgr.ActionsExecutor.OnPasteMaterial(selectedNode);
+            }
+
+            // Signal is pasted after the selected signal, or at the end when the signals node is selected
+            if (selectedNode is SignalInstance || selectedNode is SignalsCollection)
+            {
+                uiMgr.ActionsExecutor.OnPasteSignal(selectedNode);
             }
         }
     }

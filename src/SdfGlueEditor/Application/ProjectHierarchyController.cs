@@ -9,6 +9,7 @@ using SdfGlueCore.Model;
 using SingleDocAppCore.Model.BaseTypes;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
+using SdfGlueCore.Model.DataNodes.Signals;
 using SingleDocAppCore.UndoSystem;
 using SingleDocAppCore.UndoSystem.Actions;
 using SingleDocAppFramework.Platform;
@@ -415,6 +416,57 @@ namespace SdfGlueEditor.Application
             });
         }
 
+        public void OnAddNewSignal()
+        {
+            SignalInstance newSignal = GetModel().AddNewSignal("Signal " + GetModel().NextAvailableSignalId);
+            newSignal.ResetPrevVal();
+
+            GetModel().ImportantNodeToSelect = newSignal;
+
+            // undo/redo support
+            UndoManager.Instance.SaveAction(new ActionDelegates(
+                delegate
+                {
+                    // undo
+                    DeleteNodeInternal(newSignal);
+                },
+                delegate
+                {
+                    // redo
+                    GetModel().Signals.AddChild(newSignal);
+                }
+                ));
+        }
+
+        public void OnCopySignal(SignalInstance? node)
+        {
+            OnCopyNode(node);
+        }
+
+        public void OnCutSignal(SignalInstance? node)
+        {
+            OnCutNode(node);
+        }
+
+        // selectedNode: SignalInstance    - the signal is pasted right after it,
+        //               SignalsCollection - the signal is appended at the end
+        public void OnPasteSignal(TreeNode? selectedNode)
+        {
+            SignalsCollection signals = GetModel().Signals;
+
+            int? insertIndex = GetPasteIndexInCollection(signals, selectedNode);
+            if (insertIndex == null)
+                return;
+
+            // Parameters reference signals by id, so the pasted signal is a new one (new id)
+            OnPasteNode<SignalInstance>(signals, insertIndex.Value, "Signal",
+            delegate (TreeNode node)
+            {
+                node.Id = GetModel().NextAvailableSignalId;
+                GetModel().NextAvailableSignalId++;
+            });
+        }
+
         public void HandleDeleteNode()
         {
             TreeNode? node = GetModel().NodeToDelete;
@@ -483,7 +535,7 @@ namespace SdfGlueEditor.Application
                 return false;
 
             // Tylko wybrane typy węzłów można usuwać
-            if (!((node is SdfObject) || (node is MaterialInstance) || (node is RenderPassData)))
+            if (!((node is SdfObject) || (node is MaterialInstance) || (node is RenderPassData) || (node is SignalInstance)))
                 return false;
 
             // nie pozwalamy usunąć roota SDF

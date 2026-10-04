@@ -7,6 +7,7 @@ using SdfGlueCore.Model;
 using SingleDocAppCore.Model.BaseTypes;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
+using SdfGlueCore.Model.DataNodes.Signals;
 using SdfGlueCore.Model.Entities;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -473,7 +474,7 @@ namespace SdfGlueCore.Controller
 
                 foreach(MaterialInstance mat in GetModel().Materials.Children)
                 {
-                    bool isFixed = GetModel().ProjSettings.FixAllObjects.Val || mat.IsFixed.Val;
+                    bool isFixed = IsMaterialFixed(mat);
                     if (isFixed)
                         sb.AppendFormat (        "Material material_{0}      = Material( ", FormatInt(mat.Id));
                     else
@@ -501,7 +502,7 @@ namespace SdfGlueCore.Controller
             {
                 foreach(MaterialInstance mat in GetModel().Materials.Children)
                 {
-                    bool isFixed = GetModel().ProjSettings.FixAllObjects.Val || mat.IsFixed.Val;
+                    bool isFixed = IsMaterialFixed(mat);
                     if (isFixed)
                         sb.AppendLine(String.Format(        "Material material_{0};", FormatInt(mat.Id)));
                     else
@@ -516,7 +517,7 @@ namespace SdfGlueCore.Controller
                     // Nie można robić przypisań do uniformów,
                     // chyba że eksportujemy do Unity 
                     // (wtedy chcemy mieć wszystkie materiały)
-                    bool isFixed = GetModel().ProjSettings.FixAllObjects.Val || mat.IsFixed.Val;
+                    bool isFixed = IsMaterialFixed(mat);
                     if (!forUnity && !isFixed)
                         continue;
 
@@ -630,8 +631,19 @@ namespace SdfGlueCore.Controller
             return shaderSource;
         }
 
+        // Fixed material - generated with constant values (a material with a parameter driven by a signal is never fixed)
+        private bool IsMaterialFixed(MaterialInstance mat)
+        {
+            bool isFixed = GetModel().ProjSettings.FixAllObjects.Val || mat.IsFixed.Val;
+            return isFixed && !mat.HasSignalBindings();
+        }
+
         private static void AppendUniformCode(StringBuilder sb, bool isFixed, SdfParamType type, string paramName, ISimpleType paramVal, string? valuePrefix = null)
         {
+            // a parameter driven by a signal must stay a uniform, also in fixed objects
+            if (isFixed && SignalBinding.IsBound(paramVal))
+                isFixed = false;
+
             string paramType       = FunctionDefParameter.SdfTypeToString(type);
 
             string paramCurrValAsString = paramVal.FormatAsStringForUniform();
@@ -1060,6 +1072,10 @@ namespace SdfGlueCore.Controller
 
             CodeGenResult result = new CodeGenResult();
             unitySrc = ModifyFragShaderSource(sbErrors, unitySrc, result, true, renderPassData);
+
+            // signals are computed by the editor - the exported code gets the static values
+            if (GetModel().HasSignalBindings())
+                unitySrc = "// NOTE: parameters driven by signals are exported with their static values\n" + unitySrc;
 
             unitySrc = unitySrc.Replace("vec2", "float2");
             unitySrc = unitySrc.Replace("vec3", "float3");
