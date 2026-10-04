@@ -126,17 +126,17 @@ jobs:
         $changes = git log $range --no-merges --pretty=format:"- %s (%h)"
 
         $body = @(
-          "Release build"
-          "Version: ${{ steps.fullversion.outputs.version }}"
-          "Commit: ${{ github.sha }}"
-          ""
-          "## Changes since $(if ($prev) { $prev } else { 'the beginning' })"
-          ""
-        ) + $changes
+          "**Version**: ${{ steps.fullversion.outputs.version }}"
+          "**Commit**: ${{ github.sha }}"
+        )
         if ($prev) {
-          $body += ""
           $body += "**Full diff**: https://github.com/${{ github.repository }}/compare/$prev...$tag"
+        } else {
+          $body += "**Full history**: https://github.com/${{ github.repository }}/commits/$tag"
         }
+        $body += ""
+        $body += "**Changes**:"
+        $body += $changes
         $body | Out-File -Encoding utf8 release-notes.md
 
     # tagged release
