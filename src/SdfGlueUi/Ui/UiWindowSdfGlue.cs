@@ -132,7 +132,7 @@ namespace SdfGlueUi.Ui
                     //
                     //UiFloat.AddUndoHandler(param.DisplayName, exObj);
 
-                    UiFloatWithSignal.Build(ref index, displayName, exObj, param.ValSpeed, param.LimitsType, param.MinVal, param.MaxVal, param.EditInDegrees, GetModel().Signals);
+                    UiFloatWithSignal.Build(ref index, displayName, exObj, param.ValSpeed, param.LimitsType, param.MinVal, param.MaxVal, param.EditInDegrees, GetModel().Signals, ExecutorSdfGlue.OnRebuildShader);
                 }
                 else if (param.Type == SdfParamType.Int)
                 {

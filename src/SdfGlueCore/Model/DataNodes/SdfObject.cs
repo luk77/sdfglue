@@ -6,6 +6,7 @@
 using SdfGlueCore.Model.BaseTypes;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.Entities;
+using SdfGlueCore.Model.DataNodes.Signals;
 using SingleDocAppCore.Utils;
 using SingleDocAppCore.Model;
 using SingleDocAppCore.Model.BaseTypes;
@@ -111,6 +112,8 @@ namespace SdfGlueCore.Model.DataNodes
             XmlUtils.DeserializeFloat   (nodeThis, "MaterialId"             , ref MaterialId.Val            );
             XmlUtils.DeserializeFloat   (nodeThis, "MatBlendFactor"         , ref MaterialBlendFactor.Val   );
             XmlUtils.DeserializeFloat   (nodeThis, "BlendFactor"            , ref BlendFactor.Val           );
+            SignalBinding.DeserializeBinding(nodeThis.SelectSingleNode("MatBlendFactor")  , MaterialBlendFactor   );
+            SignalBinding.DeserializeBinding(nodeThis.SelectSingleNode("BlendFactor")     , BlendFactor           );
 
             FunctionSdf.Deserialize(nodeThis, this, model.SdfDefinitions);
 
@@ -173,8 +176,10 @@ namespace SdfGlueCore.Model.DataNodes
             XmlUtils.AddNodeBool    (xmlDoc, nodeThis, "UseInMaterialsFunction" , UseInMaterialsFunction.Val              );
             XmlUtils.AddNodeBool    (xmlDoc, nodeThis, "UseShape"               , UseShape.Val              );
             XmlUtils.AddNodeFloat   (xmlDoc, nodeThis, "MaterialId"             , MaterialId.Val            );
-            XmlUtils.AddNodeFloat   (xmlDoc, nodeThis, "MatBlendFactor"         , MaterialBlendFactor.Val   );
-            XmlUtils.AddNodeFloat   (xmlDoc, nodeThis, "BlendFactor"            , BlendFactor.Val           );
+            XmlElement nodeMatBlendFactor   = XmlUtils.AddNodeFloat   (xmlDoc, nodeThis, "MatBlendFactor"         , MaterialBlendFactor.Val   );
+            XmlElement nodeBlendFactor      = XmlUtils.AddNodeFloat   (xmlDoc, nodeThis, "BlendFactor"            , BlendFactor.Val           );
+            SignalBinding.SerializeBinding(nodeMatBlendFactor   , MaterialBlendFactor   );
+            SignalBinding.SerializeBinding(nodeBlendFactor      , BlendFactor           );
 
             FunctionSdf.Serialize(xmlDoc, nodeThis);
 

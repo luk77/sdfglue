@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 using ImGuiNET;
 using SdfGlueCore.Model.DataNodes;
+using SdfGlueCore.Model.DataNodes.Signals;
 using SingleDocAppCore.Model.DataNodes;
 using SingleDocAppFramework.Ui.Components;
 using SingleDocAppFramework.Ui.Menu;
@@ -65,6 +66,14 @@ namespace SdfGlueUi.Ui
                 if (ImGui.MenuItem("Cut", "CTRL+X", false, selectedMaterial != null))   { ExecutorSdfGlue.OnCutMaterial     (selectedMaterial); }
                 if (ImGui.MenuItem("Copy", "CTRL+C", false, selectedMaterial != null))  { ExecutorSdfGlue.OnCopyMaterial    (selectedMaterial); }
                 if (ImGui.MenuItem("Paste", "CTRL+V"))                                  { ExecutorSdfGlue.OnPasteMaterial   (selectedNode); }
+            }
+            else if (selectedNode is SignalInstance || selectedNode is SignalsCollection)
+            {
+                SignalInstance? selectedSignal = selectedNode as SignalInstance;
+
+                if (ImGui.MenuItem("Cut", "CTRL+X", false, selectedSignal != null))     { ExecutorSdfGlue.OnCutSignal       (selectedSignal); }
+                if (ImGui.MenuItem("Copy", "CTRL+C", false, selectedSignal != null))    { ExecutorSdfGlue.OnCopySignal      (selectedSignal); }
+                if (ImGui.MenuItem("Paste", "CTRL+V"))                                  { ExecutorSdfGlue.OnPasteSignal     (selectedNode); }
             }
             else
             {

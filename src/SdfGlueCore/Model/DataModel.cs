@@ -8,6 +8,7 @@ using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueCore.Model.DataNodes.Signals;
 using SdfGlueCore.Model.Entities;
+using SdfGlueCore.Model.BaseTypes;
 using SingleDocAppCore.Utils;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
@@ -231,13 +232,8 @@ namespace SdfGlueCore.Model
             RenderingSysData = new RenderingData(this);
             RenderingSysData.RefreshDefinitionReference(Renderers, BackdropsDefinitions, CameraControllers);
 
-            if (UseSignals)
-            {
-                Signals = new SignalsCollection();
-                AddNewSignal("Signal 1");
-                AddNewSignal("Signal 2");
-                AddNewSignal("Signal 3");
-            }
+            // Signals (the collection is always loaded and saved, but used only with UseSignals)
+            Signals = new SignalsCollection();
 
 
             CreateEmptyProjectHierarchy();
@@ -364,6 +360,24 @@ namespace SdfGlueCore.Model
                 CameraDat.Deserialize(nodeCamera);
             }
 
+            // signals
+            XmlNode? nodeSignals = nodeData.SelectSingleNode("Signals");
+            if (nodeSignals != null)
+            {
+                Signals = new SignalsCollection();
+                XmlUtils.DeserializeInt(nodeSignals, "NextAvailableSignalId", ref NextAvailableSignalId);
+                XmlNodeList? signalsList = nodeSignals.SelectNodes("Signal");
+                if (signalsList != null)
+                {
+                    foreach(XmlNode node in signalsList)
+                    {
+                        SignalInstance signal = new SignalInstance();
+                        if (signal.Deserialize(node, this))
+                            Signals.AddChild(signal);
+                    }
+                }
+            }
+
             // materials
             XmlNode? nodeMaterials = nodeData.SelectSingleNode("Materials");
             if (nodeMaterials != null)
@@ -438,6 +452,19 @@ namespace SdfGlueCore.Model
             foreach(MaterialInstance mat in Materials.Children)
             {
                 mat.Serialize(xmlDoc, nodeMaterials);
+            }
+
+            // signals (only if there are any - projects without signals do not change)
+            if (Signals.GetChildrenCount() > 0)
+            {
+                XmlNode nodeSignals = xmlDoc.CreateElement("Signals");
+                nodeData.AppendChild(nodeSignals);
+                XmlUtils.AddNodeInt(xmlDoc, nodeSignals, "NextAvailableSignalId", NextAvailableSignalId);
+                foreach(TreeNode node in Signals.Children)
+                {
+                    if (node is SignalInstance signal)
+                        signal.Serialize(xmlDoc, nodeSignals);
+                }
             }
 
             // sdf objects
@@ -542,12 +569,9 @@ namespace SdfGlueCore.Model
             });
         }
 
-        public SignalInstance? AddNewSignal(string name)
+        public SignalInstance AddNewSignal(string name)
         {
-            if (Signals == null)
-                return null;
-
-            SignalInstance newInst = new SignalOscillator();
+            SignalInstance newInst = new SignalInstance();
             newInst.Id           = NextAvailableSignalId;
             newInst.Name.Val     = name;
 
@@ -556,6 +580,91 @@ namespace SdfGlueCore.Model
             Signals.AddChild(newInst);
 
             return newInst;
+        }
+
+        public SignalInstance? FindSignal(int id)
+        {
+            return Signals.FindById(id);
+        }
+
+        // Calls the action for every float parameter which can be driven by a signal
+        // (objects, materials, render passes)
+        public void ForEachSignalBindableParameter(Action<ExFloatWithSignal> action)
+        {
+            void VisitEntity(FunctionEntity? entity)
+            {
+                if (entity == null)
+                    return;
+                foreach(ISimpleType val in entity.ParametersValues.Values)
+                {
+                    if (val is ExFloatWithSignal exObj)
+                        action(exObj);
+                }
+            }
+
+            void VisitOperators(OperatorsCollection? operators)
+            {
+                if (operators == null)
+                    return;
+                foreach(OperatorEntity op in operators.Operators)
+                    VisitEntity(op);
+            }
+
+            TreeNode.CallRecursive(SdfRoot, delegate(TreeNode node)
+            {
+                if (node is not SdfObject sdfObj)
+                    return;
+
+                action(sdfObj.BlendFactor);
+                action(sdfObj.MaterialBlendFactor);
+                VisitEntity(sdfObj.FunctionSdf);
+                VisitEntity(sdfObj.FunctionMixOp);
+                VisitOperators(sdfObj.PositionOperators);
+                VisitOperators(sdfObj.DistanceOperators);
+            });
+
+            foreach(TreeNode node in Materials.Children)
+            {
+                if (node is MaterialInstance mat)
+                    VisitEntity(mat.MaterialProps);
+            }
+
+            foreach(TreeNode node in RenderingSysData.Children)
+            {
+                if (node is not RenderPassData passData)
+                    continue;
+
+                VisitEntity(passData.RendererFunc);
+                VisitEntity(passData.BackdropFunc);
+                VisitOperators(passData.CameraOperators);
+            }
+        }
+
+        // Number of parameters bound to the signal
+        public int CountSignalUsers(int signalId)
+        {
+            int count = 0;
+            ForEachSignalBindableParameter(delegate(ExFloatWithSignal exObj)
+            {
+                if (exObj.SignalId == signalId)
+                    count++;
+            });
+            return count;
+        }
+
+        // True if any parameter is driven by a signal (and signals are enabled)
+        public bool HasSignalBindings()
+        {
+            if (!UseSignals)
+                return false;
+
+            bool found = false;
+            ForEachSignalBindableParameter(delegate(ExFloatWithSignal exObj)
+            {
+                if (exObj.SignalId != 0)
+                    found = true;
+            });
+            return found;
         }
 
         public RenderPassData? GetFinalRPass()
@@ -657,7 +766,7 @@ namespace SdfGlueCore.Model
             UpdateTime(deltaTime);
 
             if (UseSignals)
-                Signals?.Update(deltaTime);
+                Signals.Update(CurrentTime, deltaTime);
         }
 
         public override void ResetPrevVal()

@@ -17,6 +17,7 @@ using SdfGlueEditor.Utils;
 using SingleDocAppCore.Utils;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
+using SdfGlueCore.Model.DataNodes.Signals;
 using SdfGlueCore.Model.Entities;
 using System.Text;
 using OpenTK.Mathematics;
@@ -45,6 +46,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
         private     Vector3                     resolution_                     = new Vector3(0.0f, 0.0f, 1.0f);
         private     string                      pathShaderVert_;
         private     string                      pathShaderFrag_;
+        private     SignalsCollection?          signals_                        = null;     // signals of the model being rendered
 
         private readonly float[] vertices_ =
         {
@@ -329,6 +331,8 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
 
             shader_.Use();
 
+            signals_ = model.Signals;
+
             // Shadertoy compatible uniforms
             shader_.SetFloat("iTime", (float)model.CurrentTime);
             shader_.SetInt("iFrame", model.CurrentFrame);
@@ -361,8 +365,9 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             // Materials
             foreach(MaterialInstance mat in model.Materials.Children)
             {
+                // a material with a parameter driven by a signal is never fixed (see ShaderCodeGenerator)
                 bool isFixed = model.ProjSettings.FixAllObjects.Val || mat.IsFixed.Val;
-                if (isFixed)
+                if (isFixed && !mat.HasSignalBindings())
                     continue;
 
                 if (mat.MaterialProps.Definition == null)
@@ -437,13 +442,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
         {
             if (paramVal is ExFloatWithSignal exObjFS)
             {
-                float currVal = exObjFS.Val;
-                if (exObjFS.SignalRef != null)
-                {
-                    currVal = exObjFS.SignalRef.GetCurrentValue();
-                }
-
-                shader_.SetFloat(uniformName, currVal);
+                shader_.SetFloat(uniformName, SignalBinding.GetValue(exObjFS, signals_));
             }
             else if (paramVal is ExFloat exObjF)
             {

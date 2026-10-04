@@ -6,6 +6,7 @@
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
+using SdfGlueCore.Model.DataNodes.Signals;
 using SingleDocAppCore.Model.DataNodes;
 using SingleDocAppFramework.Ui;
 
@@ -43,5 +44,10 @@ namespace SdfGlueUi.Ui
         void OnCutMaterial          (MaterialInstance? node);
         void OnCopyMaterial         (MaterialInstance? node);
         void OnPasteMaterial        (TreeNode? selectedNode);
+
+        void OnAddNewSignal         ();
+        void OnCutSignal            (SignalInstance? node);
+        void OnCopySignal           (SignalInstance? node);
+        void OnPasteSignal          (TreeNode? selectedNode);
     }
 }
