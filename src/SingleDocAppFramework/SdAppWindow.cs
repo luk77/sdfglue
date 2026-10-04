@@ -10,6 +10,7 @@ using SingleDocAppFramework.Layouts;
 using SingleDocAppFramework.Platform;
 using SingleDocAppFramework.Rendering.OpenTk.ImGuiRendering;
 using SingleDocAppFramework.Ui;
+using SingleDocAppFramework.Ui.Styles;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml;
@@ -33,6 +34,7 @@ namespace SingleDocAppFramework
         private UserSettingsBase    userSettings_;
         private IPlatformServices   platform_;
         private float               dpiScaling_                 = 1.0f;
+        private string?             appliedUiStyle_             = null;     // UserSettings.UiStyle applied to ImGui
 
         // userSettings: UserSettingsBase or an application-specific derived class;
         // loaded here, so it is ready in the constructor of the derived window
@@ -268,6 +270,8 @@ namespace SingleDocAppFramework
 
             ImGui.GetIO().FontGlobalScale = GetWindowsScaling();
 
+            ApplyUiStyleIfChanged();
+
             if (IsApplicationFocused())
             {
                 uiMgr_.HandleInput((float)e.Time);
@@ -364,14 +368,8 @@ namespace SingleDocAppFramework
             if (appSettings_.EnableViewports)
                 io.ConfigFlags |= ImGuiConfigFlags.ViewportsEnable;     // This allows drag-out windows
 
-            ImGui.StyleColorsDark();
-
-            ImGuiStylePtr style = ImGui.GetStyle();
-            if ((io.ConfigFlags & ImGuiConfigFlags.ViewportsEnable) != 0)
-            {
-                style.WindowRounding = 0.0f;
-                style.Colors[(int)ImGuiCol.WindowBg].W = 1.0f;
-            }
+            appliedUiStyle_ = null;
+            ApplyUiStyleIfChanged();
 
             ImguiImplOpenTK4.Init(this);
             ImguiImplOpenGL3.Init();
@@ -388,6 +386,28 @@ namespace SingleDocAppFramework
 
             ImGui.LoadIniSettingsFromMemory(layoutData.ImguiLayoutSettingsTxt);
             uiMgr_.ApplyLayout(layoutData);
+        }
+
+        // UserSettings.UiStyle is checked every frame, so a style chosen in the settings window or the View menu
+        // takes effect immediately. Called outside ImGui.NewFrame() / ImGui.Render().
+        private void ApplyUiStyleIfChanged()
+        {
+            string styleName = userSettings_.UiStyle;
+            if (styleName == appliedUiStyle_)
+                return;
+
+            appliedUiStyle_ = styleName;
+
+            if (!UiStyles.Apply(styleName))
+                Console.WriteLine("WARNING: Unknown UI style: {0}, the default style is used", styleName);
+
+            // platform windows (viewports) must be opaque and look like OS windows
+            if ((ImGui.GetIO().ConfigFlags & ImGuiConfigFlags.ViewportsEnable) != 0)
+            {
+                ImGuiStylePtr style = ImGui.GetStyle();
+                style.WindowRounding = 0.0f;
+                style.Colors[(int)ImGuiCol.WindowBg].W = 1.0f;
+            }
         }
 
         // Layout remembered in the user settings, or the default one if it is not set or does not exist
