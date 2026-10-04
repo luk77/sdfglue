@@ -6,6 +6,7 @@
 using ImGuiNET;
 using SingleDocAppCore.Settings;
 using SingleDocAppFramework.Ui.Properties;
+using SingleDocAppFramework.Ui.Styles;
 
 namespace SingleDocAppFramework.Ui.Windows
 {
@@ -62,9 +63,22 @@ namespace SingleDocAppFramework.Ui.Windows
             if (ImGui.CollapsingHeader("User interface"))
             {
                 BeginPropertyGrid(firstColumnWidth);
+                BuildUiStyle(ref index);
                 BuildUiTextScaleFactor(ref index);
                 EndPropertyGrid();
             }
+        }
+
+        // Single property (without a section) - UI style (colors and sizes), applied immediately
+        protected void BuildUiStyle(ref int index)
+        {
+            string[] styleNames = UiStyles.GetStyleNames();
+            int styleIndex = Array.FindIndex(styleNames, n => String.Equals(n, UserSettings.UiStyle, StringComparison.OrdinalIgnoreCase));
+
+            UiComboBox.Build(ref index, "User interface style", styleNames, ref styleIndex);
+
+            if (styleIndex >= 0 && styleIndex < styleNames.Length)
+                UserSettings.UiStyle = styleNames[styleIndex];
         }
 
         // Single property (without a section) - for applications that place it in their own section

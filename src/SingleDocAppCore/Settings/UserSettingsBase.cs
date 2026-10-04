@@ -22,6 +22,7 @@ namespace SingleDocAppCore.Settings
         public  bool                    UseUpdateFrequencyLimit = true;
         public  int                     UpdateFrequencyLimit    = 60;
         public  string                  LayoutFile              = "";       // relative to the layouts directory, empty - application default
+        public  string                  UiStyle                 = "Dark";   // name of a style registered in the framework (UiStyles)
 
         // XML of the last loaded/saved state, used by IsModified()
         private string?                 lastSavedXml_           = null;
@@ -52,6 +53,7 @@ namespace SingleDocAppCore.Settings
             XmlUtils.AddNodeBool    (xmlDoc, node, "UseUpdateFrequencyLimit"    , UseUpdateFrequencyLimit   );
             XmlUtils.AddNodeInt     (xmlDoc, node, "UpdateFrequencyLimit"       , UpdateFrequencyLimit      );
             XmlUtils.AddNodeString  (xmlDoc, node, "LayoutFile"                 , LayoutFile                );
+            XmlUtils.AddNodeString  (xmlDoc, node, "UiStyle"                    , UiStyle                   );
         }
 
         // Missing nodes keep the current values (files saved by older versions stay valid)
@@ -68,6 +70,10 @@ namespace SingleDocAppCore.Settings
             string? layoutFile = LayoutFile;
             XmlUtils.DeserializeString  (parentNode, "LayoutFile"                 , ref layoutFile                );
             LayoutFile = layoutFile ?? "";
+
+            string? uiStyle = UiStyle;
+            XmlUtils.DeserializeString  (parentNode, "UiStyle"                    , ref uiStyle                   );
+            UiStyle = String.IsNullOrEmpty(uiStyle) ? UiStyle : uiStyle;
 
             return true;
         }

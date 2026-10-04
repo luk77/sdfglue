@@ -43,6 +43,7 @@ namespace SdfGlueUi.Ui.Windows
                 UiFloat.Build   (ref index, "Mouse wheel speed"                 , ref Settings.MouseWheelSpeed, 0.01f, 0.05f, 2.0f);
                 UiBool.Build    (ref index, "Use shift key to zoom"             , ref Settings.UseShiftKeyToZoom);
                 UiBool.Build    (ref index, "Use Alt+RMB for camera rotation"   , ref Settings.UseAltRmbForCameraRotation);
+                BuildUiStyle(ref index);
                 BuildUiTextScaleFactor(ref index);
 
                 EndPropertyGrid();

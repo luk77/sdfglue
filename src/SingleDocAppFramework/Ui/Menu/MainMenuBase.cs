@@ -1,6 +1,8 @@
 using ImGuiNET;
+using SingleDocAppCore.Settings;
 using SingleDocAppCore.UndoSystem;
 using SingleDocAppFramework.Ui.Components;
+using SingleDocAppFramework.Ui.Styles;
 
 namespace SingleDocAppFramework.Ui.Menu
 {
@@ -123,7 +125,25 @@ namespace SingleDocAppFramework.Ui.Menu
             }
 
             ImGui.Separator();
+            BuildStyleMenu();
+
             BuildViewMenuExtras();
+        }
+
+        // UI style (UserSettings.UiStyle, applied immediately; saved with the other user settings)
+        protected virtual void BuildStyleMenu()
+        {
+            if (!ImGui.BeginMenu("Style"))
+                return;
+
+            UserSettingsBase userSettings = Executor.GetUserSettings();
+            foreach(string styleName in UiStyles.GetStyleNames())
+            {
+                bool selected = String.Equals(styleName, userSettings.UiStyle, StringComparison.OrdinalIgnoreCase);
+                if (ImGui.MenuItem(styleName, "", selected))
+                    userSettings.UiStyle = styleName;
+            }
+            ImGui.EndMenu();
         }
 
         // Items after the windows list
