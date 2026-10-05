@@ -75,12 +75,17 @@ namespace SdfGlueCore.Model.DataNodes.Signals
 
             isEvaluating_ = true;
 
+            bool useRealTime = ctx.UseRealTime;
+            ctx.UseRealTime = Source.UsesRealTime;
+
             float val = Source.Evaluate(ctx);
             foreach(SignalOperator op in Operators)
             {
                 if (op.Enabled.Val)
                     val = op.Process(val, ctx);
             }
+
+            ctx.UseRealTime = useRealTime;
 
             if (!float.IsFinite(val))
                 val = 0.0f;

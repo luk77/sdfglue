@@ -31,7 +31,7 @@ namespace SdfGlueCore.Model.DataNodes.Signals
             new SignalTypeInfo("Time"           , "Time"            , () => new SignalSrcTime()         ),
             new SignalTypeInfo("Constant"       , "Constant"        , () => new SignalSrcConstant()     ),
             new SignalTypeInfo("Manual"         , "Manual"          , () => new SignalSrcManual()       ),
-            new SignalTypeInfo("MidiCC"         , "MIDI CC"         , () => new SignalSrcMidiCC()       ),
+            new SignalTypeInfo("InputChannel"   , "Input channel"   , () => new SignalSrcInputChannel() ),
             new SignalTypeInfo("SignalRef"      , "Other signal"    , () => new SignalSrcSignalRef()    ),
         };
 

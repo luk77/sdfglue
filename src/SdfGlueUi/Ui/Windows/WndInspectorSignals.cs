@@ -6,6 +6,7 @@
 using ImGuiNET;
 using SdfGlueCore.Model.DataNodes.Signals;
 using SdfGlueUi.Ui.Components;
+using SingleDocAppCore.Input;
 using SingleDocAppCore.Model.BaseTypes;
 using SingleDocAppCore.UndoSystem;
 using SingleDocAppCore.UndoSystem.Actions;
@@ -51,10 +52,10 @@ namespace SdfGlueUi.Ui.Windows
                 BuildSignalSourceType(ref index, signal);
                 BuildSignalElementParameters(ref index, signal.Source, signal);
 
-                if (signal.Source is SignalSrcMidiCC && SignalInputs.Provider == null)
+                if (signal.Source is SignalSrcInputChannel && Executor.GetInputSystem() == null)
                 {
                     ImGui.NextColumn();
-                    ImGui.TextDisabled("No MIDI input available (value = Min).");
+                    ImGui.TextDisabled("The input system is disabled (value = 0).");
                     ImGui.NextColumn();
                 }
                 EndNodePropertyGrid();
@@ -271,6 +272,11 @@ namespace SdfGlueUi.Ui.Windows
                         if (val is ExInt exRef)
                             BuildSignalRef(ref index, def.DisplayName, exRef, owner);
                         break;
+
+                    case SignalParamType.InputChannelRef:
+                        if (val is ExInt exChannel)
+                            BuildInputChannelRef(ref index, def.DisplayName, exChannel);
+                        break;
                 }
             }
         }
@@ -287,6 +293,38 @@ namespace SdfGlueUi.Ui.Windows
                 obj.Val = val;
                 UndoManager.Instance.SaveAction(new ActionInt(obj));
             }
+            ImGui.NextColumn();
+            ImGui.PopID();
+        }
+
+        // Combo with input channels (user data - SingleDocAppCore.Input), "(missing)" for an unknown id
+        private void BuildInputChannelRef(ref int index, string name, ExInt obj)
+        {
+            InputSystem? inputs = Executor.GetInputSystem();
+            InputChannel? current = inputs?.Channels.FindById(obj.Val);
+            string label = (current != null) ? current.GetLabel() : String.Format("(missing #{0})", obj.Val);
+
+            ImGui.PushID(index++);
+            ImGui.Text(name);
+            ImGui.NextColumn();
+            ImGui.SetNextItemWidth(-1);
+            if (ImGui.BeginCombo("##channel", label))
+            {
+                if (inputs != null)
+                {
+                    foreach(InputChannel channel in inputs.Channels.Channels)
+                    {
+                        if (ImGui.Selectable(channel.GetLabel(), channel.Id == obj.Val) && channel.Id != obj.Val)
+                        {
+                            obj.Val = channel.Id;
+                            UndoManager.Instance.SaveAction(new ActionInt(obj));
+                        }
+                    }
+                }
+                ImGui.EndCombo();
+            }
+            if (current != null && ImGui.IsItemHovered())
+                ImGui.SetTooltip("Input channels are edited in the \"Inputs\" window");
             ImGui.NextColumn();
             ImGui.PopID();
         }

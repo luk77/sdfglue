@@ -44,7 +44,10 @@ namespace SdfGlueUi.Ui
             RegisterWindow(new WndDiagnostics()         , null, false);
             RegisterWindow(new WndPlayback());
             if (DataModel.UseSignals)
+            {
                 RegisterWindow(new WndSignals()         , null, false);
+                RegisterWindow(new WndInputsSdfGlue()   , null, false);
+            }
         }
 
         // Typed access to the executor passed to the constructor

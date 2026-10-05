@@ -314,6 +314,18 @@ namespace SingleDocAppCore.Utils
             return val;
         }
 
+        public static int LoadAttributeAsInt(XmlNode node, string attributeName, int defaultValue)
+        {
+            XmlNode? attr = node.Attributes?.GetNamedItem(attributeName);
+            if (attr == null)
+                return defaultValue;
+
+            int val = defaultValue;
+            int.TryParse(attr.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out val);
+
+            return val;
+        }
+
         public static bool LoadAttributeAsBool(XmlNode node, string attributeName, bool defaultValue)
         {
             XmlNode? attr = node.Attributes?.GetNamedItem(attributeName);

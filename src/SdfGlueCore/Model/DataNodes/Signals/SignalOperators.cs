@@ -130,8 +130,9 @@ namespace SdfGlueCore.Model.DataNodes.Signals
 
         public override float Process(float val, SignalContext ctx)
         {
-            double dt = ctx.Time - lastTime_;
-            lastTime_ = ctx.Time;
+            double time = ctx.GetOperatorsTime();
+            double dt = time - lastTime_;
+            lastTime_ = time;
 
             if (!hasState_ || dt < 0.0 || dt > 1.0)
             {

@@ -7,12 +7,15 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using SdfGlueCore.Model;
+using SdfGlueCore.Model.DataNodes.Signals;
 using SdfGlueEditor.Application;
 using SdfGlueEditor.Rendering.SdfGlueRendering;
 using SdfGlueUi.Ui;
+using SingleDocAppCore.Input;
 using SingleDocAppFramework;
 using SingleDocAppFramework.Platform;
 using SingleDocAppFramework.Ui;
+using SingleDocAppMidiWin;
 using System.ComponentModel;
 using Keys = OpenTK.Windowing.GraphicsLibraryFramework.Keys;
 
@@ -61,6 +64,7 @@ namespace SdfGlueEditor
             settings.AppName            = "SDF Glue";
             settings.DocumentFileFilter = new FileFilter("Project files", "*.xml");
             settings.EnableDocking      = true;
+            settings.EnableInputSystem  = DataModel.UseSignals;     // input channels are used by signals only
             return settings;
         }
 
@@ -137,6 +141,40 @@ namespace SdfGlueEditor
             hierarchy_  = new ProjectHierarchyController(ctx_.RenderingSystem, ctx_.CodeGenerator);
 
             base.OnLoad();
+
+            // the input system is created in base.OnLoad() (only with SdAppSettings.EnableInputSystem)
+            if (Inputs != null)
+                SignalInputs.Provider = new InputSystemSignalProvider(Inputs);
+        }
+
+        // input system (only with DataModel.UseSignals)
+
+        protected override IEnumerable<IInputDevice> CreateInputDevices()
+        {
+            foreach(IInputDevice device in base.CreateInputDevices())
+                yield return device;
+            yield return new MidiInputDevice();
+        }
+
+        // 8 channels bound to the bottom row of the keyboard (not used by shortcuts)
+        protected override void InitDefaultInputChannels(InputChannelsCollection channels)
+        {
+            string[] keys = { "Z", "X", "C", "V", "B", "N", "M", "Comma" };
+            foreach(string key in keys)
+            {
+                InputChannel channel = channels.AddChannel();
+                channel.Bindings.Add(new InputBindingKey() { Key = key });
+            }
+        }
+
+        // camera movement in the preview (WASD, Q/E) and the full preview mode (F12)
+        protected override void RegisterReservedInputKeys(HashSet<string> reservedKeys)
+        {
+            base.RegisterReservedInputKeys(reservedKeys);
+
+            string[] keys = { "W", "A", "S", "D", "Q", "E", "F12" };
+            foreach(string key in keys)
+                reservedKeys.Add(key);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
