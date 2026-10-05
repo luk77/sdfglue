@@ -70,6 +70,14 @@ namespace SdfGlueCore.Model.DataNodes.Signals
             return def;
         }
 
+        protected SignalParamDef AddInputChannelRef(string name, string displayName, int defaultVal)
+        {
+            SignalParamDef def = new SignalParamDef(name, displayName, SignalParamType.InputChannelRef);
+            ParamDefs.Add(def);
+            Values[name] = new ExInt(defaultVal);
+            return def;
+        }
+
         public float GetFloat(string name)
         {
             if (Values.TryGetValue(name, out ISimpleType? val) && val is ExFloat exFloat)
@@ -180,6 +188,9 @@ namespace SdfGlueCore.Model.DataNodes.Signals
     public abstract class SignalSource : SignalElement
     {
         public abstract float Evaluate(SignalContext ctx);
+
+        // True for sources driven by real time inputs (not by the project time) - see SignalContext.UseRealTime
+        public virtual bool UsesRealTime => false;
     }
 
     public abstract class SignalOperator : SignalElement

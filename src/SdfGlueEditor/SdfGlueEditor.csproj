@@ -20,6 +20,7 @@
     <ProjectReference Include="..\SdfGlueUi\SdfGlueUi.csproj" />
     <ProjectReference Include="..\SingleDocAppFramework\SingleDocAppFramework.csproj" />
     <ProjectReference Include="..\SingleDocAppPlatformWin\SingleDocAppPlatformWin.csproj" />
+    <ProjectReference Include="..\SingleDocAppMidiWin\SingleDocAppMidiWin.csproj" />
   </ItemGroup>
 
 </Project>

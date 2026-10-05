@@ -14,6 +14,7 @@ namespace SdfGlueCore.Model.DataNodes.Signals
         Bool,           // stored as ExInt (0/1)
         Enum,           // stored as ExInt (index in EnumNames)
         SignalRef,      // stored as ExInt (id of another signal, 0 = none)
+        InputChannelRef,// stored as ExInt (id of an input channel - SingleDocAppCore.Input, 0 = none)
     }
 
     // Description of a single parameter of a signal source or operator (used by the UI and serialization)

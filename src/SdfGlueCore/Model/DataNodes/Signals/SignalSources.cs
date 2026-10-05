@@ -178,24 +178,22 @@ namespace SdfGlueCore.Model.DataNodes.Signals
         }
     }
 
-    // MIDI controller (CC) value mapped to min..max
-    public class SignalSrcMidiCC : SignalSource
+    // Value of an input channel (keyboard, gamepad, MIDI) - uses real time (see SignalSource.UsesRealTime)
+    public class SignalSrcInputChannel : SignalSource
     {
-        public SignalSrcMidiCC()
+        public SignalSrcInputChannel()
         {
-            AddInt  ("channel"      , "Channel"     , 1, LimitsType.MinMax, 1, 16);
-            AddInt  ("controller"   , "Controller (CC)", 1, LimitsType.MinMax, 0, 127);
-            AddFloat("min"          , "Min"         , 0.0f, 0.01f);
-            AddFloat("max"          , "Max"         , 1.0f, 0.01f);
+            AddInputChannelRef("channel", "Input channel", 1);
         }
+
+        public override bool UsesRealTime => true;
 
         public override float Evaluate(SignalContext ctx)
         {
-            float val01 = 0.0f;
+            float val = 0.0f;
             if (ctx.Inputs != null)
-                ctx.Inputs.TryGetMidiControllerValue(GetInt("channel"), GetInt("controller"), out val01);
-
-            return GetFloat("min") + (GetFloat("max") - GetFloat("min")) * val01;
+                ctx.Inputs.TryGetInputChannelValue(GetInt("channel"), out val);
+            return val;
         }
     }
 

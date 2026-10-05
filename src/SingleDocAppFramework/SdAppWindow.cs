@@ -4,6 +4,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using SingleDocAppCore.Input;
 using SingleDocAppCore.Settings;
 using SingleDocAppFramework.Input;
 using SingleDocAppFramework.Layouts;
@@ -35,6 +36,7 @@ namespace SingleDocAppFramework
         private IPlatformServices   platform_;
         private float               dpiScaling_                 = 1.0f;
         private string?             appliedUiStyle_             = null;     // UserSettings.UiStyle applied to ImGui
+        private InputSystem?        inputs_                     = null;     // only with SdAppSettings.EnableInputSystem
 
         // userSettings: UserSettingsBase or an application-specific derived class;
         // loaded here, so it is ready in the constructor of the derived window
@@ -54,6 +56,9 @@ namespace SingleDocAppFramework
         public UserSettingsBase         UserSettings    { get { return userSettings_; } }
         public IPlatformServices        Platform        { get { return platform_; } }
         public UiExecutorFrameworkBase  Executor        { get { return executor_; } }
+
+        // null if the input system is disabled (SdAppSettings.EnableInputSystem)
+        public InputSystem?             Inputs          { get { return inputs_; } }
 
         // User settings: defaults, then the file (if present). A missing file is created with defaults,
         // an invalid one is left untouched (defaults are used).
@@ -111,6 +116,8 @@ namespace SingleDocAppFramework
 
             ApplyUserSettings();
 
+            InitInputSystem();
+
             executor_          = CreateExecutor();
             uiMgr_              = CreateUiManager(executor_);
             uiMgr_.AppSettings  = appSettings_;
@@ -129,6 +136,70 @@ namespace SingleDocAppFramework
             RefreshWindowTitle();
 
             base.OnLoad();
+        }
+
+        //-------------------------------------------------------------------
+        // Optional input system (SdAppSettings.EnableInputSystem)
+        //-------------------------------------------------------------------
+
+        private void InitInputSystem()
+        {
+            if (!appSettings_.EnableInputSystem || inputs_ != null)
+                return;
+
+            inputs_ = new InputSystem(CreateInputDevices(), appSettings_.GetInputSettingsPath(), InitDefaultInputChannels);
+            RegisterReservedInputKeys(inputs_.ReservedKeys);
+            inputs_.Load();
+        }
+
+        // Input devices used by the input system. Override to add devices (e.g. MIDI) or to skip some of them.
+        protected virtual IEnumerable<IInputDevice> CreateInputDevices()
+        {
+            yield return new KeyboardInputDevice(this, IsKeyboardInputActive);
+            yield return new GamepadInputDevice();
+        }
+
+        // Keys are reported to input channels only when the application is focused, no ImGui text field
+        // is active and no shortcut modifier (Ctrl/Alt) is pressed
+        protected virtual bool IsKeyboardInputActive()
+        {
+            return imguiInitialized_ && IsApplicationFocused() && !ImGui.GetIO().WantTextInput && !IsDownAnyCtrl() && !IsDownAnyAlt();
+        }
+
+        // Default input channels (no input settings file, "Restore defaults")
+        protected virtual void InitDefaultInputChannels(InputChannelsCollection channels)
+        {
+        }
+
+        // Keys that can't be bound to input channels (UiKey names). Applications add their own shortcuts.
+        protected virtual void RegisterReservedInputKeys(HashSet<string> reservedKeys)
+        {
+            UiKey[] keys =
+            {
+                UiKey.Escape, UiKey.Enter, UiKey.KeyPadEnter, UiKey.Tab, UiKey.Space, UiKey.Backspace, UiKey.Delete,
+                UiKey.Up, UiKey.Down, UiKey.Left, UiKey.Right,
+                UiKey.LeftShift, UiKey.RightShift, UiKey.LeftControl, UiKey.RightControl,
+                UiKey.LeftAlt, UiKey.RightAlt, UiKey.LeftSuper, UiKey.RightSuper, UiKey.Menu,
+            };
+            foreach(UiKey key in keys)
+                reservedKeys.Add(key.ToString());
+        }
+
+        // Saves pending changes of the input channels and closes the devices
+        private void ShutdownInputSystem()
+        {
+            if (inputs_ == null)
+                return;
+
+            inputs_.Dispose();
+            inputs_ = null;
+        }
+
+        protected override void OnUnload()
+        {
+            ShutdownInputSystem();
+
+            base.OnUnload();
         }
 
         // Window title: "<app title><extra info>, <document name>[*]" (* - unsaved changes)
@@ -526,6 +597,9 @@ namespace SingleDocAppFramework
 
             HandleLayoutsSwitching();
 
+            // input channels are updated before the UI and the application logic of this frame
+            inputs_?.Update(e.Time);
+
             ImguiImplOpenGL3.NewFrame();
             ImguiImplOpenTK4.NewFrame();
             ImGui.NewFrame();
@@ -573,6 +647,7 @@ namespace SingleDocAppFramework
 
             base.OnClosing(e);
 
+            ShutdownInputSystem();
             ShutdownImGui();
         }
 
@@ -582,6 +657,7 @@ namespace SingleDocAppFramework
             if (!executor_.ConfirmDiscardChanges())
                 return;
 
+            ShutdownInputSystem();
             ShutdownImGui();
 
             Environment.Exit(0);

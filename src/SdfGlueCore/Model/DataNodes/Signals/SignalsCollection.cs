@@ -55,7 +55,7 @@ namespace SdfGlueCore.Model.DataNodes.Signals
                 if (node is not SignalInstance signal)
                     continue;
 
-                if (resetState)
+                if (resetState && !signal.Source.UsesRealTime)
                     signal.ResetState();
 
                 if (!signal.Enabled.Val)
@@ -64,6 +64,18 @@ namespace SdfGlueCore.Model.DataNodes.Signals
                 float val = signal.Evaluate(ctx_);
                 signal.History.Add((float)realTime_, val);
             }
+        }
+
+        // Signals with the "Input channel" source reading the given channel
+        public List<SignalInstance> FindInputChannelUsers(int channelId)
+        {
+            List<SignalInstance> users = new List<SignalInstance>();
+            foreach(TreeNode node in Children)
+            {
+                if (node is SignalInstance signal && signal.Source is SignalSrcInputChannel && signal.Source.GetInt("channel") == channelId)
+                    users.Add(signal);
+            }
+            return users;
         }
 
         public float GetRealTime()

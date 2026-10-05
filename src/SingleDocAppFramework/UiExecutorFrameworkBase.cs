@@ -1,3 +1,4 @@
+using SingleDocAppCore.Input;
 using SingleDocAppCore.Settings;
 using SingleDocAppCore.UndoSystem;
 using SingleDocAppFramework.Input;
@@ -92,6 +93,11 @@ namespace SingleDocAppFramework
         public virtual void OnRestoreDefaultUserSettings()
         {
             window_.RestoreDefaultUserSettings();
+        }
+
+        public InputSystem? GetInputSystem()
+        {
+            return window_.Inputs;
         }
 
         // application

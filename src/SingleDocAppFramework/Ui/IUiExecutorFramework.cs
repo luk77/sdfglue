@@ -1,3 +1,4 @@
+using SingleDocAppCore.Input;
 using SingleDocAppCore.Settings;
 using SingleDocAppFramework.Input;
 using SingleDocAppFramework.Layouts;
@@ -29,6 +30,9 @@ namespace SingleDocAppFramework.Ui
         UserSettingsBase GetUserSettings            ();
         void    OnSaveUserSettings                  ();
         void    OnRestoreDefaultUserSettings        ();     // in memory only
+
+        // optional input system (null if disabled - SdAppSettings.EnableInputSystem)
+        InputSystem? GetInputSystem                 ();
 
         // application
         void    OnExitApp           ();
