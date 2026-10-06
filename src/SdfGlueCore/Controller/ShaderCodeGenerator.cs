@@ -336,10 +336,7 @@ namespace SdfGlueCore.Controller
 
             StringBuilder sb = new StringBuilder(5000);
 
-            sb.AppendLine(String.Format("#define MAX_STEPS                ({0})", model_.MarchingMaxSteps.ToString(CultureInfo.InvariantCulture)));
-            sb.AppendLine(String.Format("#define MIN_DIST                 ({0})", model_.MarchingMinDist.ToString("F6", CultureInfo.InvariantCulture)));
-            sb.AppendLine(String.Format("#define MAX_DIST                 ({0})", model_.MarchingMaxDist.ToString("F6", CultureInfo.InvariantCulture)));
-
+            // Ray marching settings (MAX_STEPS, MIN_DIST, MAX_DIST) are compilation parameters of the renderers that use them.
             sb.AppendLine(String.Format("#define SDFG_VEC                 {0}", GetMainVectorType() ));
 
             // Compilation parameters
@@ -355,7 +352,9 @@ namespace SdfGlueCore.Controller
                     //object paramVal = renderPassData.RendererFunc.CompilationParametersValues[p.ParameterName].GetValueAsObject();
                     //int paramValAsInt = (int)paramVal;
                     ISimpleType? paramVal = renderPassData?.RendererFunc?.CompilationParametersValues[p.ParameterKey];
-                    sb.AppendLine(String.Format("#define {0}                  ({1})", p.ParameterName, paramVal?.FormatAsStringForUniform()));
+                    if (paramVal == null)
+                        continue;
+                    sb.AppendLine(String.Format("#define {0}                  ({1})", p.ParameterName, FormatCompilationParameter(p, paramVal)));
                 }
             }
 
@@ -364,6 +363,21 @@ namespace SdfGlueCore.Controller
             shaderSource = shaderSource.Replace(tag, generatedCode);
 
             return shaderSource;
+        }
+
+        // Value of a compilation parameter (#define). Toggles are always 0/1, combo indices are clamped to the options.
+        private static string FormatCompilationParameter(FunctionDefParameter param, ISimpleType paramVal)
+        {
+            if (paramVal is ExInt valInt)
+            {
+                if (param.EditorType == ParamEditorType.Toggle)
+                    return valInt.Val != 0 ? "1" : "0";
+
+                if ((param.EditorType == ParamEditorType.Combo) && (param.Options != null))
+                    return Math.Clamp(valInt.Val, 0, param.Options.Length - 1).ToString(CultureInfo.InvariantCulture);
+            }
+
+            return paramVal.FormatAsStringForUniform();
         }
 
         private bool IsCurrentShaderUsingMaterials()

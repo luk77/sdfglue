@@ -13,12 +13,13 @@ namespace SingleDocAppFramework.Ui.Properties
 {
     public class UiInt
     {
-        public static void AddUndoHandler(string name, ExInt obj)
+        // onEditFinished - called when an edit is finished (drag released, Enter, Tab, ...) and after undo/redo
+        public static void AddUndoHandler(string name, ExInt obj, OnValueChanged? onEditFinished = null)
         {
-            UndoEditTracker.HandleLastItem(() => !obj.PrevVal.Equals(obj.Val), () => new ActionInt(obj));
+            UndoEditTracker.HandleLastItem(() => !obj.PrevVal.Equals(obj.Val), () => new ActionInt(obj, onEditFinished), onEditFinished);
         }
 
-        public static void Build(ref int id, string name, ExInt obj, float speed, LimitsType limitsType, int minVal, int maxVal)
+        public static void Build(ref int id, string name, ExInt obj, float speed, LimitsType limitsType, int minVal, int maxVal, OnValueChanged? onEditFinished = null)
         {
             int valI = obj.Val;
 
@@ -42,7 +43,7 @@ namespace SingleDocAppFramework.Ui.Properties
 
             obj.Val = valI;
 
-            AddUndoHandler(name, obj);
+            AddUndoHandler(name, obj, onEditFinished);
         }
 
         public static void Build(ref int id, string name, ExInt obj, float speed)

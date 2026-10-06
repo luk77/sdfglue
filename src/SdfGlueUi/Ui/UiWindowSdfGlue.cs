@@ -38,16 +38,59 @@ namespace SdfGlueUi.Ui
             FunctionDefParametersCollection defParamsCollection     = functionEntity.Definition.CompilationParameters;
             ParametersValuesCollection      paramsValuesCollection  = functionEntity.CompilationParametersValues;
 
+            // Compilation parameters are #defines - changing them requires rebuilding the shader (onValueChanged).
+            // Checkboxes and combo boxes call it immediately, other editors after the edit is finished
+            // (drag released, Enter, Tab, ...), so the shader is not rebuilt in every frame while dragging.
+            // Signals are not supported (the values are constants of the shader).
             foreach(FunctionDefParameter param in defParamsCollection)
             {
                 if (param.ParameterName == null)
                     continue;
 
-                // compilation params ignore the type - it is always a checkbox
-                ExInt? exObj = paramsValuesCollection[param.ParameterKey] as ExInt;
-                if (exObj == null)
+                string displayName = param.DisplayName ?? param.ParameterName;
+
+                ISimpleType? paramVal;
+                if (!paramsValuesCollection.TryGetValue(param.ParameterKey, out paramVal))
                     continue;
-                UiBool.Build(index++, param.DisplayName ?? param.ParameterName, exObj, onValueChanged );
+
+                if ((param.Type == SdfParamType.Int) && (paramVal is ExInt exInt))
+                {
+                    if (param.EditorType == ParamEditorType.Toggle)
+                        UiBool.Build(index++, displayName, exInt, onValueChanged);
+                    else if ((param.EditorType == ParamEditorType.Combo) && (param.Options != null))
+                        UiComboBox.Build(ref index, displayName, param.Options, exInt, onValueChanged);
+                    else
+                        UiInt.Build(ref index, displayName, exInt, param.ValSpeed, param.LimitsType, (int)param.MinVal, (int)param.MaxVal, onValueChanged);
+                }
+                else if ((param.Type == SdfParamType.Float) && (paramVal is ExFloat exFloat))
+                {
+                    UiFloat.Build(ref index, displayName, exFloat, param.ValSpeed, param.LimitsType, param.MinVal, param.MaxVal, param.EditInDegrees, onValueChanged);
+                }
+                else if ((param.Type == SdfParamType.Vec2) && (paramVal is ExVector2 exVec2))
+                {
+                    UiVector2.Build(ref index, displayName, exVec2, param.ValSpeed, onValueChanged);
+                }
+                else if ((param.Type == SdfParamType.Vec3) && (paramVal is ExVector3 exVec3))
+                {
+                    if (param.EditorType == ParamEditorType.Color)
+                        UiColor3.Build(ref index, displayName, exVec3, onValueChanged);
+                    else
+                        UiVector3.Build(ref index, displayName, exVec3, param.ValSpeed, onValueChanged);
+                }
+                else if ((param.Type == SdfParamType.Vec4) && (paramVal is ExVector4 exVec4))
+                {
+                    UiVector4.Build(ref index, displayName, exVec4, param.ValSpeed, onValueChanged);
+                }
+                else
+                {
+                    ImGui.PushID(index++);
+                    ImGui.Text(displayName);
+                    ImGui.NextColumn();
+                    ImGui.SetNextItemWidth(-1);
+                    ImGui.Text("???");
+                    ImGui.NextColumn();
+                    ImGui.PopID();
+                }
             }
         }
 

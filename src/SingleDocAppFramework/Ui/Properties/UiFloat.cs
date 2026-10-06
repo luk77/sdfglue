@@ -14,9 +14,10 @@ namespace SingleDocAppFramework.Ui.Properties
 {
     public class UiFloat
     {
-        public static void AddUndoHandler(string name, ExFloat obj)
+        // onEditFinished - called when an edit is finished (drag released, Enter, Tab, ...) and after undo/redo
+        public static void AddUndoHandler(string name, ExFloat obj, OnValueChanged? onEditFinished = null)
         {
-            UndoEditTracker.HandleLastItem(() => !obj.PrevVal.Equals(obj.Val), () => new ActionFloat(obj));
+            UndoEditTracker.HandleLastItem(() => !obj.PrevVal.Equals(obj.Val), () => new ActionFloat(obj, onEditFinished), onEditFinished);
         }
 
         public static void Build(ref int id, string name, ExFloat obj, float speed, bool editInDegrees = false)
@@ -34,7 +35,7 @@ namespace SingleDocAppFramework.Ui.Properties
         //    Build(ref id, name, obj, speed, LimitsType.MinMax, minVal, maxVal);
         //}
 
-        public static void Build(ref int id, string name, ExFloat obj, float speed, LimitsType limitsType, float minVal, float maxVal, bool editInDegrees)
+        public static void Build(ref int id, string name, ExFloat obj, float speed, LimitsType limitsType, float minVal, float maxVal, bool editInDegrees, OnValueChanged? onEditFinished = null)
         {
             float valF = obj.Val;
             if (editInDegrees)
@@ -65,7 +66,7 @@ namespace SingleDocAppFramework.Ui.Properties
 
             obj.Val = valF;
 
-            AddUndoHandler(name, obj);
+            AddUndoHandler(name, obj, onEditFinished);
         }
 
         public static bool Build(ref int id, string name, ref float val, float speed)

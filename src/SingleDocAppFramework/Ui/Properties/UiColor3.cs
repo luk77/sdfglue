@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using ImGuiNET;
+using SingleDocAppCore.Model;
 using SingleDocAppCore.Model.BaseTypes;
 using SingleDocAppCore.UndoSystem;
 using SingleDocAppCore.UndoSystem.Actions;
@@ -13,10 +14,11 @@ namespace SingleDocAppFramework.Ui.Properties
 {
     public class UiColor3
     {
-        public static void Build(ref int id, string name, ExVector3 obj)
+        // onEditFinished - called when an edit is finished (drag released, Enter, color picker closed, ...) and after undo/redo
+        public static void Build(ref int id, string name, ExVector3 obj, OnValueChanged? onEditFinished = null)
         {
             Build(ref id, name, ref obj.Val);
-            UndoEditTracker.HandleLastItem(() => !obj.PrevVal.Equals(obj.Val), () => new ActionVector3(obj));
+            UndoEditTracker.HandleLastItem(() => !obj.PrevVal.Equals(obj.Val), () => new ActionVector3(obj, onEditFinished), onEditFinished);
         }
 
         public static void Build(ref int id, string name, ref Vector3 val)

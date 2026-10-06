@@ -79,11 +79,6 @@ namespace SdfGlueCore.Model
         // Camera (polar-style)
         public  CameraData              CameraDat               = new CameraData();
 
-        // Ray marching
-        public  int                     MarchingMaxSteps                = 100;
-        public  float                   MarchingMinDist                 = 0.01f;
-        public  float                   MarchingMaxDist                 = 50.0f;
-
         public  MaterialsCollection         Materials                   = new MaterialsCollection();
         public  SignalsCollection           Signals                     = new SignalsCollection();
 

@@ -8,6 +8,8 @@ namespace SdfGlueCore.Model.CodeFragments
     public enum ParamEditorType
     {
         Default,
-        Color
+        Color,          // vec3 edited as a color
+        Toggle,         // int edited as a checkbox (0/1)
+        Combo           // int edited as a combo box (index of one of FunctionDefParameter.Options)
     }
 }
