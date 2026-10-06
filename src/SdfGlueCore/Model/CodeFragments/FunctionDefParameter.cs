@@ -67,17 +67,17 @@ namespace SdfGlueCore.Model.CodeFragments
 
                 case SdfParamType.Vec2:
                     System.Numerics.Vector2 valV2 = XmlUtils.LoadAttributeAsVec2(node, "default", System.Numerics.Vector2.Zero);
-                    DefaultVal = new ExVector2(valV2);
+                    DefaultVal = new ExVector2WithSignal(valV2);
                     break;
 
                 case SdfParamType.Vec3:
                     System.Numerics.Vector3 valV3 = XmlUtils.LoadAttributeAsVec3(node, "default", System.Numerics.Vector3.Zero);
-                    DefaultVal = new ExVector3(valV3);
+                    DefaultVal = new ExVector3WithSignal(valV3);
                     break;
 
                 case SdfParamType.Vec4:
                     System.Numerics.Vector4 valV4 = XmlUtils.LoadAttributeAsVec4(node, "default", System.Numerics.Vector4.Zero);
-                    DefaultVal = new ExVector4(valV4);
+                    DefaultVal = new ExVector4WithSignal(valV4);
                     break;
             }
 

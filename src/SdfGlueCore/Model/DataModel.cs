@@ -587,9 +587,9 @@ namespace SdfGlueCore.Model
             return Signals.FindById(id);
         }
 
-        // Calls the action for every float parameter which can be driven by a signal
+        // Calls the action for every parameter (float or vector) which can be driven by signals
         // (objects, materials, render passes)
-        public void ForEachSignalBindableParameter(Action<ExFloatWithSignal> action)
+        public void ForEachSignalBindableParameter(Action<ISignalBindable> action)
         {
             void VisitEntity(FunctionEntity? entity)
             {
@@ -597,8 +597,8 @@ namespace SdfGlueCore.Model
                     return;
                 foreach(ISimpleType val in entity.ParametersValues.Values)
                 {
-                    if (val is ExFloatWithSignal exObj)
-                        action(exObj);
+                    if (val is ISignalBindable bindable)
+                        action(bindable);
                 }
             }
 
@@ -640,14 +640,17 @@ namespace SdfGlueCore.Model
             }
         }
 
-        // Number of parameters bound to the signal
+        // Number of parameter channels bound to the signal (a vector bound in X and Y counts twice)
         public int CountSignalUsers(int signalId)
         {
             int count = 0;
-            ForEachSignalBindableParameter(delegate(ExFloatWithSignal exObj)
+            ForEachSignalBindableParameter(delegate(ISignalBindable bindable)
             {
-                if (exObj.SignalId == signalId)
-                    count++;
+                for(int ch=0; ch<bindable.ChannelCount; ch++)
+                {
+                    if (bindable.GetSignalId(ch) == signalId)
+                        count++;
+                }
             });
             return count;
         }
@@ -659,10 +662,13 @@ namespace SdfGlueCore.Model
                 return false;
 
             bool found = false;
-            ForEachSignalBindableParameter(delegate(ExFloatWithSignal exObj)
+            ForEachSignalBindableParameter(delegate(ISignalBindable bindable)
             {
-                if (exObj.SignalId != 0)
-                    found = true;
+                for(int ch=0; ch<bindable.ChannelCount; ch++)
+                {
+                    if (bindable.GetSignalId(ch) != 0)
+                        found = true;
+                }
             });
             return found;
         }

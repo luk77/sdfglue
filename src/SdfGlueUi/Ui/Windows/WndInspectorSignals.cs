@@ -33,7 +33,7 @@ namespace SdfGlueUi.Ui.Windows
             UiString.Build          (ref index, "Name"      , signal.Name);
             UiBool.Build            (ref index, "Enabled"   , signal.Enabled);
             UiString.BuildReadonly  (ref index, "Value"     , signal.Enabled.Val ? signal.GetCurrentValue().ToString("0.####", CultureInfo.InvariantCulture) : "(disabled)");
-            UiString.BuildReadonly  (ref index, "Used by"   , String.Format("{0} parameter(s)", GetModel().CountSignalUsers(signal.Id)));
+            UiString.BuildReadonly  (ref index, "Used by"   , String.Format("{0} binding(s)", GetModel().CountSignalUsers(signal.Id)));
             EndNodePropertyGrid();
 
             // plot

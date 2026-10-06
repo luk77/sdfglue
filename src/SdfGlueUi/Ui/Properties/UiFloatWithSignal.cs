@@ -20,6 +20,7 @@ namespace SdfGlueUi.Ui.Properties
 {
     // Float editor with an optional binding to a signal (only with DataModel.UseSignals).
     // A bound parameter shows the signal (name, sparkline, current value) instead of the value editor.
+    // The binding helpers work on a single channel of ISignalBindable, so they are shared with UiVectorWithSignal.
     public class UiFloatWithSignal : UiFloat
     {
         // onBindingChanged - called after the binding is changed (also on undo/redo), e.g. to rebuild the shader
@@ -41,14 +42,14 @@ namespace SdfGlueUi.Ui.Properties
             {
                 objWithSignal = obj as ExFloatWithSignal;
                 if (objWithSignal != null)
-                    BuildBindingButton(ref id, name, objWithSignal, signals, onBindingChanged);
+                    BuildBindingButton(ref id, objWithSignal, 0, signals, onBindingChanged);
             }
 
             ImGui.SetNextItemWidth(-1);
 
             if (objWithSignal != null && objWithSignal.SignalId != 0 && signals != null)
             {
-                BuildBoundSignalInfo(ref id, objWithSignal, signals, editInDegrees);
+                BuildBoundSignalInfo(ref id, objWithSignal.SignalId, signals, obj.Val, editInDegrees);
             }
             else
             {
@@ -71,9 +72,11 @@ namespace SdfGlueUi.Ui.Properties
             ImGui.NextColumn();
         }
 
-        private static void BuildBindingButton(ref int id, string name, ExFloatWithSignal obj, SignalsCollection signals, OnValueChanged? onBindingChanged)
+        // "~" button with the menu of signals for a single channel (followed by SameLine)
+        internal static void BuildBindingButton(ref int id, ISignalBindable obj, int channel, SignalsCollection signals, OnValueChanged? onBindingChanged)
         {
-            bool isBound = obj.SignalId != 0;
+            int  signalId = obj.GetSignalId(channel);
+            bool isBound  = signalId != 0;
 
             ImGui.PushID(id++);
             if (isBound)
@@ -85,20 +88,20 @@ namespace SdfGlueUi.Ui.Properties
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("Drive the value by a signal");
 
-            if (MenuSignals.BuildPopup("menu_signal", signals, obj.SignalId, out int newSignalId))
-                SetBinding(obj, newSignalId, onBindingChanged);
+            if (MenuSignals.BuildPopup("menu_signal", signals, signalId, out int newSignalId))
+                SetBinding(obj, channel, newSignalId, onBindingChanged);
             ImGui.PopID();
 
             ImGui.SameLine();
         }
 
-        private static void SetBinding(ExFloatWithSignal obj, int newSignalId, OnValueChanged? onBindingChanged)
+        internal static void SetBinding(ISignalBindable obj, int channel, int newSignalId, OnValueChanged? onBindingChanged)
         {
-            int oldSignalId = obj.SignalId;
+            int oldSignalId = obj.GetSignalId(channel);
             if (oldSignalId == newSignalId)
                 return;
 
-            obj.SignalId = newSignalId;
+            obj.SetSignalId(channel, newSignalId);
             onBindingChanged?.Invoke();
 
             // undo/redo support
@@ -106,22 +109,23 @@ namespace SdfGlueUi.Ui.Properties
                 delegate
                 {
                     // undo
-                    obj.SignalId = oldSignalId;
+                    obj.SetSignalId(channel, oldSignalId);
                     onBindingChanged?.Invoke();
                 },
                 delegate
                 {
                     // redo
-                    obj.SignalId = newSignalId;
+                    obj.SetSignalId(channel, newSignalId);
                     onBindingChanged?.Invoke();
                 }
                 ));
         }
 
-        private static void BuildBoundSignalInfo(ref int id, ExFloatWithSignal obj, SignalsCollection signals, bool editInDegrees)
+        // Signal driving a channel: sparkline, name and current value (staticVal - used when the signal is disabled or missing)
+        internal static void BuildBoundSignalInfo(ref int id, int signalId, SignalsCollection signals, float staticVal, bool editInDegrees)
         {
-            SignalInstance? signal = signals.FindById(obj.SignalId);
-            string label = MenuSignals.GetSignalLabel(signals, obj.SignalId);
+            SignalInstance? signal = signals.FindById(signalId);
+            string label = MenuSignals.GetSignalLabel(signals, signalId);
 
             ImGui.PushID(id++);
             if (signal == null)
@@ -144,7 +148,7 @@ namespace SdfGlueUi.Ui.Properties
             {
                 ImGui.SetTooltip(String.Format(CultureInfo.InvariantCulture,
                     "Driven by signal: {0}\nStatic value: {1:0.###}{2}\n(used when the signal is disabled or missing, and in exported code)",
-                    label, editInDegrees ? obj.Val * GMath.RadToDeg : obj.Val, editInDegrees ? " deg (the signal value is in radians)" : ""));
+                    label, editInDegrees ? staticVal * GMath.RadToDeg : staticVal, editInDegrees ? " deg (the signal value is in radians)" : ""));
             }
             ImGui.PopID();
         }

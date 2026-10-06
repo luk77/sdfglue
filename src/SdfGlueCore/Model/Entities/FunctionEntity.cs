@@ -145,7 +145,8 @@ namespace SdfGlueCore.Model.Entities
         public bool SetParameterVec3(string paramName, System.Numerics.Vector3 paramVal, bool force = false)
         {
             string paramKey = ParametersValuesCollection.MakeKey(SdfParamType.Vec3, paramName);
-            return SetParameter<ExVector3, System.Numerics.Vector3>(ParametersValues, paramKey, paramVal, force);
+            //return SetParameter<ExVector3, System.Numerics.Vector3>(ParametersValues, paramKey, paramVal, force);
+            return SetParameter<ExVector3WithSignal, System.Numerics.Vector3>(ParametersValues, paramKey, paramVal, force);
         }
 
         public bool SetParameterFloat(string paramName, float paramVal, bool force = false)
