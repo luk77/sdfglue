@@ -530,15 +530,15 @@ namespace SdfGlueEditor.Application
 
         private bool CanDeleteNode(TreeNode node)
         {
-            // nie pozwalamy usunąć roota
+            // the root cannot be deleted
             if (node.Parent == null)
                 return false;
 
-            // Tylko wybrane typy węzłów można usuwać
+            // Only selected node types can be deleted
             if (!((node is SdfObject) || (node is MaterialInstance) || (node is RenderPassData) || (node is SignalInstance)))
                 return false;
 
-            // nie pozwalamy usunąć roota SDF
+            // the SDF root cannot be deleted
             if (node is SdfObject sdfObject)
             {
                 if (sdfObject.ParentAsSdf == null)
@@ -547,7 +547,7 @@ namespace SdfGlueEditor.Application
 
             if (node is MaterialInstance)
             {
-                // nie pozwalamy usunąć ostatniego materiału
+                // the last material cannot be deleted
                 if (GetModel().Materials.GetChildrenCount() <= 1)
                     return false;
             }

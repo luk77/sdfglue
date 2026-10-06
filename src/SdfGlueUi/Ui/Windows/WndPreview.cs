@@ -410,7 +410,7 @@ namespace SdfGlueUi.Ui.Windows
             float cX = clickedPosForShader_.X;
             float cY = clickedPosForShader_.Y;
 
-            // skalowanie robimy w każdej klatce, aby poprawnie obsłużyć zmianę rozdzielczości podglądu
+            // scale in every frame to correctly handle a change of the preview resolution
             mX *= resolution.X;
             mY *= resolution.Y;
             mY = resolution.Y - mY; // flip Y axis

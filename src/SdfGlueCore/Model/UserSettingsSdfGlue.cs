@@ -15,7 +15,7 @@ namespace SdfGlueCore.Model
     public class UserSettingsSdfGlue : UserSettingsBase
     {
         public  bool        EnableRendering                     = true;         // diagnostics only, not saved
-        public  bool        UseNamesAsIds                       = false;        // to ustawienie powoduje, że w shaderze zostaną użyte nazwy obiektów zamiast identyfikatorów liczbowych. Nazwy muszą być unikalne.
+        public  bool        UseNamesAsIds                       = false;        // when enabled, object names are used in the shader instead of numeric ids. Names must be unique.
         public  float       MouseCameraPanSpeed                 = 1.0f;
         public  float       MouseCameraRotationSpeedPitch       = 1.0f;
         public  float       MouseCameraRotationSpeedYaw         = 1.0f;
@@ -38,8 +38,8 @@ namespace SdfGlueCore.Model
         public List<IntCoords>          Resolutions             = new List<IntCoords>();
         public string[]                 ResolutionsAsStrings    = new string[1];
         public int                      CurrentResolutionIndex  = 0;
-        // to nie takie proste - przy pathtrace'ingu trzeba zakumulować więcej klatek
-        // a nie tylko zmienić rozdzielczość na jedną klatkę
+        // not that simple - path tracing needs more frames to be accumulated
+        // rather than just changing the resolution for a single frame
         //public int                      ExportImageResolutionIndex = 0;
 
         public bool                     PreviewLastSelectedPass = true;
@@ -75,7 +75,7 @@ namespace SdfGlueCore.Model
             Resolutions.Add(new IntCoords(512, 512));
             Resolutions.Add(new IntCoords(1024, 1024));
             Resolutions.Add(new IntCoords(2048, 2048));
-            //Resolutions.Add(new IntCoords(1920 * 2, 1080 * 2)); (to samo co niżej)
+            //Resolutions.Add(new IntCoords(1920 * 2, 1080 * 2)); (same as below)
             Resolutions.Add(new IntCoords(3840 , 2160));    // 4k (TV)  (4K UHD)
             Resolutions.Add(new IntCoords(4096 , 2160));    // 4k (movie) (DCI 4K)
 

@@ -24,7 +24,7 @@ namespace SdfGlueUi.Ui.Windows
                 BeginPropertyGrid(firstColumnWidth);
 
                 UiBool.Build(ref index, "Use names as identifiers", ref Settings.UseNamesAsIds);
-                //HelpMarker("To ustawienie powoduje, że w shaderze zostaną użyte nazwy obiektów zamiast identyfikatorów liczbowych.\nNazwy muszą być unikalne.");
+                //HelpMarker("When enabled, object names are used in the shader instead of numeric ids.\nNames must be unique.");
 
                 EndPropertyGrid();
             }

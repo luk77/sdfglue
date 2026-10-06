@@ -148,12 +148,12 @@ namespace SdfGlueCore.Controller
             int index = shaderSource.IndexOf(tag);
             if (index == -1)
             {
-                // TODO: ten error można przywrócić gdy będzie już sensowne przekazywanie do shadera
-                // które rzeczy ma zawierać a które nie.
-                // Obecnie ten error jest raportowany dla secondary pass'ów,
-                // które nie mają wielu z funkcjonalności primary pass'ów.
-                // Dodatkowym problemem jest generowanie kodu Unity,
-                // które jest wpięte na sztywno i używa swojego template'a (bez: __generated_call_init_materials__).
+                // TODO: this error can be restored once there is a sensible way to tell the shader
+                // which features it should contain and which not.
+                // Currently this error is reported for secondary passes,
+                // which do not have many of the features of primary passes.
+                // An additional problem is the Unity code generation,
+                // which is hardcoded and uses its own template (without: __generated_call_init_materials__).
                 //sbErrors.AppendLine(String.Format("Tag: '{0}' not found. Code modification not possible.", tag));
                 return -1;
             }
@@ -443,7 +443,7 @@ namespace SdfGlueCore.Controller
                 //}
             }
 
-            // Doklejamy polę "zaślepkę" aby uniknąć błędów kompilacji shadera (gdy struktura nie ma żadnych pól)
+            // Append a "dummy" field to avoid shader compilation errors (when the struct has no fields)
             if (materialDefinition.MaterialParameters.Count == 0)
             {
                 sb.AppendLine   (String.Format("    float dummy_param;"));
@@ -461,8 +461,8 @@ namespace SdfGlueCore.Controller
             sb.AppendLine   (""                             );
 
 
-            // Stare podejście - z użyciem konstruktorów struktur.
-            // Niestety nie działa w Unity
+            // Old approach - using struct constructors.
+            // Unfortunately it does not work in Unity
             if (useStructConstructors)
             {
                 sb.Append       ("//");
@@ -514,9 +514,9 @@ namespace SdfGlueCore.Controller
                 sb.AppendLine   ("{");
                 foreach(MaterialInstance mat in GetModel().Materials.Children)
                 {
-                    // Nie można robić przypisań do uniformów,
-                    // chyba że eksportujemy do Unity 
-                    // (wtedy chcemy mieć wszystkie materiały)
+                    // Assignments to uniforms are not allowed,
+                    // unless we export to Unity 
+                    // (then we want to have all materials)
                     bool isFixed = IsMaterialFixed(mat);
                     if (!forUnity && !isFixed)
                         continue;
@@ -552,7 +552,7 @@ namespace SdfGlueCore.Controller
                 if (p.Type == SdfParamType.Float)
                 {
                     sb.AppendLine   (String.Format("    mtOut.{0}     = mix         (mt1.{0}    , mt2.{0}    , blend);", p.ParameterName));
-                    // TODO: dodać różne rodzaje interpolacji wartości (np. smoothstep). Sprawdzone - działa:
+                    // TODO: add different kinds of value interpolation (e.g. smoothstep). Tested - works:
                     //sb.AppendLine   (String.Format("    mtOut.{0}     = mix         (mt1.{0}    , mt2.{0}    , smoothstep(0.0, 1.0, blend) );", p.ParameterName));
                 }
                 else if (p.Type == SdfParamType.Int)
@@ -565,7 +565,7 @@ namespace SdfGlueCore.Controller
                 }
                 else if (p.Type == SdfParamType.Vec3)
                 {
-                    // TODO: tymczasowo każdy vec3 traktujemy jako kolor
+                    // TODO: temporarily every vec3 is treated as a color
                     //sb.AppendLine   (String.Format("    mtOut.{0}     = mix         (mt1.{0}    , mt2.{0}    , blend);", p.ParameterName));
                     sb.AppendLine   (String.Format("    mtOut.{0}    = MIX_COLORS  (mt1.{0}   , mt2.{0}   , blend);", p.ParameterName));
                 }
@@ -721,8 +721,8 @@ namespace SdfGlueCore.Controller
                 if (sdfObj == null)
                     return;
 
-                // Większość uniform'ów jest współdzielona między funkcjami distance i material.
-                // Dla tego ich generowanie można pominąć tylko wtedy, gdy obie flagi są wyłączone.
+                // Most uniforms are shared between the distance and material functions.
+                // That is why generating them can be skipped only when both flags are disabled.
                 if (!sdfObj.CanBeUsedInDistanceFunction() && !sdfObj.CanBeUsedInMaterialsFunction())
                     return;
 
@@ -850,14 +850,14 @@ namespace SdfGlueCore.Controller
                 // distance operators
                 AppendFunctionsCallCodeForOperatorsCollection(sb, nodeId, "dist_", sdfObj.DistanceOperators.Operators);
 
-                // opakowanie w vec2, materiał
+                // wrap in vec2, material
                 if (isMaterialsBlendingFunction)
                 {
                     string materialObjectName = String.Format("material_{0}", (((int)sdfObj.MaterialId.Val)).ToString(CultureInfo.InvariantCulture));
 
-                    // Stare podejście - konstruktor struktury:
+                    // Old approach - struct constructor:
                     //sb.AppendLine(String.Format("    MaterialDesc   obj_{0}         = MaterialDesc(dist_{0}, g_obj_{0}_matId, {1});", nodeId, materialObjectName));
-                    // Bez konstruktora struktury:
+                    // Without struct constructor:
                     sb.AppendLine(String.Format("    MaterialDesc   obj_{0};"                   , nodeId));
                     sb.AppendLine(String.Format("    obj_{0}.distance    = dist_{0};"           , nodeId));
                     sb.AppendLine(String.Format("    obj_{0}.materialId  = g_obj_{0}_matId;"    , nodeId));
@@ -872,8 +872,8 @@ namespace SdfGlueCore.Controller
             sb.AppendLine("    // Mixing objects");
             sb.AppendLine("");
 
-            // Operator łączenia jest zawsze stosowany w stosunku do parenta.
-            // W związku z tym składanie obiektów musi się odbywać od najniższego poziomu w górę.
+            // The mix operator is always applied relative to the parent.
+            // Therefore objects must be combined from the lowest level upwards.
             TreeNode.CallRecursiveChildrenFirst(model_.SdfRoot, delegate(TreeNode node)
             {
                 SdfObject? sdfObj = node as SdfObject;
@@ -1090,7 +1090,7 @@ namespace SdfGlueCore.Controller
             unitySrc = unitySrc.Replace("float4(0.0)", "float4(0.0, 0.0, 0.0, 0.0)");
             unitySrc = unitySrc.Replace("float4(1.0)", "float4(1.0, 1.0, 1.0, 1.0)");
             //unitySrc = unitySrc.Replace("mix(", "lerp(");
-            unitySrc = unitySrc.Replace("mix", "lerp");     // bardziej ryzykownie
+            unitySrc = unitySrc.Replace("mix", "lerp");     // more risky
 
             return unitySrc;
         }

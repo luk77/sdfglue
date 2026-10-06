@@ -329,7 +329,7 @@ namespace SdfGlueCore.Model
             // the object tree must come from the file (see the check at the end)
             SdfRoot = null;
 
-            // TODO: na razie można tak zrobić - dopóki nie ma serializacji/deserializacji render passów
+            // TODO: good enough for now - as long as there is no serialization/deserialization of render passes
             RenderPassData? renderPassForMaterials = GetRenderPassForMaterials();
             if (renderPassForMaterials == null)
                 return false;
@@ -390,7 +390,7 @@ namespace SdfGlueCore.Model
                     {
                         MaterialInstance mat = new MaterialInstance();
 
-                        // od razu odświeżamy definicję - to jest potrzebne przy deserializacji
+                        // refresh the definition immediately - this is needed during deserialization
                         mat.MaterialProps.Definition = renderPassForMaterials?.RendererFunc?.Definition;
 
                         mat.Deserialize(node, this);
@@ -550,8 +550,8 @@ namespace SdfGlueCore.Model
             return newMat;
         }
 
-        // funkcja usuwa referencje na nieistniejące materiały
-        // (jest to potrzebne np. po usunięciu materiału, lub po załadowaniu starego pliku)
+        // removes references to non-existent materials
+        // (needed e.g. after a material is deleted or after an old file is loaded)
         // Objects referring to a non-existing material get the first material.
         // root - subtree to fix (e.g. a pasted object), null = whole SDF tree
         public void FixMaterialsReferences(TreeNode? root = null)
@@ -679,7 +679,7 @@ namespace SdfGlueCore.Model
             if (count == 0)
                 return null;
 
-            // iterujemy od końca, szukamy włączonego
+            // iterate from the end, look for an enabled one
             for(int i=count-1; i>=0; i--)
             {
                 RenderPassData? pass = RenderingSysData?.GetChildrenAt(i) as RenderPassData;
@@ -793,7 +793,7 @@ namespace SdfGlueCore.Model
             //if (!UseCustomMaterialProperties)
             //    return null;
 
-            // TODO: możliwe że do usprawnienia w przyszłości - na razie bazujemy na pierwszym znalezionym primary pass
+            // TODO: may be improved in the future - for now the first primary pass found is used
             RenderPassData? primRp = GetFirstPrimaryRPass();
             if (primRp == null)
                 return null;

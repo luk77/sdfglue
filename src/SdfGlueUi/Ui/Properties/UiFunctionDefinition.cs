@@ -54,7 +54,7 @@ namespace SdfGlueUi.Ui.Properties
                 }
                 else
                 {
-                    // To nigdy nie powinno wystąpić przy poprawnym zarządzaniu: ResetPrevVal()
+                    // This should never happen with correct handling: ResetPrevVal()
                     Console.WriteLine("WARNING: Undo unconsistency. functionEntity.DefinitionName = null for object: {0}", name);
                 }
                 actionsExec.OnRebuildShader(); 

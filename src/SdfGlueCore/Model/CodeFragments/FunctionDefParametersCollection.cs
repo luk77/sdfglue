@@ -29,21 +29,21 @@ namespace SdfGlueCore.Model.CodeFragments
                 if (p.ParameterName == null)
                     continue;
 
-                // Jesli już taki wpis występuje w słowniku to zostawiamy stare dane.
-                // Dzięki temu przy dynamicznej zmianie typu przejdzie parametr 'radius'.
-                // Klucz zawiera typ parametru ("float:radius"), więc zostawiona wartość ma zawsze zgodny typ.
+                // If such an entry already exists in the dictionary, keep the old data.
+                // Thanks to that, e.g. the 'radius' parameter is kept when the type is changed dynamically.
+                // The key contains the parameter type ("float:radius"), so a kept value always has a matching type.
                 if (parametersValues.ContainsKey(p.ParameterKey))
                 {
                     continue;
                 }
                 else
                 {
-                    // Jeśli w definicji występuje ten parametr, to z niej bierzemy default
+                    // If the definition contains this parameter, take the default from it
                     FunctionDefParameter? paramDef = FindParameterByKey(p.ParameterKey);
                     if (paramDef != null)
                     {
                         if (paramDef.DefaultVal == null)
-                            continue; // to raczej nigdy nie powinno wystąpić
+                            continue; // this should never happen
 
                         //switch(p.Type)
                         //{
@@ -55,8 +55,8 @@ namespace SdfGlueCore.Model.CodeFragments
                         //    //case SdfParamType.Bool:     parametersValues[p.ParameterKey] = (paramDef.DefaultVal != 0.0f); break;
                         //}
 
-                        // konwersja jest robiona wcześniej
-                        // tu musi być kopia obiektu wrappera, a nie przeniesienie referencji!
+                        // conversion is done earlier
+                        // this must be a copy of the wrapper object, not a copied reference!
                         parametersValues[p.ParameterKey] = paramDef.DefaultVal.Copy();
                     }
                     else

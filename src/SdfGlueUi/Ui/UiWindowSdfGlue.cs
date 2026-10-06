@@ -43,7 +43,7 @@ namespace SdfGlueUi.Ui
                 if (param.ParameterName == null)
                     continue;
 
-                // compilation params ignorują typ - to zawsze jest checkbox
+                // compilation params ignore the type - it is always a checkbox
                 ExInt? exObj = paramsValuesCollection[param.ParameterKey] as ExInt;
                 if (exObj == null)
                     continue;
@@ -90,7 +90,7 @@ namespace SdfGlueUi.Ui
 
 //                if (useCompilationParams)
 //                {
-//                    // compilation params ignorują typ - to zawsze jest checkbox
+//                    // compilation params ignore the type - it is always a checkbox
 //                    ExInt exObj = paramsValuesCollection[param.ParameterName] as ExInt;
 //                    UiBool.Build(index++, param.DisplayName, exObj, onValueChanged );
 //                }

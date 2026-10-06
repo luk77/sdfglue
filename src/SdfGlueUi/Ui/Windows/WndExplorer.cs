@@ -49,7 +49,7 @@ namespace SdfGlueUi.Ui.Windows
                 }
 
 
-                // zaznaczanie po kliknięciu
+                // select on click
                 TreeNode? nodeToSelect = clickedNode;
                 if (GetModel().ImportantNodeToSelect != null)
                 {

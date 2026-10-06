@@ -87,11 +87,11 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             //    }
             //}
 
-            // to jest clear całego okna (tło pod oknami ImGui)
+            // clear the whole window (background under the ImGui windows)
             GL.ClearColor(new Color4(0, 32, 48, 255));
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
 
-            // Ustawiamy viewport dla podglądu w oknie
+            // Set the viewport for the preview in the window
             IntCoords previewResolution = model.Config.GetPreviewResolution();
             GL.Viewport(0, 0, previewResolution.X, previewResolution.Y);
 
@@ -119,7 +119,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
                 prevEnabledPass = pass;
             }
 
-            // Przywracamy viewport dla całego ekranu (z wszystkimi oknami ImGui)
+            // Restore the viewport for the whole screen (with all ImGui windows)
             GL.Viewport(0, 0, appViewportWidth, appViewportHeight);
 
             //swFrame_.ElapsedMilliseconds;

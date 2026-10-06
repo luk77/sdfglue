@@ -18,7 +18,7 @@ namespace SdfGlueCore.Model.Entities
     {
         public  ExString                            DefinitionName = new ExString(null);
         private FunctionDefinition?                 definition_;
-        private string                              paramPrefix_;   // to jest prefix używany przy generowaniu kodu
+        private string                              paramPrefix_;   // prefix used in code generation
         public  ParametersValuesCollection          ParametersValues            = new ParametersValuesCollection();
         public  ParametersValuesCollection          CompilationParametersValues = new ParametersValuesCollection();
         //public  ParametersValuesCollection          MaterialParametersValues    = new ParametersValuesCollection();
@@ -65,8 +65,8 @@ namespace SdfGlueCore.Model.Entities
             if (Definition == null)
                 return;
 
-            // tu wyjątek dla MaterialEntity - w tym przypadku musimy podpiąć
-            // defaultowe parametry z innej listy w definicji
+            // exception for MaterialEntity - in this case we have to take
+            // the default parameters from another list in the definition
             if (this is MaterialEntity)
             {
                 ParametersValues            = Definition.GetDefaultMaterialParameters(ParametersValues);
@@ -87,7 +87,7 @@ namespace SdfGlueCore.Model.Entities
             if (definitions != null)
                 RefreshDefinitionReference(definitions);
 
-            // Ustawiamy defaultowe parametry
+            // Set default parameters
             RefreshDefaultParameters();
 
             // Compilation parameters values
@@ -166,7 +166,7 @@ namespace SdfGlueCore.Model.Entities
 //            return SetParameter<ExFloat, float>(MaterialParametersValues, paramId, paramVal, force);
 //        }
 
-        // Ta metoda to zło...
+        // This method is evil...
         private static bool SetParameter<TEx, TVal>(ParametersValuesCollection destCollection, string paramId, TVal paramVal, bool force) where TEx : ExSimpleType<TVal>, new() where TVal : struct
         {
             if (destCollection == null)
