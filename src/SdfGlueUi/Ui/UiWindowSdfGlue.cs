@@ -171,53 +171,21 @@ namespace SdfGlueUi.Ui
                     ExVector2? exObj = paramsValuesCollection[param.ParameterKey] as ExVector2;
                     if (exObj == null)
                         continue;
-                    Vector2 valV = exObj.Val;
-                    if (param.EditInDegrees)
-                        valV *= GMath.RadToDeg;
-                    UiVector2.Build(ref index, displayName, ref valV, param.ValSpeed);
-                    if (param.EditInDegrees)
-                        valV *= GMath.DegToRad;
-                    //paramsValuesCollection[param.ParameterName] = valV;
-                    exObj.Val =  valV;
-
-                    UiVector2.AddUndoHandler(displayName, exObj);
+                    UiVectorWithSignal.Build(ref index, displayName, exObj, param.ValSpeed, param.EditInDegrees, GetModel().Signals, ExecutorSdfGlue.OnRebuildShader);
                 }
                 else if (param.Type == SdfParamType.Vec3)
                 {
                     ExVector3? exObj = paramsValuesCollection[param.ParameterKey] as ExVector3;
                     if (exObj == null)
                         continue;
-                    Vector3 valV = exObj.Val;
-                    if (param.EditorType == ParamEditorType.Color)
-                        UiColor3.Build(ref index, displayName, ref valV);
-                    else
-                    {
-                        if (param.EditInDegrees)
-                            valV *= GMath.RadToDeg;
-                        UiVector3.Build(ref index, displayName, ref valV, param.ValSpeed);
-                        if (param.EditInDegrees)
-                            valV *= GMath.DegToRad;
-                    }
-                    //paramsValuesCollection[param.ParameterName] = valV;
-                    exObj.Val = valV;
-
-                    UiVector3.AddUndoHandler(displayName, exObj);
+                    UiVectorWithSignal.Build(ref index, displayName, exObj, param.ValSpeed, param.EditInDegrees, param.EditorType == ParamEditorType.Color, GetModel().Signals, ExecutorSdfGlue.OnRebuildShader);
                 }
                 else if (param.Type == SdfParamType.Vec4)
                 {
                     ExVector4? exObj = paramsValuesCollection[param.ParameterKey] as ExVector4;
                     if (exObj == null)
                         continue;
-                    Vector4 valV = exObj.Val;
-                    if (param.EditInDegrees)
-                        valV *= GMath.RadToDeg;
-                    UiVector4.Build(ref index, displayName, ref valV, param.ValSpeed);
-                    if (param.EditInDegrees)
-                        valV *= GMath.DegToRad;
-                    //paramsValuesCollection[param.ParameterName] = valV;
-                    exObj.Val = valV;
-
-                    UiVector4.AddUndoHandler(displayName, exObj);
+                    UiVectorWithSignal.Build(ref index, displayName, exObj, param.ValSpeed, param.EditInDegrees, GetModel().Signals, ExecutorSdfGlue.OnRebuildShader);
                 }
                 //else if (param.Type == SdfParamType.Bool)
                 //{

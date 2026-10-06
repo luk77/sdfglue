@@ -9,9 +9,13 @@ namespace SdfGlueCore.Model.BaseTypes
 {
     // Float parameter which can be driven by a signal (see SignalBinding).
     // The signal is referenced by Id (0 = none), so a deleted signal only leaves an unresolved binding.
-    public  class ExFloatWithSignal : ExFloat
+    public  class ExFloatWithSignal : ExFloat, ISignalBindable
     {
         public int SignalId = 0;
+
+        public int  ChannelCount                                => 1;
+        public int  GetSignalId(int channel)                    { return SignalId; }
+        public void SetSignalId(int channel, int signalId)      { SignalId = signalId; }
 
         public override ISimpleType Copy()
         {

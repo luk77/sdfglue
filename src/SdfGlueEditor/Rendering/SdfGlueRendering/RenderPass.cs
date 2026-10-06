@@ -452,6 +452,18 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             {
                 shader_.SetInt(uniformName, exObjI.Val);
             }
+            else if (paramVal is ExVector2WithSignal exObjV2S)
+            {
+                shader_.SetVector2(uniformName, MathUtils.ToGlVec2(SignalBinding.GetValue(exObjV2S, signals_)));
+            }
+            else if (paramVal is ExVector3WithSignal exObjV3S)
+            {
+                shader_.SetVector3(uniformName, MathUtils.ToGlVec3(SignalBinding.GetValue(exObjV3S, signals_)));
+            }
+            else if (paramVal is ExVector4WithSignal exObjV4S)
+            {
+                shader_.SetVector4(uniformName, MathUtils.ToGlVec4(SignalBinding.GetValue(exObjV4S, signals_)));
+            }
             else if (paramVal is ExVector2 exObjV2)
             {
                 shader_.SetVector2(uniformName, MathUtils.ToGlVec2(exObjV2.Val));

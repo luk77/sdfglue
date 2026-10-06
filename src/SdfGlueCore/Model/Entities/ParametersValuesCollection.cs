@@ -108,19 +108,25 @@ namespace SdfGlueCore.Model.Entities
                     {
                         System.Numerics.Vector2 readVal = System.Numerics.Vector2.Zero;
                         XmlUtils.TryParseVector2(nodeParam.InnerText, ref readVal);
-                        this[paramKey] = new ExVector2(readVal);
+                        ExVector2WithSignal exObj = new ExVector2WithSignal(readVal);
+                        SignalBinding.DeserializeBinding(nodeParam, exObj);
+                        this[paramKey] = exObj;
                     }
                     else if ((paramType == "vec3"))
                     {
                         System.Numerics.Vector3 readVal = System.Numerics.Vector3.Zero;
                         XmlUtils.TryParseVector3(nodeParam.InnerText, ref readVal);
-                        this[paramKey] = new ExVector3(readVal);
+                        ExVector3WithSignal exObj = new ExVector3WithSignal(readVal);
+                        SignalBinding.DeserializeBinding(nodeParam, exObj);
+                        this[paramKey] = exObj;
                     }
                     else if ((paramType == "vec4"))
                     {
                         System.Numerics.Vector4 readVal = System.Numerics.Vector4.Zero;
                         XmlUtils.TryParseVector4(nodeParam.InnerText, ref readVal);
-                        this[paramKey] = new ExVector4(readVal);
+                        ExVector4WithSignal exObj = new ExVector4WithSignal(readVal);
+                        SignalBinding.DeserializeBinding(nodeParam, exObj);
+                        this[paramKey] = exObj;
                     }
                 }
             }
@@ -148,26 +154,32 @@ namespace SdfGlueCore.Model.Entities
                     XmlUtils.AddAtributeString(nodeParam, "name", GetParameterName(keyVal.Key));
                     XmlUtils.AddAtributeString(nodeParam, "type", "int");
                 }
-                else if (param.GetType() == typeof(ExVector2))
+                else if (param.GetType() == typeof(ExVector2) ||
+                         param.GetType() == typeof(ExVector2WithSignal) )
                 {
                     ExVector2 val = (ExVector2)param;
                     XmlElement nodeParam = XmlUtils.AddNodeVector2(xmlDoc, nodeParametersValues, "PValue"    , val.Val);
                     XmlUtils.AddAtributeString(nodeParam, "name", GetParameterName(keyVal.Key));
                     XmlUtils.AddAtributeString(nodeParam, "type", "vec2");
+                    SignalBinding.SerializeBinding(nodeParam, val);
                 }
-                else if (param.GetType() == typeof(ExVector3))
+                else if (param.GetType() == typeof(ExVector3) ||
+                         param.GetType() == typeof(ExVector3WithSignal) )
                 {
                     ExVector3 val = (ExVector3)param;
                     XmlElement nodeParam = XmlUtils.AddNodeVector3(xmlDoc, nodeParametersValues, "PValue"    , val.Val);
                     XmlUtils.AddAtributeString(nodeParam, "name", GetParameterName(keyVal.Key));
                     XmlUtils.AddAtributeString(nodeParam, "type", "vec3");
+                    SignalBinding.SerializeBinding(nodeParam, val);
                 }
-                else if (param.GetType() == typeof(ExVector4))
+                else if (param.GetType() == typeof(ExVector4) ||
+                         param.GetType() == typeof(ExVector4WithSignal) )
                 {
                     ExVector4 val = (ExVector4)param;
                     XmlElement nodeParam = XmlUtils.AddNodeVector4(xmlDoc, nodeParametersValues, "PValue"    , val.Val);
                     XmlUtils.AddAtributeString(nodeParam, "name", GetParameterName(keyVal.Key));
                     XmlUtils.AddAtributeString(nodeParam, "type", "vec4");
+                    SignalBinding.SerializeBinding(nodeParam, val);
                 }
                 else
                 {

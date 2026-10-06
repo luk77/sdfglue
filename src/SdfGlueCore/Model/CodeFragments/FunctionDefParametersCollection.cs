@@ -65,9 +65,9 @@ namespace SdfGlueCore.Model.CodeFragments
                         {
                             case SdfParamType.Float:    parametersValues[p.ParameterKey] = new ExFloatWithSignal(0.0f); break;
                             case SdfParamType.Int:      parametersValues[p.ParameterKey] = new ExInt(0);      break;
-                            case SdfParamType.Vec2:     parametersValues[p.ParameterKey] = new ExVector2(System.Numerics.Vector2.Zero);      break;
-                            case SdfParamType.Vec3:     parametersValues[p.ParameterKey] = new ExVector3(System.Numerics.Vector3.Zero);      break;
-                            case SdfParamType.Vec4:     parametersValues[p.ParameterKey] = new ExVector4(System.Numerics.Vector4.Zero);      break;
+                            case SdfParamType.Vec2:     parametersValues[p.ParameterKey] = new ExVector2WithSignal(System.Numerics.Vector2.Zero);      break;
+                            case SdfParamType.Vec3:     parametersValues[p.ParameterKey] = new ExVector3WithSignal(System.Numerics.Vector3.Zero);      break;
+                            case SdfParamType.Vec4:     parametersValues[p.ParameterKey] = new ExVector4WithSignal(System.Numerics.Vector4.Zero);      break;
                             //case SdfParamType.Bool:     parametersValues[p.ParameterKey] = new ExBool(false); break;
                         }
                     }
