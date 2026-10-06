@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using ImGuiNET;
+using SingleDocAppCore.Model;
 using SingleDocAppCore.Model.BaseTypes;
 using SingleDocAppCore.UndoSystem;
 using SingleDocAppCore.UndoSystem.Actions;
@@ -13,15 +14,16 @@ namespace SingleDocAppFramework.Ui.Properties
 {
     public class UiVector4
     {
-        public static void AddUndoHandler(string name, ExVector4 obj)
+        // onEditFinished - called when an edit is finished (drag released, Enter, Tab, ...) and after undo/redo
+        public static void AddUndoHandler(string name, ExVector4 obj, OnValueChanged? onEditFinished = null)
         {
-            UndoEditTracker.HandleLastItem(() => !obj.PrevVal.Equals(obj.Val), () => new ActionVector4(obj));
+            UndoEditTracker.HandleLastItem(() => !obj.PrevVal.Equals(obj.Val), () => new ActionVector4(obj, onEditFinished), onEditFinished);
         }
 
-        public static void Build(ref int id, string name, ExVector4 obj, float speed)
+        public static void Build(ref int id, string name, ExVector4 obj, float speed, OnValueChanged? onEditFinished = null)
         {
             Build(ref id, name, ref obj.Val, speed);
-            AddUndoHandler(name, obj);
+            AddUndoHandler(name, obj, onEditFinished);
         }
 
         public static void Build(ref int id, string name, ref Vector4 val, float speed)

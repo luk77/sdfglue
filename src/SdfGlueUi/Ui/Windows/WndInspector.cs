@@ -139,19 +139,8 @@ namespace SdfGlueUi.Ui.Windows
                 }
                 else if (selectedNode is RenderingData)
                 {
-                    // Old "Scene Inspector" window
-                    float firstColumnWidth = GetDefaultFirstColumnWidth();
-
-                    if (ImGui.CollapsingHeader("Ray marching settings", ImGuiTreeNodeFlags.DefaultOpen))
-                    {
-                        BeginNodePropertyGrid(firstColumnWidth);
-
-                        UiInt   .Build(ref index, "Max number of steps"   , ref GetModel().MarchingMaxSteps  , 0.1f);
-                        UiFloat .Build(ref index, "Minimum distance"      , ref GetModel().MarchingMinDist   , 0.1f);
-                        UiFloat .Build(ref index, "Maximum distance"      , ref GetModel().MarchingMaxDist    , 0.1f);
-
-                        EndNodePropertyGrid();
-                    }
+                    // Ray marching settings (MAX_STEPS, MIN_DIST, MAX_DIST) are compilation parameters of the renderers
+                    ImGui.TextWrapped("Select a render pass to edit its settings. Ray marching settings (max. number of steps, distances) are compilation parameters of the pass renderer.");
                 }
                 else if (selectedNode is RenderPassData passData)
                 {

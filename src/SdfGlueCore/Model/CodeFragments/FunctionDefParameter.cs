@@ -29,6 +29,7 @@ namespace SdfGlueCore.Model.CodeFragments
         public          LimitsType                      LimitsType;
         public          bool                            EditInDegrees;
         public          ParamEditorType                 EditorType;
+        public          string[]?                       Options;                // names of the values for ParamEditorType.Combo (attribute 'options', separated by ';')
 
         // Key used in the parameter values dictionaries (ParametersValuesCollection), e.g. "vec3:radius".
         // It contains the type, so after changing the function of an entity a parameter with the same name,
@@ -89,12 +90,51 @@ namespace SdfGlueCore.Model.CodeFragments
             if (hasMax)
                 LimitsType = LimitsType.MinMax;
 
-            EditorType = ParamEditorType.Default;
-            string? strEditor = XmlUtils.LoadAttributeAsString(node, "editor", null);
-            if (!String.IsNullOrEmpty(strEditor) && strEditor.ToLower() == "color")
-                EditorType = ParamEditorType.Color;
+            EditorType = LoadEditorType(node);
 
             return true;
+        }
+
+        // Editor type for the 'editor' attribute. Unknown editors or editors not matching the type fall back to Default.
+        private ParamEditorType LoadEditorType(XmlNode node)
+        {
+            Options = null;
+
+            string? strEditor = XmlUtils.LoadAttributeAsString(node, "editor", null);
+            if (String.IsNullOrEmpty(strEditor))
+                return ParamEditorType.Default;
+
+            ParamEditorType     editorType;
+            SdfParamType        requiredType;
+            switch (strEditor.ToLower())
+            {
+                case "color":   editorType = ParamEditorType.Color;     requiredType = SdfParamType.Vec3;   break;
+                case "toggle":  editorType = ParamEditorType.Toggle;    requiredType = SdfParamType.Int;    break;
+                case "combo":   editorType = ParamEditorType.Combo;     requiredType = SdfParamType.Int;    break;
+                default:
+                    Console.WriteLine("WARNING: Unknown parameter editor '{0}'. Parameter name:{1}", strEditor, ParameterName);
+                    return ParamEditorType.Default;
+            }
+
+            if (Type != requiredType)
+            {
+                Console.WriteLine("WARNING: Parameter editor '{0}' requires type '{1}'. Parameter name:{2}", strEditor, SdfTypeToString(requiredType), ParameterName);
+                return ParamEditorType.Default;
+            }
+
+            if (editorType == ParamEditorType.Combo)
+            {
+                string strOptions = XmlUtils.LoadAttributeAsString(node, "options", null) ?? "";
+                string[] options = strOptions.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (options.Length == 0)
+                {
+                    Console.WriteLine("WARNING: Parameter editor 'combo' requires the 'options' attribute. Parameter name:{0}", ParameterName);
+                    return ParamEditorType.Default;
+                }
+                Options = options;
+            }
+
+            return editorType;
         }
 
         private static SdfParamType LoadParameterType(XmlNode node, string attributeName)

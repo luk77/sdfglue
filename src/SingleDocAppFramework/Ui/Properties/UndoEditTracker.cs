@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using ImGuiNET;
+using SingleDocAppCore.Model;
 using SingleDocAppCore.UndoSystem;
 
 namespace SingleDocAppFramework.Ui.Properties
@@ -13,16 +14,20 @@ namespace SingleDocAppFramework.Ui.Properties
     // If the widget disappears while it is being edited (e.g. another node is selected while typing a name),
     // ImGui never reports its deactivation - then EndFrame() saves the action, so the edit is undoable
     // and the document is marked as modified.
+    // The optional onEditFinished callback is called together with saving the action - once per finished edit
+    // (e.g. to rebuild something expensive only after a drag is released or Enter/Tab is pressed, not in every frame).
     public static class UndoEditTracker
     {
         private static uint                     pendingItemId_          = 0;
         private static Func<bool>?              pendingIsChanged_       = null;
         private static Func<UndoAction>?        pendingCreateAction_    = null;
+        private static OnValueChanged?          pendingOnEditFinished_  = null;
         private static bool                     pendingSubmitted_       = false;    // the pending widget was submitted in this frame
 
-        // isChanged    - true if the value differs from the one stored for undo (PrevVal)
-        // createAction - creates the undo action (and resets PrevVal)
-        public static void HandleLastItem(Func<bool> isChanged, Func<UndoAction> createAction)
+        // isChanged        - true if the value differs from the one stored for undo (PrevVal)
+        // createAction     - creates the undo action (and resets PrevVal)
+        // onEditFinished   - optional, called after the action is saved
+        public static void HandleLastItem(Func<bool> isChanged, Func<UndoAction> createAction, OnValueChanged? onEditFinished = null)
         {
             uint itemId = ImGui.GetItemID();
 
@@ -31,6 +36,7 @@ namespace SingleDocAppFramework.Ui.Properties
                 pendingItemId_          = itemId;
                 pendingIsChanged_       = isChanged;
                 pendingCreateAction_    = createAction;
+                pendingOnEditFinished_  = onEditFinished;
             }
 
             bool isPendingItem = pendingCreateAction_ != null && itemId == pendingItemId_;
@@ -42,6 +48,8 @@ namespace SingleDocAppFramework.Ui.Properties
                 UndoManager.Instance.SaveAction(createAction());
                 if (isPendingItem)
                     ClearPending();
+                if (onEditFinished != null)
+                    onEditFinished();
             }
             else if (isPendingItem && ImGui.IsItemDeactivated())
             {
@@ -58,9 +66,15 @@ namespace SingleDocAppFramework.Ui.Properties
             if (!pendingSubmitted_)
             {
                 // the edited widget was not submitted in this frame - its deactivation will never be reported
+                OnValueChanged? onEditFinished = null;
                 if (pendingIsChanged_ != null && pendingIsChanged_())
+                {
                     UndoManager.Instance.SaveAction(pendingCreateAction_());
+                    onEditFinished = pendingOnEditFinished_;
+                }
                 ClearPending();
+                if (onEditFinished != null)
+                    onEditFinished();
                 return;
             }
 
@@ -72,6 +86,7 @@ namespace SingleDocAppFramework.Ui.Properties
             pendingItemId_          = 0;
             pendingIsChanged_       = null;
             pendingCreateAction_    = null;
+            pendingOnEditFinished_  = null;
             pendingSubmitted_       = false;
         }
     }
