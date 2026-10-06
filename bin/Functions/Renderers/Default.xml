@@ -1,29 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FuncDef displayName="Default" functionName="Default">
 <CompilationParameters>
-    <Param type="int" displayName="Use fog"                     parameterName="USE_FOG"                     default="1"/>
-    <Param type="int" displayName="Use point light 1"           parameterName="USE_POINT_LIGHT_1"           default="0"/>
-    <Param type="int" displayName="Use point light 2"           parameterName="USE_POINT_LIGHT_2"           default="0"/>
-    <Param type="int" displayName="Use directional light 1"     parameterName="USE_DIR_LIGHT_1"             default="1"/>
-    <Param type="int" displayName="Use directional light 2"     parameterName="USE_DIR_LIGHT_2"             default="1"/>
-    <Param type="int" displayName="Use rim light"               parameterName="USE_RIM_LIGHT"               default="1"/>
-    <Param type="int" displayName="Use materials cell-variations" parameterName="USE_MATERIAL_CELL_VARIATIONS" default="1"/>
-    <Param type="int" displayName="Use shadows"                 parameterName="USE_SHADOWS"                 default="1"/>
-    <Param type="int" displayName="Use reflections"             parameterName="USE_REFLECTIONS"             default="0"/>
-    <Param type="int" displayName="Use fresnel"                 parameterName="USE_FRESNEL"                 default="0"/>
-    <Param type="int" displayName="Use tone mapping"            parameterName="USE_TONE_MAPPING"            default="1"/>
-    <Param type="int" displayName="Use vignette"                parameterName="USE_VIGNETTE"                default="1"/>
-    <Param type="int" displayName="Use Blinn-Phong"             parameterName="USE_BLINN_PHONG"             default="0"/>
-    <Param type="int" displayName="Prevent back side lighting"  parameterName="PREVENT_BACK_LIGHTING"       default="1"/>
-    <Param type="int" displayName="Use dithering"               parameterName="USE_DITHERING"               default="1"/>
-    <Param type="int" displayName="Use outline"                 parameterName="USE_OUTLINE"                 default="0"/>
-    <Param type="int" displayName="Use tempotal camera blur"    parameterName="TEMPORAL_CAMERA_BLUR"        default="0"/>
-    <Param type="int" displayName="Use camera safe area"        parameterName="USE_CAMERA_SAFE_AREA"        default="0"/>
-    <Param type="int" displayName="Output depth as alpha"       parameterName="DEPTH_AS_ALPHA"              default="0"/>
-    <Param type="int" displayName="Reflect background color"    parameterName="REFLECT_BG_COLOR"            default="0"/>
-    <Param type="int" displayName="DEBUG: Show normals"         parameterName="DEBUG_NORMALS"               default="0"/>
-    <Param type="int" displayName="DEBUG: Show depth"           parameterName="DEBUG_DEPTH"                 default="0"/>
-    <Param type="int" displayName="DEBUG: Show shadows"         parameterName="DEBUG_SHADOWS"               default="0"/>
+    <Param type="int"   displayName="Max number of steps"         parameterName="MAX_STEPS"                   default="100"   min="1"     max="10000"     speed="0.1"/>
+    <Param type="float" displayName="Minimum distance"            parameterName="MIN_DIST"                    default="0.01"  min="0.0"   max="1.0"       speed="0.0001"/>
+    <Param type="float" displayName="Maximum distance"            parameterName="MAX_DIST"                    default="50.0"  min="0.0"   max="100000.0"  speed="0.1"/>
+    <Param type="int" editor="toggle" displayName="Use fog"                     parameterName="USE_FOG"                     default="1"/>
+    <Param type="int" editor="toggle" displayName="Use point light 1"           parameterName="USE_POINT_LIGHT_1"           default="0"/>
+    <Param type="int" editor="toggle" displayName="Use point light 2"           parameterName="USE_POINT_LIGHT_2"           default="0"/>
+    <Param type="int" editor="toggle" displayName="Use directional light 1"     parameterName="USE_DIR_LIGHT_1"             default="1"/>
+    <Param type="int" editor="toggle" displayName="Use directional light 2"     parameterName="USE_DIR_LIGHT_2"             default="1"/>
+    <Param type="int" editor="toggle" displayName="Use rim light"               parameterName="USE_RIM_LIGHT"               default="1"/>
+    <Param type="int" editor="toggle" displayName="Use materials cell-variations" parameterName="USE_MATERIAL_CELL_VARIATIONS" default="1"/>
+    <Param type="int" editor="toggle" displayName="Use shadows"                 parameterName="USE_SHADOWS"                 default="1"/>
+    <Param type="int" editor="toggle" displayName="Use reflections"             parameterName="USE_REFLECTIONS"             default="0"/>
+    <Param type="int" editor="toggle" displayName="Use fresnel"                 parameterName="USE_FRESNEL"                 default="0"/>
+    <Param type="int" editor="toggle" displayName="Use tone mapping"            parameterName="USE_TONE_MAPPING"            default="1"/>
+    <Param type="int" editor="toggle" displayName="Use vignette"                parameterName="USE_VIGNETTE"                default="1"/>
+    <Param type="int" editor="toggle" displayName="Use Blinn-Phong"             parameterName="USE_BLINN_PHONG"             default="0"/>
+    <Param type="int" editor="toggle" displayName="Prevent back side lighting"  parameterName="PREVENT_BACK_LIGHTING"       default="1"/>
+    <Param type="int" editor="toggle" displayName="Use dithering"               parameterName="USE_DITHERING"               default="1"/>
+    <Param type="int" editor="toggle" displayName="Use outline"                 parameterName="USE_OUTLINE"                 default="0"/>
+    <Param type="int" editor="toggle" displayName="Use tempotal camera blur"    parameterName="TEMPORAL_CAMERA_BLUR"        default="0"/>
+    <Param type="int" editor="toggle" displayName="Use camera safe area"        parameterName="USE_CAMERA_SAFE_AREA"        default="0"/>
+    <Param type="int" editor="toggle" displayName="Output depth as alpha"       parameterName="DEPTH_AS_ALPHA"              default="0"/>
+    <Param type="int" editor="toggle" displayName="Reflect background color"    parameterName="REFLECT_BG_COLOR"            default="0"/>
+    <Param type="int" editor="toggle" displayName="DEBUG: Show normals"         parameterName="DEBUG_NORMALS"               default="0"/>
+    <Param type="int" editor="toggle" displayName="DEBUG: Show depth"           parameterName="DEBUG_DEPTH"                 default="0"/>
+    <Param type="int" editor="toggle" displayName="DEBUG: Show shadows"         parameterName="DEBUG_SHADOWS"               default="0"/>
 </CompilationParameters>
 <Parameters>
   <Param type="float"   displayName="Fog density"               parameterName="fogDensity"                  default="1.0"               speed="0.01"/>

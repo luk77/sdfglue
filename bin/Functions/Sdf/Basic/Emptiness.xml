@@ -5,7 +5,7 @@
 <![CDATA[
 float sdEmptiness(in SDFG_VEC p)
 {
-    return MAX_DIST;
+    return SDFG_FAR_DIST;
 }
 ]]>
 </Code>

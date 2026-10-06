@@ -9,7 +9,7 @@
 <![CDATA[
 void opHideOverTime(inout float dist, in float period, in float phase, in float fill)
 {
-    dist = mod(iTime + phase * period, period) / period < fill ? dist : MAX_DIST;
+    dist = mod(iTime + phase * period, period) / period < fill ? dist : SDFG_FAR_DIST;
 }
 ]]>
 </Code>
