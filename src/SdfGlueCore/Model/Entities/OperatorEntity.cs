@@ -12,7 +12,7 @@ using SingleDocAppCore.Model.DataNodes;
 
 namespace SdfGlueCore.Model.Entities
 {
-    // Z grubsza to samo co FunctionEntity, tylko z dodatkowym polem 'enabled'
+    // Roughly the same as FunctionEntity, with an additional 'enabled' field
     public class OperatorEntity : FunctionEntity
     {
         public  ExBool                  Enabled = new ExBool(true);

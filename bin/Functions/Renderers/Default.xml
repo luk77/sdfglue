@@ -432,12 +432,12 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     
     if (d <= 0.01f)
     {
-        // to jest kolor gdy kamera jest w obiekcie
+        // color when the camera is inside an object
         col = fogColor;
     }
     else if ( d >= MAX_DIST)
     {
-        // to zapobiega artefaktom w odbiciach (obszar bez odbicia poza MAX_DIST)
+        // prevents artifacts in reflections (area without reflection beyond MAX_DIST)
         col = fogColor;
     }
 #if USE_OUTLINE
@@ -515,7 +515,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
             {
                 newShadeColor = fogColor;
                 col = col * (1.0 - refMult) + refMult * newShadeColor;
-                break;  // to zapobiega artefaktom w odbiciach (obszar w "lustrze" poza MAX_DIST)
+                break;  // prevents artifacts in reflections (area in the "mirror" beyond MAX_DIST)
             }
 
             col = col * (1.0 - refMult) + refMult * newShadeColor;

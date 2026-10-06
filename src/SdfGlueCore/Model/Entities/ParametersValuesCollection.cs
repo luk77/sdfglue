@@ -54,13 +54,13 @@ namespace SdfGlueCore.Model.Entities
 
                 string paramKey = MakeKey(paramType, paramName);
 
-                // Logika jest taka:
-                // Przed wczytaniem w ParametersValues są defaultowe parametry zgodne z obecną definicją.
-                // Przy wczycie uzupełniamy wszystko o ile jest zgodność typów.
-                // Klucz zawiera typ, więc wartość o innym typie niż w definicji (definicja uległa zmianie)
-                // trafia pod inny klucz jako parametr nadmiarowy, a default zostaje.
-                // Wczytujemy także nadmiarowe parametry, które są np. pozostałością po dynamicznej zmianie typu obiektu.
-                // Dzięki temu jak ktoś wróci do starego typu to będzie miał stare dane ustawione.
+                // The logic is:
+                // Before loading, ParametersValues contains default parameters matching the current definition.
+                // While loading, everything is filled in as long as the types match.
+                // The key contains the type, so a value with a different type than in the definition (the definition has changed)
+                // goes under another key as an extra parameter, and the default stays.
+                // Extra parameters are loaded too, e.g. leftovers from a dynamic change of the object type.
+                // Thanks to that, switching back to the old type restores the old values.
                 bool canLoad = false;
                 if (this.ContainsKey(paramKey))
                 {

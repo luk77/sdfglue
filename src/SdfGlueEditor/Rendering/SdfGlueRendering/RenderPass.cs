@@ -211,8 +211,8 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             StringBuilder sbErrors = new StringBuilder(2048);
 
             // TODO:
-            // Tymczasowo generowanie kodu Unity wpięte na sztywno tutaj.
-            // Docelowo można by to robić tylko przy eksporcie.
+            // Temporarily the Unity code generation is hardcoded here.
+            // Eventually it could be done only on export.
             //codeGenerator.GetModel().LastGenCodeUnity = codeGenerator.GenerateUnityCode(passData_);
             passData_.LastGenCodeUnity = codeGenerator.GenerateUnityCode(sbErrors, passData_);
 
@@ -339,20 +339,20 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             shader_.SetVector3("iResolution", resolution_);
             shader_.SetVector4("iMouse", MathUtils.ToGlVec4(model.RenderingSysData.MouseData));
 
-            // Output z tego przebiegu jako kanał 0
+            // Output of this pass as channel 0
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, GetTextureId());
 
-            // Output z poprzedniego przebiegu jako kanał 1
+            // Output of the previous pass as channel 1
             GL.ActiveTexture(TextureUnit.Texture1);
             GL.BindTexture(TextureTarget.Texture2D, prevPassTextureId);
 
-            // To jest istotne, bez tego nie działa:
+            // This is important, it does not work without it:
             // From: https://opentk.net/learn/chapter1/6-multiple-textures.html
-            shader_.SetInt("iChannel0", 0); // W 0 jest output z tego przebiegu
-            shader_.SetInt("iChannel1", 1); // W 1 jest output z poprzedniego przebiegu
-            shader_.SetInt("iChannel2", 2); // na razie nie używane
-            shader_.SetInt("iChannel3", 3); // na razie nie używane
+            shader_.SetInt("iChannel0", 0); // 0 is the output of this pass
+            shader_.SetInt("iChannel1", 1); // 1 is the output of the previous pass
+            shader_.SetInt("iChannel2", 2); // not used yet
+            shader_.SetInt("iChannel3", 3); // not used yet
 
             // Camera
             shader_.SetVector3  ("cameraTargetPosition"     , MathUtils.ToGlVec3(model.CameraDat.TargetPosition.Val)          );
@@ -389,8 +389,11 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             // Renderer
             SetShaderParametersForFunctionEntity(passData_.RendererFunc, null);
 
-            // Backdrop
-            SetShaderParametersForFunctionEntity(passData_.BackdropFunc, null);
+            // Backdrop (generated only for the primary pass)
+            if (passData_.IsPrimaryPass)
+            {
+                SetShaderParametersForFunctionEntity(passData_.BackdropFunc, null);
+            }
 
             if (DataModel.UseCameraControllers)
             {
@@ -406,8 +409,8 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
                 if (sdfObj == null)
                     return;
 
-                // Większość uniform'ów jest współdzielona między funkcjami distance i material.
-                // Dla tego ich ustawianie można pominąć tylko wtedy, gdy obie flagi są wyłączone.
+                // Most uniforms are shared between the distance and material functions.
+                // That is why setting them can be skipped only when both flags are disabled.
                 if (!sdfObj.CanBeUsedInDistanceFunction() && !sdfObj.CanBeUsedInMaterialsFunction())
                     return;
 
@@ -537,7 +540,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             int     rowSize = width * 4;
             byte[]  pixels  = new byte[rowSize * height];
 
-            // To dziwne, ale trzeba użyć formatu PixelFormat.Bgra (kolejność bajtów jak w Format32bppArgb)
+            // Strange, but PixelFormat.Bgra has to be used (byte order as in Format32bppArgb)
             GL.PixelStore(PixelStoreParameter.PackAlignment, 4);
             GL.GetTexImage<byte>(TextureTarget.Texture2D, 0, PixelFormat.Bgra, PixelType.UnsignedByte, pixels);
             GL.BindTexture(TextureTarget.Texture2D, 0);

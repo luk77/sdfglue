@@ -37,7 +37,7 @@ namespace SdfGlueCore.Model.DataNodes
         public  RenderPassEntity        RendererFunc;
         public  BackdropEntity          BackdropFunc;
         //public  CameraControllerEntity  CameraCtrlFunc;
-        public  OperatorsCollection     CameraOperators;                // operatory nakładane na parametry kamery
+        public  OperatorsCollection     CameraOperators;                // operators applied to camera parameters
 
         public  ExBool                  UseTextureFiltering             = new ExBool    (true);
 
@@ -121,17 +121,18 @@ namespace SdfGlueCore.Model.DataNodes
 //            }
 //        }
 
-        // Code of the includes used by this pass: renderer, backdrop and - for the primary pass -
+        // Code of the includes used by this pass: renderer and - for the primary pass - backdrop,
         // camera operators and functions used in the SDF tree (not all loaded definitions)
         public string CollectIncludes(DataModel model, StringBuilder sbErrors)
         {
             IncludesCollection includes = new IncludesCollection();
 
             RendererFunc?.Definition?.CollectIncludeNames(includes, sbErrors);
-            BackdropFunc?.Definition?.CollectIncludeNames(includes, sbErrors);
 
             if (IsPrimaryPass)
             {
+                BackdropFunc?.Definition?.CollectIncludeNames(includes, sbErrors);
+
                 foreach (OperatorEntity op in CameraOperators.Operators)
                     op.Definition?.CollectIncludeNames(includes, sbErrors);
 
@@ -186,11 +187,7 @@ namespace SdfGlueCore.Model.DataNodes
 
         public override bool Deserialize(XmlNode nodeThis, IAbstractDocument model)
         {
-            XmlUtils.DeserializeInt     (nodeThis, "Id"             , ref Id                    );
-            XmlUtils.DeserializeString  (nodeThis, "Name"           , ref Name.Val              );
-            XmlUtils.DeserializeBool    (nodeThis, "IsFixed"        , ref IsFixed.Val           );
-
-            XmlUtils.DeserializeInt     (nodeThis, "Id"                     , ref Id                        );
+            XmlUtils.DeserializeInt   (nodeThis, "Id"                     , ref Id                        );
             XmlUtils.DeserializeString  (nodeThis, "Name"                   , ref Name.Val                  );
             XmlUtils.DeserializeBool    (nodeThis, "IsPrimaryPass"          , ref IsPrimaryPass             );
             XmlUtils.DeserializeBool    (nodeThis, "ForceClear"             , ref ForceClear                );
@@ -208,8 +205,8 @@ namespace SdfGlueCore.Model.DataNodes
             if (nodeBackdrop != null)
             {
                 // TODO:
-                // wyjaśnić sprawę z "this" przekazywanym jako parentObject.
-                // Czy to tylko do debugowego komunikatu, czy coś więcej?
+                // clarify why "this" is passed as parentObject.
+                // Is it only for a debug message, or something more?
                 BackdropFunc.Deserialize(nodeBackdrop, this, null);
             }
 

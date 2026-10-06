@@ -103,8 +103,8 @@ namespace SdfGlueUi.Ui.Windows
 
                     if (!isFixed)
                     {
-                        // Bugfix: to nie może być pod 'UseShape', bo 'material blending' z parenta 
-                        // (nawet wyłączonego) ma wpływ na 'material blending' potomków.
+                        // Bugfix: this cannot be under 'UseShape', because 'material blending' of the parent 
+                        // (even a disabled one) affects 'material blending' of its children.
                         //if (selectedSdfNode.UseShape)
                         //{
                             // Material
@@ -131,7 +131,7 @@ namespace SdfGlueUi.Ui.Windows
                         BuildEditorForOperatorsCollection(ref index, "Distance operators", selectedSdfNode.DistanceOperators, GetModel().DistanceOpDefinitions, selectedSdfNode.InsertNewDistanceOp);
                     }
 
-                    //to jest bug!! ImGui.End();
+                    //this is a bug!! ImGui.End();
                 }
                 else if (selectedNode is CameraData)
                 {
@@ -188,8 +188,8 @@ namespace SdfGlueUi.Ui.Windows
 
                     bool isFixed = GetModel().ProjSettings.FixAllObjects.Val || passData.IsFixed.Val;
 
-                    // backdrop
-                    if (!isFixed)
+                    // backdrop (used only by the primary pass)
+                    if (!isFixed && passData.IsPrimaryPass)
                     {
                         ImGui.PushID(index++);
                         if (ImGui.CollapsingHeader(string.Format("Backdrop"), ImGuiTreeNodeFlags.DefaultOpen))
@@ -319,7 +319,7 @@ namespace SdfGlueUi.Ui.Windows
                 ImGui.Separator();
             }
 
-            // przycisk do dodawania elementów na końcu listy
+            // button for adding items at the end of the list
             ImGui.PushID(index++);
             ImGui.NextColumn();
             if (ImGui.Button("Insert"))
@@ -329,7 +329,7 @@ namespace SdfGlueUi.Ui.Windows
             ImGui.NextColumn();
             ImGui.PopID(); // balance the PushID before the Insert button
 
-            // To musimy wywołać poza pętlą, ponieważ modyfikuje kolekcję
+            // This must be called outside the loop, because it modifies the collection
             if (indexForInsert != -1)
             {
                 OperatorEntity newOpEnt = delegateInsertNewOp(indexForInsert);
@@ -346,7 +346,7 @@ namespace SdfGlueUi.Ui.Windows
                     delegate
                     {
                         // redo
-                        //tu nie można tworzyć nowej instancji, trzeba użyć istniejącej
+                        //a new instance cannot be created here, the existing one has to be used
                         opList.Insert(indexForInsert, newOpEnt);
                         //newOpEnt.RefreshDefinitionReference(opDefinitions);
                         uiMgr.ActionsExecutor.OnRebuildShader();
@@ -495,8 +495,8 @@ namespace SdfGlueUi.Ui.Windows
         {
             UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
-            // ComboBox w Imgui jest kiepski bo polega na indeksach i nazwach
-            // Lepiej zastąpić go prostym menu.
+            // ComboBox in ImGui is poor, because it relies on indices and names
+            // Better replace it with a simple menu.
 
             ImGui.PushID(id);
             ImGui.Text(name);

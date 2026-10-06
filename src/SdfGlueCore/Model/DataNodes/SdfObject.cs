@@ -26,8 +26,8 @@ namespace SdfGlueCore.Model.DataNodes
         public ExFloatWithSignal        BlendFactor             = new ExFloatWithSignal(0.0f);
         public SdfEntity                FunctionSdf;
         public MixOperatorEntity        FunctionMixOp;
-        public OperatorsCollection      PositionOperators;  // operatory nakładane na obliczaną pozycję 3d
-        public OperatorsCollection      DistanceOperators;  // operatory nakładane na obliczany dystans do powierzchni sdf
+        public OperatorsCollection      PositionOperators;  // operators applied to the computed 3d position
+        public OperatorsCollection      DistanceOperators;  // operators applied to the computed distance to the sdf surface
 
         // Parameterless constructor (for copy/paste serialization)
         public SdfObject() : this(0, "", null) { }
@@ -68,9 +68,9 @@ namespace SdfGlueCore.Model.DataNodes
 
         public delegate OperatorEntity DelegateInsertNewOperator(int index);
 
-        // Chodzi o to, że czasem chcemy przetestować czy węzeł jest Root'em.
-        // RootObj ma parenta, ale nie jest on typu SdfObject, tylko DataModel (dawniej po prostu miał Parent==null)
-        // Do rozważenia - można by to zastąpić czymś w rodzaju: IsRootSdf
+        // Sometimes we want to test whether a node is the root.
+        // RootObj has a parent, but it is a DataModel, not a SdfObject (it used to simply have Parent==null)
+        // To consider - this could be replaced with something like: IsRootSdf
         public SdfObject? ParentAsSdf
         {
             get
