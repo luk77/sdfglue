@@ -12,7 +12,7 @@ float opFiniteRepeatZ(inout vec3 p, float spacing, int repetitions)
     float cellIndex = floor((p.z + spacing*0.5)/spacing);
 
     //p.z = min(p.z, p.z - spacing * clamp(round(p.z / spacing), -repetitions, repetitions));
-    p.z = p.z - spacing * clamp(round(p.z / spacing), 0.0, repetitions);
+    p.z = p.z - spacing * clamp(round(p.z / spacing), 0.0, float(repetitions));
     
     return cellIndex;
 }

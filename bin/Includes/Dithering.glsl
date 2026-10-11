@@ -1,6 +1,11 @@
 //---------------------------------------------------------------------------
 // Dithering
 //---------------------------------------------------------------------------
+// renderers without the "Use dithering" compilation parameter
+#ifndef USE_DITHERING
+#define USE_DITHERING (0)
+#endif
+
 #if USE_DITHERING
 
 #define DITHERING_STEPS 5

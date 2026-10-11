@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using ImGuiNET;
+using SdfGlueCore.Controller;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueCore.Model.DataNodes.Signals;
 using SingleDocAppCore.Model.DataNodes;
@@ -31,6 +32,14 @@ namespace SdfGlueUi.Ui
             if (ImGui.MenuItem("Save image as", "CTRL+I"))                      { ExecutorSdfGlue.OnSaveImage(); }
             if (ImGui.MenuItem("Export image sequence", ""))                    { ExecutorSdfGlue.OnExportAnimation(); }
 
+            if (ImGui.BeginMenu("Export"))
+            {
+                BuildExportShaderMenuItems(ShaderExportTarget.Shadertoy , "Shadertoy");
+                ImGui.Separator();
+                BuildExportShaderMenuItems(ShaderExportTarget.Unity     , "Unity shader");
+                ImGui.EndMenu();
+            }
+
             ImGui.Separator();
             if (Directory.Exists("Examples"))
             {
@@ -44,6 +53,12 @@ namespace SdfGlueUi.Ui
                     ImGui.EndMenu();
                 }
             }
+        }
+
+        private void BuildExportShaderMenuItems(ShaderExportTarget target, string label)
+        {
+            if (ImGui.MenuItem(label + " to clipboard"))                        { ExecutorSdfGlue.OnExportShaderToClipboard(target); }
+            if (ImGui.MenuItem(label + " to file..."))                          { ExecutorSdfGlue.OnExportShaderToFile(target); }
         }
 
         protected override void BuildEditMenuExtras()
@@ -103,6 +118,7 @@ namespace SdfGlueUi.Ui
         protected override void BuildDevelopmentMenuExtras()
         {
             if (ImGui.MenuItem("Batch process all projects", ""))               { ExecutorSdfGlue.OnBatchProcessAllProjects(); }
+            if (ImGui.MenuItem("Validate shader exports (all projects)...", "")) { ExecutorSdfGlue.OnValidateShaderExports(); }
         }
 
         protected override void BuildViewMenuExtras()

@@ -25,37 +25,7 @@ uniform sampler2D iChannel3;
 //-------------------------------------------------------------------------------
 
 
-//-------------------------------------------------------------------------------
-// UV / FragCoords conversion functions
-// (for better compatibility with Shadertoy)
-// uv - range: 0.0 - 1.0
-// frag coords - range: 0.0 - iResolution.xy
-//-------------------------------------------------------------------------------
-vec2 convertUvToFragCoords(vec2 uv)
-{
-    uv *= iResolution.xy;
-    return uv;
-}
-vec2 convertFragCoordsToUv(vec2 fragCoords)
-{
-    fragCoords /= iResolution.xy;
-    return fragCoords;
-}
-
-//__generated_definitions__
-//__common_functions__
-//__generated_camera_data__
-//__generated_materials__
-//__generated_distance_functions__
-//__generated_mixop_functions__
-//__generated_posop_functions__
-//__generated_distop_functions__
-//__generated_map_uniforms__
-//__generated_map_function__
-//__generated_materials_function__
-//__generated_renderer_uniforms__
-//__generated_backdrop_function__
-//__generated_renderer_code__
+//__generated_code__
 
 
 
@@ -64,8 +34,6 @@ vec2 convertFragCoordsToUv(vec2 fragCoords)
 //-------------------------------------------------------------------------------
 void main(void)
 {
-    //__generated_call_init_materials__
-
     // Pixel perfect discard test
     //if (abs(mod(texCoord.x * iResolution.x, 2.0)) <= 1.0)
     //    discard;
@@ -73,7 +41,7 @@ void main(void)
     //if (abs(mod(texCoord.y * iResolution.y, 2.0)) <= 1.0)
     //    discard;
 
-    vec2 fragCoord = convertUvToFragCoords(texCoord);
+    vec2 fragCoord = texCoord * iResolution.xy;
     
     vec4 col = vec4(0.0);
     mainImage(col, fragCoord);

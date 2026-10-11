@@ -82,6 +82,15 @@
 <Code>
 <![CDATA[
 
+// Features not available as compilation parameters of this renderer
+// (GLSL ES - e.g. Shadertoy - does not allow undefined macros in #if)
+#ifndef USE_ENV_LIGHT
+#define USE_ENV_LIGHT (0)
+#endif
+#ifndef USE_PBR
+#define USE_PBR (0)
+#endif
+
 //-------------------------------------------------------------------------------
 #define PI                      3.14159265
 #define MX_ID                   (mat3(1.0))
@@ -136,8 +145,8 @@ MaterialDesc getMaterial(SDFG_VEC p)
     Material material = m0.material;
 
     m0.distance    = cameraSafeArea_sdSphere(p - g_cameraPos, renderer_cameraSafeAreaRadius);
-    m0.materialId  = 0;
-    m0.cellIndex   = 0;
+    m0.materialId  = 0.0;
+    m0.cellIndex   = 0.0;
     m0.material.colorAmbient = vec3(0.3, 0.2, 0.5);
     //m0.material.colorDiffuse = vec3(1.0, 1.0, 1.0);
     m0.material.colorSpecular = vec3(0.04, 0.01, 0.01);

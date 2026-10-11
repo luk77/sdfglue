@@ -34,6 +34,7 @@ namespace SdfGlueEditor
         // created in OnLoad() (require the OpenGL context / rendering system)
         private DocumentController              documents_              = null!;
         private RenderController                render_                 = null!;
+        private ShaderExportController          shaderExport_           = null!;
         private CameraController                camera_                 = null!;
         private DemoModeController              demoMode_               = null!;
         private ProjectHierarchyController      hierarchy_              = null!;
@@ -112,7 +113,7 @@ namespace SdfGlueEditor
 
         protected override UiExecutorFrameworkBase CreateExecutor()
         {
-            return new UiExecutorSdfGlue(ctx_, documents_, render_, camera_, hierarchy_);
+            return new UiExecutorSdfGlue(ctx_, documents_, render_, shaderExport_, camera_, hierarchy_);
         }
 
         protected override UiManagerBase CreateUiManager(UiExecutorFrameworkBase executor)
@@ -138,6 +139,7 @@ namespace SdfGlueEditor
             render_     = new RenderController(ctx_);
             camera_     = new CameraController(ctx_);
             demoMode_   = new DemoModeController(documents_);
+            shaderExport_ = new ShaderExportController(ctx_, documents_);
             hierarchy_  = new ProjectHierarchyController(ctx_.RenderingSystem, ctx_.CodeGenerator);
 
             base.OnLoad();

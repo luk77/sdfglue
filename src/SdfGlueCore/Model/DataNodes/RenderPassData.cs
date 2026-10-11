@@ -23,7 +23,6 @@ namespace SdfGlueCore.Model.DataNodes
         public  IRenderingPass?         RenderingPass                   = null;
 
         public  CodeGenResult           LastGenCode                     = new CodeGenResult();
-        public  string?                 LastGenCodeUnity                = null;
         public  string                  LastErrors                      = "";
 
         public  bool                    IsPrimaryPass                   = false;

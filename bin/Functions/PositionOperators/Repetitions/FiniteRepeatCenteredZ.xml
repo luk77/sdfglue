@@ -10,11 +10,11 @@
 float opFiniteRepeatCenteredZ(inout vec3 p, float spacing, int repetitions)
 {
     // centering
-    p.z += 0.5 * repetitions * spacing;
+    p.z += 0.5 * float(repetitions) * spacing;
 
     float cellIndex = floor((p.z + spacing*0.5)/spacing);
 
-    p.z = p.z - spacing * clamp(round(p.z / spacing), 0.0, repetitions);
+    p.z = p.z - spacing * clamp(round(p.z / spacing), 0.0, float(repetitions));
     
     return cellIndex;
 }

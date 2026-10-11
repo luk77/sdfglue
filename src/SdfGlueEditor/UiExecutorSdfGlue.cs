@@ -3,6 +3,7 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
+using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
@@ -10,6 +11,7 @@ using SdfGlueCore.Model.DataNodes.Signals;
 using SdfGlueEditor.Application;
 using SdfGlueUi.Ui;
 using SingleDocAppFramework;
+using System.Text;
 using TreeNode = SingleDocAppCore.Model.DataNodes.TreeNode;
 
 namespace SdfGlueEditor
@@ -21,15 +23,17 @@ namespace SdfGlueEditor
         private SdfGlueAppContext               ctx_;
         private DocumentController              documents_;
         private RenderController                render_;
+        private ShaderExportController          shaderExport_;
         private CameraController                camera_;
         private ProjectHierarchyController      hierarchy_;
 
-        public UiExecutorSdfGlue(SdfGlueAppContext ctx, DocumentController documents, RenderController render, CameraController camera, ProjectHierarchyController hierarchy)
+        public UiExecutorSdfGlue(SdfGlueAppContext ctx, DocumentController documents, RenderController render, ShaderExportController shaderExport, CameraController camera, ProjectHierarchyController hierarchy)
             : base(ctx.Window)
         {
             ctx_        = ctx;
             documents_  = documents;
             render_     = render;
+            shaderExport_ = shaderExport;
             camera_     = camera;
             hierarchy_  = hierarchy;
         }
@@ -53,6 +57,12 @@ namespace SdfGlueEditor
         public void OnPreviewResolutionChanged  ()                  { render_.PreviewResolutionChanged();   }
         public void OnSaveImage                 ()                  { render_.SaveImage();                  }
         public void OnExportAnimation           ()                  { render_.ExportAnimation();            }
+
+        // shader export
+        public string? GenerateExportCode       (ShaderExportTarget target, RenderPassData pass, StringBuilder errors) { return shaderExport_.GenerateCode(target, pass, errors); }
+        public void OnExportShaderToClipboard   (ShaderExportTarget target) { shaderExport_.ExportToClipboard(target);  }
+        public void OnExportShaderToFile        (ShaderExportTarget target) { shaderExport_.ExportToFile(target);       }
+        public void OnValidateShaderExports     ()                          { shaderExport_.ValidateExportsOfAllProjects(); }
 
         // camera
         public void OnFocusObject       (SdfObject? node)                                   { camera_.FocusObject(node);                        }

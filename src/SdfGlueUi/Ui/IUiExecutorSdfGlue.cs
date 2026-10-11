@@ -3,12 +3,14 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
+using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueCore.Model.DataNodes.Signals;
 using SingleDocAppCore.Model.DataNodes;
 using SingleDocAppFramework.Ui;
+using System.Text;
 
 namespace SdfGlueUi.Ui
 {
@@ -25,6 +27,14 @@ namespace SdfGlueUi.Ui
         void OnBatchProcessAllProjects();
         void OnSaveImage();
         void OnExportAnimation();
+
+        // Code of the pass for an export target, generated on demand (null on error - see errors)
+        string? GenerateExportCode  (ShaderExportTarget target, RenderPassData pass, StringBuilder errors);
+        // Export of the first primary pass (File -> Export)
+        void OnExportShaderToClipboard  (ShaderExportTarget target);
+        void OnExportShaderToFile       (ShaderExportTarget target);
+        // Development: exports and compiles (Shadertoy) all projects
+        void OnValidateShaderExports    ();
 
         void OnDeleteNode           (TreeNode? node);
         void OnMoveNodeUp           (TreeNode? node);

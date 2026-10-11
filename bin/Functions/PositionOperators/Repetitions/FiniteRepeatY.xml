@@ -12,7 +12,7 @@ float opFiniteRepeatY(inout vec3 p, float spacing, int repetitions)
     float cellIndex = floor((p.y + spacing*0.5)/spacing);
 
     //p.y = min(p.y, p.y - spacing * clamp(round(p.y / spacing), -repetitions, repetitions));
-    p.y = p.y - spacing * clamp(round(p.y / spacing), 0.0, repetitions);
+    p.y = p.y - spacing * clamp(round(p.y / spacing), 0.0, float(repetitions));
     
     return cellIndex;
 }
