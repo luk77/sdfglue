@@ -7,14 +7,14 @@ The main motivation behind this project was to build a convenient environment fo
 
 A key feature of SdfGlue is its **open and extensible architecture**. The system is designed to be easily extended with custom SDF functions, object composition operators, and rendering components.
 
-The project is heavily inspired by **Shadertoy** and the work of its community. SdfGlue is largely compatible with Shadertoy — generated code can be exported and reused within that platform.
+The project is heavily inspired by **Shadertoy** and the work of its community. SdfGlue is largely compatible with Shadertoy — a scene can be exported (File → Export → Shadertoy) and pasted directly into a new Shadertoy shader.
 
 ### About the project status
 
 **SdfGlue** is currently a hobby project developed and maintained by a single person. As such, you may encounter some rough edges while using it.
 
 - Minor bugs may occur — if you run into any issues, feel free to report them in the Issues section.
-- Some features are experimental and not yet fully functional (e.g. 4D raymarching, shader export to Unity).
+- Some features are experimental and not yet fully functional (e.g. 4D raymarching, shader export to Unity - working, but tested only on a limited set of scenes).
 - There is currently no formal documentation. While the core functionality should be relatively intuitive, some areas would benefit from more detailed explanations. Documentation (written or video) is planned for the future.
 
 # Downloads
@@ -31,6 +31,7 @@ The project is heavily inspired by **Shadertoy** and the work of its community. 
 - customizable layout
 - easy integration of custom SDF functions
 - GLSL code generation preview
+- shader export: Shadertoy (single pass) and Unity (experimental), to the clipboard or to a file
 - debugging tools (normals, iteration count, SDF visualization)
 
 ### SDF Modeling Features
