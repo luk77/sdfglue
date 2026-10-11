@@ -10,7 +10,7 @@ void opQuatRotateDiagonal90(inout vec3 p, int numTurns)
 {
     vec3 axis = normalize(vec3(1.0));
 
-    float halfAngle     = 2.0 * 0.333333 * PI * numTurns;
+    float halfAngle     = 2.0 * 0.333333 * PI * float(numTurns);
     float sinHalfAngle  = sin(halfAngle);
     float cosHalfAngle  = cos(halfAngle);
 

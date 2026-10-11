@@ -92,12 +92,12 @@ float calculateCellIndex2d(in vec2 coords)
 {
     //return coords.x + coords.y + PI * sin(coords.x * coords.y);
     //return spiralIndex(int(coords.x), int(coords.y), false);    // CCW
-    return spiralIndex(int(coords.x), int(coords.y), true);     // CW
+    return float(spiralIndex(int(coords.x), int(coords.y), true));     // CW
     //return diamondSpiralIndex(int(coords.x), int(coords.y), true);     // CW
 }
 
 float calculateCellIndex3d(in vec3 coords)
 {
     //return coords.x + coords.y + PI * sin(coords.x * coords.y) + PI * sin(0.88 + coords.x * coords.y * coords.z);
-    return mortonIndex(ivec3(coords.x, coords.y, coords.z));
+    return float(mortonIndex(ivec3(coords.x, coords.y, coords.z)));
 }
