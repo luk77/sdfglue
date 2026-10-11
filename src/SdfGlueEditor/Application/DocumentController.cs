@@ -140,7 +140,8 @@ namespace SdfGlueEditor.Application
         // Loads and re-saves all projects (upgrades them to the current file format).
         // Every project is loaded into its own model - the current project is not changed.
         // Files that cannot be loaded are not saved.
-        public void BatchProcessAllProjects()
+        // Project files for batch operations (Development menu)
+        public static List<string> FindBatchProjectFiles()
         {
             List<string> files = new List<string>();
             foreach (string rootPath in BatchProjectDirectories)
@@ -148,6 +149,12 @@ namespace SdfGlueEditor.Application
                 if (Directory.Exists(rootPath))
                     files.AddRange(Directory.GetFiles(rootPath, ProjectSearchPattern, SearchOption.AllDirectories));
             }
+            return files;
+        }
+
+        public void BatchProcessAllProjects()
+        {
+            List<string> files = FindBatchProjectFiles();
 
             if (files.Count == 0)
             {
@@ -197,7 +204,7 @@ namespace SdfGlueEditor.Application
 
         // Loads a project into a new model (function definitions are shared with the current model).
         // Returns null on error (invalid XML, missing data).
-        private DataModel? LoadProjectFromFile(string filePath, out string errorMessage)
+        public DataModel? LoadProjectFromFile(string filePath, out string errorMessage)
         {
             try
             {

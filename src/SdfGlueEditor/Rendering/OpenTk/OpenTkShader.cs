@@ -154,6 +154,17 @@ namespace SdfGlueEditor.Rendering.OpenTk
             Console.WriteLine(error);
         }
 
+        // Compiles a fragment shader only to check it (e.g. exported code). log: compiler messages.
+        public static bool TryCompileFragmentShader(string source, out string log)
+        {
+            int shader = GL.CreateShader(ShaderType.FragmentShader);
+            GL.ShaderSource(shader, source);
+            bool success = CompileShader(shader);
+            log = GL.GetShaderInfoLog(shader);
+            GL.DeleteShader(shader);
+            return success;
+        }
+
         private static bool CompileShader(int shader)
         {
             // Try to compile the shader

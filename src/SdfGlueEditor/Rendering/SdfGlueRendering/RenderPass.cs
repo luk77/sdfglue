@@ -10,6 +10,7 @@
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL4;
 using SdfGlueCore.Controller;
+using SdfGlueCore.Controller.CodeGen;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.BaseTypes;
 using SdfGlueEditor.Rendering.OpenTk;
@@ -210,15 +211,9 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
 
             StringBuilder sbErrors = new StringBuilder(2048);
 
-            // TODO:
-            // Temporarily the Unity code generation is hardcoded here.
-            // Eventually it could be done only on export.
-            //codeGenerator.GetModel().LastGenCodeUnity = codeGenerator.GenerateUnityCode(passData_);
-            passData_.LastGenCodeUnity = codeGenerator.GenerateUnityCode(sbErrors, passData_);
-
             string shaderVert = File.ReadAllText(pathShaderVert_);
             string shaderFrag = File.ReadAllText(pathShaderFrag_);
-            shaderFrag = codeGenerator.ModifyFragShaderSource(sbErrors, shaderFrag, passData_.LastGenCode, false, passData_);
+            shaderFrag = codeGenerator.ModifyFragShaderSource(sbErrors, shaderFrag, passData_.LastGenCode, ShaderExportTarget.Preview, passData_);
 
             bool compiled = shader_.Reinitialize(sbErrors, shaderVert, shaderFrag, passData_.Name.Val ?? "");
             if (!compiled && sbErrors.Length == 0)
@@ -403,7 +398,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             // Objects
             TreeNode.CallRecursive(model.SdfRoot, delegate(TreeNode node)
             {
-                string? nodeId  = model.Config.UseNamesAsIds ? node.Name.Val : node.Id.ToString();
+                string  nodeId  = ShaderNames.GetNodeId(model, node);
 
                 SdfObject? sdfObj = node as SdfObject;
                 if (sdfObj == null)
@@ -491,29 +486,13 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             if (functionEntity.Definition == null)
                 return;
 
-            bool simpleParamsFormat = String.IsNullOrEmpty(nodeId);
-
             for(int i=0; i<functionEntity.Definition.Parameters.Count; i++)
             {
                 FunctionDefParameter p = functionEntity.Definition.Parameters[i];
                 if (p.ParameterName == null)
                     continue;
 
-                string? fullNameId = null;
-                if (opEntityIndex == -1)
-                {
-                    if (simpleParamsFormat)
-                        fullNameId = String.Format("{0}_{1}"                , functionEntity.ParamPrefix, p.ParameterName);
-                    else
-                        fullNameId = String.Format("g_obj_{0}_{1}_{2}"      , nodeId, functionEntity.ParamPrefix, p.ParameterName);
-                }
-                else
-                {
-                    if (simpleParamsFormat)
-                        fullNameId = String.Format("{0}{1}_{2}"                , functionEntity.ParamPrefix, opEntityIndex + 1, p.ParameterName);
-                    else
-                        fullNameId = String.Format("g_obj_{0}_{1}{2}_{3}"      , nodeId, functionEntity.ParamPrefix, opEntityIndex + 1, p.ParameterName);
-                }
+                string fullNameId = ShaderNames.GetParamName(nodeId, functionEntity, opEntityIndex, p.ParameterName);
 
                 ISimpleType paramVal = functionEntity.ParametersValues[p.ParameterKey];
                 SetShaderParameterByType(paramVal, fullNameId);

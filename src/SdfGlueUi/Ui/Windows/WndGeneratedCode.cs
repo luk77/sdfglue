@@ -4,10 +4,12 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using ImGuiNET;
+using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueUi.Ui.Components;
 using System.Numerics;
+using System.Text;
 
 namespace SdfGlueUi.Ui.Windows
 {
@@ -18,7 +20,17 @@ namespace SdfGlueUi.Ui.Windows
         private MenuRenderPass.PreviewMode  previewMode_            = MenuRenderPass.PreviewMode.LastSelectedPass;
         private RenderPassData?             selectedPass_           = null;
 
-        private int                         selectedOptionIndex_    = 0;
+        private const string                OptionFullShader        = "Full shader";
+        private const string                OptionFullShaderToy     = "Full shader (Shadertoy)";
+        private const string                OptionFullShaderUnity   = "Full shader (Unity)";
+
+        private string                      selectedOption_         = OptionFullShader;
+
+        // export code generated on demand for the selected pass (regenerated when the pass code changes)
+        private string?                     exportCode_             = null;
+        private ShaderExportTarget?         exportCodeTarget_       = null;
+        private RenderPassData?             exportCodePass_         = null;
+        private int                         exportCodeVersion_      = -1;
 
         private string title_ = string.Empty;
         public override string Title
@@ -48,20 +60,16 @@ namespace SdfGlueUi.Ui.Windows
 
                 MenuRenderPass.Build(GetModel(), ref previewMode_, ref selectedPass_);
 
-                string[] arrOptions = { 
-                    "Full shader"           , // 0
-                    "Full shader (Unity)"   , // 1
-                    "Defines"               , // 2
-                    "Materials"             , // 3
-                    "Includes"              , // 4
-                    "Distance functions"    , // 5
-                    "Mix operators"         , // 6
-                    "Position operators"    , // 7
-                    "Distance operators"    , // 8
-                    "Map uniforms"          , // 9
-                    "Map function"          , // 10
-                    "Materials function"    , // 12
-                    };
+                // fixed options + sections of the generated code (CodeGenResult.Sections)
+                List<string> options = new List<string> { OptionFullShader, OptionFullShaderToy, OptionFullShaderUnity };
+                if (selectedPass_ != null)
+                {
+                    foreach (CodeGenSection section in selectedPass_.LastGenCode.Sections)
+                        options.Add(section.Name);
+                }
+
+                // the option is remembered by name - the list of sections depends on the pass
+                int selectedOptionIndex = Math.Max(options.IndexOf(selectedOption_), 0);
 
                 ImGui.SameLine();
                 ImGui.PushID(id++);
@@ -70,26 +78,21 @@ namespace SdfGlueUi.Ui.Windows
                 ImGui.SameLine();
                 ImGui.SetNextItemWidth(400);
                 ImGui.PushID(id++);
-                ImGui.Combo("", ref selectedOptionIndex_, arrOptions, arrOptions.Length, arrOptions.Length);
+                if (ImGui.Combo("", ref selectedOptionIndex, options.ToArray(), options.Count, options.Count))
+                    selectedOption_ = options[selectedOptionIndex];
                 ImGui.PopID();
 
                 string? selectedCode = null;
+                string  option       = options[selectedOptionIndex];
 
-                switch ( selectedOptionIndex_)
-                {
-                    case 0: selectedCode = selectedPass_?.LastGenCode.FullShader         ; break;
-                    case 1: selectedCode = selectedPass_?.LastGenCodeUnity               ; break;
-                    case 2: selectedCode = selectedPass_?.LastGenCode.Definitions        ; break;
-                    case 3: selectedCode = selectedPass_?.LastGenCode.Materials          ; break;
-                    case 4: selectedCode = selectedPass_?.LastGenCode.Includes           ; break;
-                    case 5: selectedCode = selectedPass_?.LastGenCode.DistanceFunctions  ; break;
-                    case 6: selectedCode = selectedPass_?.LastGenCode.MixOpFunctions     ; break;
-                    case 7: selectedCode = selectedPass_?.LastGenCode.PosOpFunctions     ; break;
-                    case 8: selectedCode = selectedPass_?.LastGenCode.DistOpFunctions    ; break;
-                    case 9: selectedCode = selectedPass_?.LastGenCode.MapUniforms        ; break;
-                    case 10:selectedCode = selectedPass_?.LastGenCode.MapFunction        ; break;
-                    case 11:selectedCode = selectedPass_?.LastGenCode.MaterialsFunction  ; break;
-                }
+                if (option == OptionFullShader)
+                    selectedCode = selectedPass_?.LastGenCode.FullShader;
+                else if (option == OptionFullShaderToy)
+                    selectedCode = GetExportCode(uiMgr, ShaderExportTarget.Shadertoy);
+                else if (option == OptionFullShaderUnity)
+                    selectedCode = GetExportCode(uiMgr, ShaderExportTarget.Unity);
+                else
+                    selectedCode = selectedPass_?.LastGenCode.FindSectionCode(option);
 
                 ImGui.SameLine();
                 ImGui.PushID(id++);
@@ -111,6 +114,25 @@ namespace SdfGlueUi.Ui.Windows
 
                 InsertScrollableTextPanel( selectedCode );
             });
+        }
+
+        private string? GetExportCode(UiManagerSdfGlue uiMgr, ShaderExportTarget target)
+        {
+            if (selectedPass_ == null)
+                return null;
+
+            if (exportCodeTarget_ != target || exportCodePass_ != selectedPass_ || exportCodeVersion_ != selectedPass_.LastGenCode.Version)
+            {
+                StringBuilder errors = new StringBuilder();
+                exportCode_         = uiMgr.ActionsExecutor.GenerateExportCode(target, selectedPass_, errors);
+                if (errors.Length > 0)
+                    exportCode_     = "// ERRORS:\n// " + errors.ToString().TrimEnd().Replace("\n", "\n// ") + "\n" + exportCode_;
+                exportCodeTarget_   = target;
+                exportCodePass_     = selectedPass_;
+                exportCodeVersion_  = selectedPass_.LastGenCode.Version;
+            }
+
+            return exportCode_;
         }
 
         private static void InsertScrollableTextPanel(string? text)
