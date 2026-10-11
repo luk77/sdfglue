@@ -28,7 +28,7 @@ namespace SdfGlueCore.Model
 
         public static readonly bool     UseCameraControllers        = true;
         public static readonly bool     ImportOldMaterials          = false;
-        public static readonly bool     UseSignals                  = false;//true;
+        public static readonly bool     UseSignals                  = true;
 
         public static readonly int      NodeIdDataModel             = -10000;
         public static readonly int      NodeIdRenderingData         = -1000;
@@ -171,11 +171,11 @@ namespace SdfGlueCore.Model
             EmptyChildrenList();
 
             //AddChild(ProjSettings);
+            if (UseSignals)
+                AddChild(Signals);
             AddChild(RenderingSysData);
             AddChild(CameraDat);
             AddChild(Materials);
-            if (UseSignals)
-                AddChild(Signals);
 
             if (SdfRoot != null)
                 AddChild(SdfRoot);
