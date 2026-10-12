@@ -123,9 +123,16 @@ namespace SdfGlueUi.Ui
 
         protected override void BuildViewMenuExtras()
         {
-            bool fullPreviewMode = uiMgrSdfGlue_.GetFullPreviewMode();
-            if (ImGui.Checkbox("Full screen preview", ref fullPreviewMode))
-                uiMgrSdfGlue_.SetFullPreviewMode(fullPreviewMode);
+            // the menu is visible only in the editor mode; F12 cycles Editor -> Maximized -> Fullscreen, Esc returns
+            if (ImGui.MenuItem("Maximized preview", "F12"))                         { uiMgrSdfGlue_.SetPreviewViewMode(PreviewViewMode.Maximized); }
+            if (ImGui.MenuItem("Fullscreen preview", "F12"))                        { uiMgrSdfGlue_.SetPreviewViewMode(PreviewViewMode.Fullscreen); }
+
+            // pass drawn under all windows (visible in the empty area of the dockspace)
+            if (ImGui.BeginMenu("Background preview"))
+            {
+                uiMgrSdfGlue_.BuildBackgroundPreviewMenuItems();
+                ImGui.EndMenu();
+            }
         }
     }
 }

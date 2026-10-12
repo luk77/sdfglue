@@ -126,6 +126,13 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
 
         }
 
+        public void ClearWindowToBlack()
+        {
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            GL.ClearColor(new Color4(0, 0, 0, 255));
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+        }
+
         public void ReinitializeShader(ShaderCodeGenerator codeGenerator)
         {
             foreach(RenderPass pass in passes_)

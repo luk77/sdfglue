@@ -23,6 +23,8 @@ namespace SingleDocAppCore.Settings
         public  int                     UpdateFrequencyLimit    = 60;
         public  string                  LayoutFile              = "";       // relative to the layouts directory, empty - application default
         public  string                  UiStyle                 = "Dark";   // name of a style registered in the framework (UiStyles)
+        public  bool                    FullscreenOnPrimaryMonitor = false; // borderless fullscreen: false - monitor with the window, true - primary monitor
+        public  float                   WindowOpacity           = 0.75f;    // opacity of window backgrounds, used by apps that draw under the UI (SdAppWindow.GetWindowOpacity)
 
         // XML of the last loaded/saved state, used by IsModified()
         private string?                 lastSavedXml_           = null;
@@ -54,6 +56,8 @@ namespace SingleDocAppCore.Settings
             XmlUtils.AddNodeInt     (xmlDoc, node, "UpdateFrequencyLimit"       , UpdateFrequencyLimit      );
             XmlUtils.AddNodeString  (xmlDoc, node, "LayoutFile"                 , LayoutFile                );
             XmlUtils.AddNodeString  (xmlDoc, node, "UiStyle"                    , UiStyle                   );
+            XmlUtils.AddNodeBool    (xmlDoc, node, "FullscreenOnPrimaryMonitor" , FullscreenOnPrimaryMonitor);
+            XmlUtils.AddNodeFloat   (xmlDoc, node, "WindowOpacity"              , WindowOpacity             );
         }
 
         // Missing nodes keep the current values (files saved by older versions stay valid)
@@ -74,6 +78,10 @@ namespace SingleDocAppCore.Settings
             string? uiStyle = UiStyle;
             XmlUtils.DeserializeString  (parentNode, "UiStyle"                    , ref uiStyle                   );
             UiStyle = String.IsNullOrEmpty(uiStyle) ? UiStyle : uiStyle;
+
+            XmlUtils.DeserializeBool    (parentNode, "FullscreenOnPrimaryMonitor" , ref FullscreenOnPrimaryMonitor);
+            XmlUtils.DeserializeFloat   (parentNode, "WindowOpacity"              , ref WindowOpacity             );
+            WindowOpacity = Math.Clamp(WindowOpacity, 0.0f, 1.0f);
 
             return true;
         }

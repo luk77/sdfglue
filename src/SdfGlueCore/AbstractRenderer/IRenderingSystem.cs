@@ -11,5 +11,7 @@ namespace SdfGlueCore.AbstractRenderer
         void ReinitializeShader(ShaderCodeGenerator codeGenerator);
         void ReinitializePreviewFrameBuffer(IntCoords previewResolution);
         void RenderFrame(DataModel model, int appViewportWidth, int appViewportHeight);
+        // Clears the whole application window to black (e.g. bars around a preview drawn directly into the window)
+        void ClearWindowToBlack();
    }
 }

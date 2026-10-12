@@ -7,6 +7,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using SdfGlueCore.Model;
+using SdfGlueCore.Model.DataNodes;
 using SdfGlueCore.Model.DataNodes.Signals;
 using SdfGlueEditor.Application;
 using SdfGlueEditor.Rendering.SdfGlueRendering;
@@ -169,7 +170,7 @@ namespace SdfGlueEditor
             }
         }
 
-        // camera movement in the preview (WASD, Q/E) and the full preview mode (F12)
+        // camera movement in the preview (WASD, Q/E) and the maximized / fullscreen preview modes (F12)
         protected override void RegisterReservedInputKeys(HashSet<string> reservedKeys)
         {
             base.RegisterReservedInputKeys(reservedKeys);
@@ -183,6 +184,9 @@ namespace SdfGlueEditor
         {
             // Note: UI input, shortcuts and user settings (update frequency) are handled in base.OnUpdateFrame()
             base.OnUpdateFrame(e);
+
+            // after the shortcuts (base.OnUpdateFrame); the mode can also be changed from the View menu
+            SyncFullscreenWindow();
 
             camera_.RecalculateCamera();
 
@@ -198,9 +202,28 @@ namespace SdfGlueEditor
             demoMode_.Update(e.Time, ref GetUiManager().EnabledDemoMode);
         }
 
+        // windows are (semi-)transparent only while the background preview is visible
+        protected override float GetWindowOpacity()
+        {
+            return GetUiManager().IsBackgroundPreviewActive() ? UserSettings.WindowOpacity : 1.0f;
+        }
+
+        // borderless fullscreen OS window only in the fullscreen preview mode
+        private void SyncFullscreenWindow()
+        {
+            bool fullscreen = GetUiManager().GetPreviewViewMode() == PreviewViewMode.Fullscreen;
+            if (fullscreen != IsBorderlessFullscreen())
+                SetBorderlessFullscreen(fullscreen);
+        }
+
         protected override void OnRender3d()
         {
             render_.RenderFrame();
+
+            // fullscreen / background preview: drawn directly into the window (under the UI); the mode is from the previous UI frame
+            RenderPassData? screenPass = GetUiManager().GetScreenPreviewPass(out bool keepAspectRatio);
+            if (screenPass != null)
+                render_.RenderScreenPreview(screenPass, keepAspectRatio);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -257,17 +280,18 @@ namespace SdfGlueEditor
         {
             UiManagerSdfGlue uiMgr = GetUiManager();
 
+            // Editor -> Maximized -> Fullscreen -> Editor
             if (IsKeyPressed(Keys.F12))
             {
-                uiMgr.SetFullPreviewMode(!uiMgr.GetFullPreviewMode());
+                uiMgr.CyclePreviewViewMode();
             }
 
             if (IsKeyPressed(Keys.Escape))
             {
-                // turn off full preview mode
-                if (uiMgr.GetFullPreviewMode())
+                // back to the editor from maximized / fullscreen preview
+                if (uiMgr.GetPreviewViewMode() != PreviewViewMode.Editor)
                 {
-                    uiMgr.SetFullPreviewMode(false);
+                    uiMgr.SetPreviewViewMode(PreviewViewMode.Editor);
                 }
             }
 
