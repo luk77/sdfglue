@@ -40,11 +40,17 @@ namespace SdfGlueUi.Ui.Windows
         private MenuRenderPass.PreviewMode  previewMode_            = MenuRenderPass.PreviewMode.LastSelectedPass;
         private RenderPassData?             selectedPass_           = null;
 
+        // background preview: not an ImGui window, drawn under all windows (see UiManagerSdfGlue)
+        private bool                        isBackground_           = false;
+
+        // camera smoothing is updated once per frame, also when more previews are visible
+        private static int                  lastSmoothingFrame_     = -1;
+
         private string title_ = string.Empty;
         public override string Title
         {
             get
-            { 
+            {
                 return title_;
             }
         }
@@ -52,6 +58,15 @@ namespace SdfGlueUi.Ui.Windows
         public WndPreview(string title)
         {
             title_ = title;
+        }
+
+        // Background preview - shows nothing until a pass is chosen in the View menu
+        public WndPreview(string title, bool isBackground)
+        {
+            title_          = title;
+            isBackground_   = isBackground;
+            if (isBackground_)
+                previewMode_ = MenuRenderPass.PreviewMode.None;
         }
 
         public override void Build()
@@ -197,6 +212,69 @@ namespace SdfGlueUi.Ui.Windows
             });
         }
 
+        public bool KeepAspectRatio { get { return constAspectRatio_; } }
+
+        // Preview rectangle in the application window (ImGui coordinates) for the preview drawn by the application
+        // directly into the window framebuffer (see BuildScreenPreview). Used by the renderer and the mouse input.
+        public static void CalcScreenRect(Vector2 windowSize, IntCoords previewRes, bool keepAspectRatio, out Vector2 pos, out Vector2 size)
+        {
+            pos     = Vector2.Zero;
+            size    = windowSize;
+
+            if (!keepAspectRatio || windowSize.X <= 0.0f || windowSize.Y <= 0.0f || previewRes.X <= 0 || previewRes.Y <= 0)
+                return;
+
+            float scale = Math.Min(windowSize.X / previewRes.X, windowSize.Y / previewRes.Y);
+            size    = new Vector2(previewRes.X * scale, previewRes.Y * scale);
+            pos     = 0.5f * (windowSize - size);
+        }
+
+        // Pass shown by the fullscreen preview (main preview) or the background preview (null - none)
+        public RenderPassData? GetScreenPreviewPass()
+        {
+            if (!isBackground_)
+                return GetModel().GetRPassDataForPreview();
+
+            MenuRenderPass.ResolveSelectedPass(GetModel(), previewMode_, ref selectedPass_);
+
+            // a chosen pass may have been deleted (or another project loaded)
+            if (selectedPass_ != null && !GetModel().RenderingSysData.Children.Contains(selectedPass_))
+                return null;
+
+            return selectedPass_;
+        }
+
+        // Fullscreen / background preview: the image is drawn by the application directly into the window framebuffer
+        // (RenderController.RenderScreenPreview), no ImGui window is built - only the state needed by HandleInput().
+        // Fullscreen (exclusive): nothing else is on the screen. Background: the camera is controlled when
+        // the mouse is not over an ImGui window (and keyboard - when no window is focused).
+        public void BuildScreenPreview(bool exclusive)
+        {
+            UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
+
+            CalcScreenRect(new Vector2(uiMgr.MainWindowSizeX, uiMgr.MainWindowSizeY), GetModel().Config.GetPreviewResolution(),
+                           constAspectRatio_, out previewPos_, out previewSize_);
+
+            if (exclusive)
+            {
+                IsHovered = true;
+                IsFocused = true;
+            }
+            else
+            {
+                IsHovered = !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow);
+                IsFocused = !ImGui.IsWindowFocused(ImGuiFocusedFlags.AnyWindow);
+            }
+        }
+
+        // Background preview items of the View menu
+        public void BuildBackgroundMenuItems()
+        {
+            MenuRenderPass.BuildMenuItems(GetModel(), ref previewMode_, ref selectedPass_, true);
+            ImGui.Separator();
+            ImGui.MenuItem("Keep aspect ratio", "", ref constAspectRatio_);
+        }
+
         public void BuildFullPreview()
         {
             UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
@@ -309,9 +387,16 @@ namespace SdfGlueUi.Ui.Windows
             HandlePanAndRotationByMouse();
             HandleMovementByWASD(deltaTime);
 
-            GetModel().CameraDat.UpdateSmoothing(deltaTime, GetModel().Config);
+            int frame = ImGui.GetFrameCount();
+            if (frame != lastSmoothingFrame_)
+            {
+                lastSmoothingFrame_ = frame;
+                GetModel().CameraDat.UpdateSmoothing(deltaTime, GetModel().Config);
+            }
 
-            StoreMouseDataForShader();
+            // the background preview does not override the mouse data of preview windows
+            if (!isBackground_ || IsHovered)
+                StoreMouseDataForShader();
         }
 
         private void HandleCameraDistanceByMouseWheel()

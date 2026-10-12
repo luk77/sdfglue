@@ -87,6 +87,24 @@ namespace SingleDocAppFramework.Ui.Windows
             UiFloat.Build   (ref index, "User interface text scale factor"  , ref UserSettings.UiTextScaleFactor, 0.01f, 0.05f, 2.0f);
         }
 
+        // Single property (without a section) - monitor used by the borderless fullscreen mode (SdAppWindow.SetBorderlessFullscreen)
+        protected void BuildFullscreenMonitor(ref int index)
+        {
+            string[] monitorNames = { "Monitor with the window", "Primary monitor" };
+            int monitorIndex = UserSettings.FullscreenOnPrimaryMonitor ? 1 : 0;
+
+            UiComboBox.Build(ref index, "Fullscreen monitor", monitorNames, ref monitorIndex);
+
+            UserSettings.FullscreenOnPrimaryMonitor = (monitorIndex == 1);
+        }
+
+        // Single property (without a section) - opacity of window backgrounds (used only if the app overrides
+        // SdAppWindow.GetWindowOpacity, e.g. while something is drawn under the UI)
+        protected void BuildWindowOpacity(ref int index, string label)
+        {
+            UiFloat.Build   (ref index, label, ref UserSettings.WindowOpacity, 0.01f, 0.0f, 1.0f);
+        }
+
         protected void BuildFpsLimitSettings(ref int index, float firstColumnWidth)
         {
             if (ImGui.CollapsingHeader("FPS Limits"))

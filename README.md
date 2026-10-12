@@ -28,6 +28,8 @@ The project is heavily inspired by **Shadertoy** and the work of its community. 
 - camera controls similar to popular 3D tools (e.g. Blender, Unity)
 - real-time parameter editing with live preview
 - adjustable preview resolution
+- preview modes: maximized (F12) and borderless fullscreen (F12 twice, Esc returns to the editor)
+- background preview: any render pass drawn under the editor windows, with adjustable window opacity
 - customizable layout
 - easy integration of custom SDF functions
 - GLSL code generation preview

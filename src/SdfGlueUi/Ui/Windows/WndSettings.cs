@@ -45,6 +45,8 @@ namespace SdfGlueUi.Ui.Windows
                 UiBool.Build    (ref index, "Use Alt+RMB for camera rotation"   , ref Settings.UseAltRmbForCameraRotation);
                 BuildUiStyle(ref index);
                 BuildUiTextScaleFactor(ref index);
+                BuildFullscreenMonitor(ref index);
+                BuildWindowOpacity(ref index, "Window opacity (background preview)");
 
                 EndPropertyGrid();
             }

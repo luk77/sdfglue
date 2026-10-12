@@ -106,7 +106,8 @@ namespace SingleDocAppFramework.Ui
             return null;
         }
 
-        public void HandleInput(float deltaTime)
+        // Override to handle input of UI elements that are not registered windows (call the base implementation)
+        public virtual void HandleInput(float deltaTime)
         {
             foreach(UiWindowBase wnd in allWindows_)
             {
@@ -127,11 +128,19 @@ namespace SingleDocAppFramework.Ui
             return false;
         }
 
+        // Override to change the flags of the dockspace over the main viewport, e.g. PassthruCentralNode
+        // (the empty central node shows what the application rendered under the UI) or KeepAliveOnly
+        // (the dockspace is not displayed, docked windows stay docked)
+        protected virtual ImGuiDockNodeFlags GetDockSpaceFlags()
+        {
+            return ImGuiDockNodeFlags.None;
+        }
+
         public void SubmitUI()
         {
             if (AppSettings.EnableDocking)
             {
-                ImGui.DockSpaceOverViewport();
+                ImGui.DockSpaceOverViewport(0, ImGui.GetMainViewport(), GetDockSpaceFlags());
             }
 
             if (SubmitOverrideUI())

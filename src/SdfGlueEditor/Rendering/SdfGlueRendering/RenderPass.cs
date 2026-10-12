@@ -500,6 +500,20 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
         }
 
 
+        // Direct copy into the default framebuffer (no ImGui) - used for the fullscreen / background preview
+        public void BlitToWindow(IntCoords sourceSize, int dstX0, int dstY0, int dstX1, int dstY1)
+        {
+            if (windowFrameBuffer_ == 0)
+                return;
+
+            BlitFramebufferFilter filter = passData_.UseTextureFiltering.Val ? BlitFramebufferFilter.Linear : BlitFramebufferFilter.Nearest;
+
+            GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, windowFrameBuffer_);
+            GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+            GL.BlitFramebuffer(0, 0, sourceSize.X, sourceSize.Y, dstX0, dstY0, dstX1, dstY1, ClearBufferMask.ColorBufferBit, filter);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+        }
+
         // Returns a copy of the pass texture (the caller owns the Bitmap and should dispose it).
         // The size is taken from the texture itself, so the buffer always matches the data written by GL.
         public Bitmap? GetFrameAsBitmap()

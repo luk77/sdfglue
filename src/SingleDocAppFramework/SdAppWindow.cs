@@ -36,7 +36,16 @@ namespace SingleDocAppFramework
         private IPlatformServices   platform_;
         private float               dpiScaling_                 = 1.0f;
         private string?             appliedUiStyle_             = null;     // UserSettings.UiStyle applied to ImGui
+        private float               appliedWindowOpacity_       = 1.0f;     // GetWindowOpacity() applied to ImGui
+        private float               styleWindowBgAlpha_         = 1.0f;     // WindowBg alpha of the applied style
         private InputSystem?        inputs_                     = null;     // only with SdAppSettings.EnableInputSystem
+
+        // borderless fullscreen (SetBorderlessFullscreen) and the window state to restore after it
+        private bool                borderlessFullscreen_       = false;
+        private WindowState         savedWindowState_           = WindowState.Normal;
+        private WindowBorder        savedWindowBorder_          = WindowBorder.Resizable;
+        private Vector2i            savedClientLocation_        = new Vector2i(0, 0);
+        private Vector2i            savedClientSize_            = new Vector2i(0, 0);
 
         // userSettings: UserSettingsBase or an application-specific derived class;
         // loaded here, so it is ready in the constructor of the derived window
@@ -269,6 +278,54 @@ namespace SingleDocAppFramework
             GL.Viewport(0, 0, e.Width, e.Height);
         }
 
+        // borderless fullscreen
+
+        public bool IsBorderlessFullscreen()
+        {
+            return borderlessFullscreen_;
+        }
+
+        // A window without border and title bar covering the whole monitor (not the exclusive fullscreen mode -
+        // WindowState.Fullscreen is not used). The monitor is chosen by UserSettings.FullscreenOnPrimaryMonitor.
+        // Turning it off restores the previous window state, position and size.
+        public void SetBorderlessFullscreen(bool enable)
+        {
+            if (enable == borderlessFullscreen_)
+                return;
+
+            if (enable)
+            {
+                // the monitor is taken before leaving the maximized state (the window may be moved by it)
+                MonitorInfo monitor = userSettings_.FullscreenOnPrimaryMonitor
+                                    ? Monitors.GetPrimaryMonitor()
+                                    : Monitors.GetMonitorFromWindow(this);
+
+                savedWindowState_   = WindowState;
+                savedWindowBorder_  = WindowBorder;
+
+                // position and size of the normal (not maximized) window
+                if (WindowState != WindowState.Normal)
+                    WindowState = WindowState.Normal;
+                savedClientLocation_ = ClientLocation;
+                savedClientSize_     = ClientSize;
+
+                Box2i area = monitor.ClientArea;
+                WindowBorder    = WindowBorder.Hidden;
+                ClientLocation  = area.Min;
+                ClientSize      = area.Size;
+            }
+            else
+            {
+                WindowBorder    = savedWindowBorder_;
+                ClientLocation  = savedClientLocation_;
+                ClientSize      = savedClientSize_;
+                if (savedWindowState_ == WindowState.Maximized)
+                    WindowState = WindowState.Maximized;
+            }
+
+            borderlessFullscreen_ = enable;
+        }
+
         // IUiInput
         public bool IsKeyDown(UiKey uiKey)
         {
@@ -461,24 +518,42 @@ namespace SingleDocAppFramework
 
         // UserSettings.UiStyle is checked every frame, so a style chosen in the settings window or the View menu
         // takes effect immediately. Called outside ImGui.NewFrame() / ImGui.Render().
+        // The window opacity (GetWindowOpacity) is checked every frame as well.
         private void ApplyUiStyleIfChanged()
         {
             string styleName = userSettings_.UiStyle;
-            if (styleName == appliedUiStyle_)
+            float  opacity   = Math.Clamp(GetWindowOpacity(), 0.0f, 1.0f);
+            if (styleName == appliedUiStyle_ && opacity == appliedWindowOpacity_)
                 return;
 
-            appliedUiStyle_ = styleName;
+            ImGuiStylePtr style = ImGui.GetStyle();
 
-            if (!UiStyles.Apply(styleName))
-                Console.WriteLine("WARNING: Unknown UI style: {0}, the default style is used", styleName);
-
-            // platform windows (viewports) must be opaque and look like OS windows
-            if ((ImGui.GetIO().ConfigFlags & ImGuiConfigFlags.ViewportsEnable) != 0)
+            if (styleName != appliedUiStyle_)
             {
-                ImGuiStylePtr style = ImGui.GetStyle();
-                style.WindowRounding = 0.0f;
-                style.Colors[(int)ImGuiCol.WindowBg].W = 1.0f;
+                appliedUiStyle_ = styleName;
+
+                if (!UiStyles.Apply(styleName))
+                    Console.WriteLine("WARNING: Unknown UI style: {0}, the default style is used", styleName);
+
+                // platform windows (viewports) must be opaque and look like OS windows
+                if ((ImGui.GetIO().ConfigFlags & ImGuiConfigFlags.ViewportsEnable) != 0)
+                {
+                    style.WindowRounding = 0.0f;
+                    style.Colors[(int)ImGuiCol.WindowBg].W = 1.0f;
+                }
+
+                styleWindowBgAlpha_ = style.Colors[(int)ImGuiCol.WindowBg].W;
             }
+
+            appliedWindowOpacity_ = opacity;
+            style.Colors[(int)ImGuiCol.WindowBg].W = styleWindowBgAlpha_ * opacity;
+        }
+
+        // Opacity of the window backgrounds (multiplies the alpha of the style), e.g. UserSettings.WindowOpacity
+        // while the application draws something under the UI. Default: the style is not changed.
+        protected virtual float GetWindowOpacity()
+        {
+            return 1.0f;
         }
 
         // Layout remembered in the user settings, or the default one if it is not set or does not exist

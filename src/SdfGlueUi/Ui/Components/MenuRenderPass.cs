@@ -15,12 +15,14 @@ namespace SdfGlueUi.Ui.Components
     {
         private static readonly string      lastSelectedPassLabel_      = "-- Last selected pass --";
         private static readonly string      finalPassLabel_             = "-- Final pass --";
+        private static readonly string      noneLabel_                  = "-- None --";
 
         public enum PreviewMode
         {
             LastSelectedPass,
             FinalPass,
-            Custom
+            Custom,
+            None        // nothing is displayed (background preview)
         }
 
         public static void Build(DataModel model, ref PreviewMode previewMode, ref RenderPassData? selectedPass)
@@ -56,36 +58,61 @@ namespace SdfGlueUi.Ui.Components
             }
             if (ImGui.BeginPopup("menu_render_passes"))
             {
-                // last selected pass
-                if (ImGui.MenuItem(lastSelectedPassLabel_))
-                {
-                    previewMode = PreviewMode.LastSelectedPass;
-                    selectedPass = null;
-                }
-                ImGui.Separator();
-                // all, one by one
-                foreach (TreeNode tn in model.RenderingSysData.Children)
-                {
-                    RenderPassData? p = tn as RenderPassData;
-                    if (p == null)
-                        continue;
-                    if (ImGui.MenuItem(p.Name.Val))
-                    {
-                        previewMode = PreviewMode.Custom;
-                        selectedPass = p;
-                    }
-                }
-                ImGui.Separator();
-                // final pass
-                if (ImGui.MenuItem(finalPassLabel_))
-                {
-                    previewMode = PreviewMode.FinalPass;
-                    selectedPass = null;
-                }
+                BuildMenuItems(model, ref previewMode, ref selectedPass, false);
                 ImGui.EndPopup();
             }
 
-            if (previewMode == MenuRenderPass.PreviewMode.LastSelectedPass)
+            ResolveSelectedPass(model, previewMode, ref selectedPass);
+        }
+
+        // Menu items: [none], last selected pass, all passes, final pass (inside a popup or a menu)
+        public static void BuildMenuItems(DataModel model, ref PreviewMode previewMode, ref RenderPassData? selectedPass, bool withNone)
+        {
+            if (withNone)
+            {
+                if (ImGui.MenuItem(noneLabel_, "", previewMode == PreviewMode.None))
+                {
+                    previewMode = PreviewMode.None;
+                    selectedPass = null;
+                }
+                ImGui.Separator();
+            }
+            // last selected pass
+            if (ImGui.MenuItem(lastSelectedPassLabel_, "", previewMode == PreviewMode.LastSelectedPass))
+            {
+                previewMode = PreviewMode.LastSelectedPass;
+                selectedPass = null;
+            }
+            ImGui.Separator();
+            // all, one by one
+            foreach (TreeNode tn in model.RenderingSysData.Children)
+            {
+                RenderPassData? p = tn as RenderPassData;
+                if (p == null)
+                    continue;
+                if (ImGui.MenuItem(p.Name.Val, "", previewMode == PreviewMode.Custom && selectedPass == p))
+                {
+                    previewMode = PreviewMode.Custom;
+                    selectedPass = p;
+                }
+            }
+            ImGui.Separator();
+            // final pass
+            if (ImGui.MenuItem(finalPassLabel_, "", previewMode == PreviewMode.FinalPass))
+            {
+                previewMode = PreviewMode.FinalPass;
+                selectedPass = null;
+            }
+        }
+
+        // The pass to display for the mode (LastSelectedPass / FinalPass follow the model, None - null)
+        public static void ResolveSelectedPass(DataModel model, PreviewMode previewMode, ref RenderPassData? selectedPass)
+        {
+            if (previewMode == PreviewMode.None)
+            {
+                selectedPass = null;
+            }
+            else if (previewMode == MenuRenderPass.PreviewMode.LastSelectedPass)
             {
                 selectedPass = model.LastSelectedRPass;
             }
