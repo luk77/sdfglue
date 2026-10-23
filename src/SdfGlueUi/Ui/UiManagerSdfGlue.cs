@@ -6,9 +6,11 @@
 using ImGuiNET;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.DataNodes;
+using SdfGlueUi.Ui.Settings;
 using SdfGlueUi.Ui.Windows;
 using SingleDocAppFramework.Ui;
 using SingleDocAppFramework.Ui.Menu;
+using SingleDocAppFramework.Ui.Settings;
 using SingleDocAppFramework.Ui.Windows;
 
 namespace SdfGlueUi.Ui
@@ -49,7 +51,6 @@ namespace SdfGlueUi.Ui
                 RegisterWindow(new WndGeneratedCode(String.Format("Code view {0}", i+1)), ViewGroupCode, false);
             }
             RegisterWindow(new WndLog()                 , null, false);
-            RegisterWindow(new WndSettings()            , null, false);
             RegisterWindow(new WndDiagnostics()         , null, false);
             RegisterWindow(new WndPlayback());
             if (DataModel.UseSignals)
@@ -86,6 +87,13 @@ namespace SdfGlueUi.Ui
         protected override MainMenuBase CreateMainMenu()
         {
             return new MainMenuSdfGlue(this);
+        }
+
+        protected override void RegisterSettingsCategories(SettingsRegistry registry)
+        {
+            base.RegisterSettingsCategories(registry);
+
+            SettingsCategoriesSdfGlue.Register(registry);
         }
 
         // Pass drawn by the application directly into the window, under the UI (null - nothing).

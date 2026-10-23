@@ -30,6 +30,7 @@ namespace SingleDocAppFramework.Ui
         UserSettingsBase GetUserSettings            ();
         void    OnSaveUserSettings                  ();
         void    OnRestoreDefaultUserSettings        ();     // in memory only
+        void    OnUserSettingsChanged               ();     // call after editing the settings in memory - they are applied in the next frame
 
         // optional input system (null if disabled - SdAppSettings.EnableInputSystem)
         InputSystem? GetInputSystem                 ();

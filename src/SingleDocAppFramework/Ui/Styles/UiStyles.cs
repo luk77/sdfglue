@@ -34,9 +34,15 @@ namespace SingleDocAppFramework.Ui.Styles
 
         static UiStyles()
         {
-            Register("Dark"     , delegate(ImGuiStylePtr style) { ImGui.StyleColorsDark(style);     });
-            Register("Light"    , delegate(ImGuiStylePtr style) { ImGui.StyleColorsLight(style);    });
-            Register("Classic"  , delegate(ImGuiStylePtr style) { ImGui.StyleColorsClassic(style);  });
+            Register("Dark"     , delegate(ImGuiStylePtr style) { ImGui.StyleColorsDark(style);     ApplyStyleModifications(style); });
+            Register("Light"    , delegate(ImGuiStylePtr style) { ImGui.StyleColorsLight(style);    ApplyStyleModifications(style); });
+            Register("Classic"  , delegate(ImGuiStylePtr style) { ImGui.StyleColorsClassic(style);  ApplyStyleModifications(style); });
+        }
+
+        private static void ApplyStyleModifications(ImGuiStylePtr style)
+        {
+            style.Colors[(int)ImGuiCol.ModalWindowDimBg] = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
+            style.Colors[(int)ImGuiCol.PopupBg].W = 1.0f;
         }
 
         // Adds a style, or replaces a registered style with the same name (names are case-insensitive)

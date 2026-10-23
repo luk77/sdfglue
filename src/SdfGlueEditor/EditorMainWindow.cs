@@ -13,6 +13,7 @@ using SdfGlueEditor.Application;
 using SdfGlueEditor.Rendering.SdfGlueRendering;
 using SdfGlueUi.Ui;
 using SingleDocAppCore.Input;
+using SingleDocAppCore.Settings;
 using SingleDocAppFramework;
 using SingleDocAppFramework.Platform;
 using SingleDocAppFramework.Ui;
@@ -200,6 +201,20 @@ namespace SdfGlueEditor
             }
 
             demoMode_.Update(e.Time, ref GetUiManager().EnabledDemoMode);
+        }
+
+        // Called only after the user settings were changed (settings dialog, revert, restore defaults)
+        protected override void ApplyUserSettings(UserSettingsBase? previous)
+        {
+            base.ApplyUserSettings(previous);
+
+            UserSettingsSdfGlue? prev = previous as UserSettingsSdfGlue;
+            if (prev == null)
+                return;
+
+            // identifiers in the generated code
+            if (prev.UseNamesAsIds != GetModel().Config.UseNamesAsIds)
+                render_.RebuildShader();
         }
 
         // windows are (semi-)transparent only while the background preview is visible

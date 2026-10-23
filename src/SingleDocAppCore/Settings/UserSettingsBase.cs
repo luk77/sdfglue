@@ -11,7 +11,7 @@ namespace SingleDocAppCore.Settings
     // User settings common to all SingleDocApp applications, persisted in an XML file.
     // Applications derive from this class, add their own fields and override
     // Serialize(xmlDoc, node) / Deserialize(node) (calling the base implementation).
-    // Derived classes must have a parameterless constructor (used by RestoreDefaults()).
+    // Derived classes must have a parameterless constructor (used by CreateDefaults()).
     public class UserSettingsBase
     {
         public static readonly string   RootNodeName            = "UserSettings";
@@ -136,17 +136,39 @@ namespace SingleDocAppCore.Settings
         // Sets default values (in memory only - saving is explicit)
         public void RestoreDefaults()
         {
+            RestoreSnapshot(CreateDefaults().TakeSnapshot());
+        }
+
+        // New instance of the same (derived) type with default values
+        public UserSettingsBase CreateDefaults()
+        {
             UserSettingsBase? defaults = Activator.CreateInstance(GetType()) as UserSettingsBase;
             if (defaults == null)
-                return;
+                throw new InvalidOperationException(String.Format("Can't create default user settings: {0}", GetType().Name));
 
             defaults.InitDefault();
+            return defaults;
+        }
 
-            XmlElement? rootNode = defaults.Serialize().DocumentElement;
-            if (rootNode == null)
-                return;
+        // Copy of the current state, e.g. to revert changes made in the settings dialog
+        public XmlDocument TakeSnapshot()
+        {
+            return Serialize();
+        }
 
-            Deserialize(rootNode);
+        public void RestoreSnapshot(XmlDocument snapshot)
+        {
+            XmlElement? rootNode = snapshot.DocumentElement;
+            if (rootNode != null)
+                Deserialize(rootNode);
+        }
+
+        // Independent copy of the current state (same type)
+        public UserSettingsBase Clone()
+        {
+            UserSettingsBase copy = CreateDefaults();
+            copy.RestoreSnapshot(TakeSnapshot());
+            return copy;
         }
 
         private string GetXmlText()

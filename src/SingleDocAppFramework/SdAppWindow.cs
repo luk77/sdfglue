@@ -38,6 +38,8 @@ namespace SingleDocAppFramework
         private string?             appliedUiStyle_             = null;     // UserSettings.UiStyle applied to ImGui
         private float               appliedWindowOpacity_       = 1.0f;     // GetWindowOpacity() applied to ImGui
         private float               styleWindowBgAlpha_         = 1.0f;     // WindowBg alpha of the applied style
+        private bool                userSettingsChanged_        = true;     // ApplyUserSettings() pending (NotifyUserSettingsChanged)
+        private UserSettingsBase?   appliedUserSettings_        = null;     // copy of the settings passed last to ApplyUserSettings()
         private InputSystem?        inputs_                     = null;     // only with SdAppSettings.EnableInputSystem
 
         // borderless fullscreen (SetBorderlessFullscreen) and the window state to restore after it
@@ -103,14 +105,50 @@ namespace SingleDocAppFramework
         public void RestoreDefaultUserSettings()
         {
             userSettings_.RestoreDefaults();
+            NotifyUserSettingsChanged();
         }
 
-        // Applies settings that are not read directly where they are used.
-        // Called in OnLoad() and every frame, so changes in the settings window take effect immediately.
-        protected virtual void ApplyUserSettings()
+        // To be called after the user settings were changed in memory (settings dialog, menu, revert).
+        // ApplyUserSettings() is called once at the beginning of the next update frame.
+        public void NotifyUserSettingsChanged()
+        {
+            userSettingsChanged_ = true;
+        }
+
+        private void ApplyUserSettingsIfChanged()
+        {
+            if (!userSettingsChanged_)
+                return;
+
+            userSettingsChanged_ = false;
+
+            ApplyUserSettings(appliedUserSettings_);
+            appliedUserSettings_ = userSettings_.Clone();
+        }
+
+        // Applies settings that are not read directly where they are used. Called only after a change
+        // (NotifyUserSettingsChanged), not every frame - expensive operations are allowed here.
+        // previous: settings applied the last time (compare to apply only what changed),
+        //           null on the first call (in OnLoad(), before the UI manager and ImGui are created).
+        // Derived classes call the base implementation.
+        protected virtual void ApplyUserSettings(UserSettingsBase? previous)
         {
             //RenderFrequency = userSettings_.UseRenderFrequencyLimit ? userSettings_.RenderFrequencyLimit : 0;
             UpdateFrequency = userSettings_.UseUpdateFrequencyLimit ? userSettings_.UpdateFrequencyLimit : 0;
+
+            if (imguiInitialized_)
+                ApplyImGuiUserSettings();
+        }
+
+        // Settings stored in the ImGui context: also applied after the context is (re)created
+        private void ApplyImGuiUserSettings()
+        {
+            float scaling = GetWindowsScaling();
+            uiMgr_.WindowsScaling           = scaling;
+            ImGui.GetIO().FontGlobalScale   = scaling;
+
+            if (userSettings_.UiStyle != appliedUiStyle_)
+                ApplyUiStyle();
         }
 
         // Factories implemented by the application.
@@ -123,7 +161,7 @@ namespace SingleDocAppFramework
         {
             // Note: derived classes should call base.OnLoad() at the end of their OnLoad()!
 
-            ApplyUserSettings();
+            ApplyUserSettingsIfChanged();
 
             InitInputSystem();
 
@@ -172,7 +210,7 @@ namespace SingleDocAppFramework
         // is active and no shortcut modifier (Ctrl/Alt) is pressed
         protected virtual bool IsKeyboardInputActive()
         {
-            return imguiInitialized_ && IsApplicationFocused() && !ImGui.GetIO().WantTextInput && !IsDownAnyCtrl() && !IsDownAnyAlt();
+            return imguiInitialized_ && IsApplicationFocused() && !uiMgr_.IsModalDialogOpen() && !ImGui.GetIO().WantTextInput && !IsDownAnyCtrl() && !IsDownAnyAlt();
         }
 
         // Default input channels (no input settings file, "Restore defaults")
@@ -387,20 +425,19 @@ namespace SingleDocAppFramework
         {
             base.OnUpdateFrame(e);
 
-            ApplyUserSettings();
+            ApplyUserSettingsIfChanged();
 
             currMouseClientPos_ = this.PointToClient(new Vector2i((int)MouseState.X, (int)MouseState.Y));
 
             // this is required when docking for proper positioning of preview image
-            uiMgr_.WindowsScaling   = GetWindowsScaling();
             uiMgr_.MainWindowSizeX  = this.ClientSize.X;
             uiMgr_.MainWindowSizeY  = this.ClientSize.Y;
 
-            ImGui.GetIO().FontGlobalScale = GetWindowsScaling();
+            // depends also on the application state (GetWindowOpacity), cheap when nothing changed
+            ApplyWindowOpacityIfChanged();
 
-            ApplyUiStyleIfChanged();
-
-            if (IsApplicationFocused())
+            // a modal dialog (e.g. settings) blocks the input of windows and shortcuts
+            if (IsApplicationFocused() && !uiMgr_.IsModalDialogOpen())
             {
                 uiMgr_.HandleInput((float)e.Time);
 
@@ -425,7 +462,7 @@ namespace SingleDocAppFramework
         private static readonly Keys[] WindowToggleKeys = { Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0 };
 
         // Shortcuts common to all applications: New/Open/Save/Save as, Undo/Redo,
-        // close focused window (Ctrl+W) and toggle windows (Ctrl+1..Ctrl+0)
+        // close focused window (Ctrl+W), settings dialog (Ctrl+,) and toggle windows (Ctrl+1..Ctrl+0)
         private void HandleFrameworkShortcuts()
         {
             if (!appSettings_.EnableFrameworkShortcuts)
@@ -468,6 +505,10 @@ namespace SingleDocAppFramework
             {
                 uiMgr_.CloseCurrentWindow();
             }
+            if (IsKeyPressed(Keys.Comma))
+            {
+                uiMgr_.OpenSettingsDialog();
+            }
 
             for (int i = 0; i < WindowToggleKeys.Length; i++)
             {
@@ -496,8 +537,10 @@ namespace SingleDocAppFramework
             if (appSettings_.EnableViewports)
                 io.ConfigFlags |= ImGuiConfigFlags.ViewportsEnable;     // This allows drag-out windows
 
+            // the new context has the default style and scale
             appliedUiStyle_ = null;
-            ApplyUiStyleIfChanged();
+            ApplyImGuiUserSettings();
+            ApplyWindowOpacityIfChanged();
 
             ImguiImplOpenTK4.Init(this);
             ImguiImplOpenGL3.Init();
@@ -516,37 +559,41 @@ namespace SingleDocAppFramework
             uiMgr_.ApplyLayout(layoutData);
         }
 
-        // UserSettings.UiStyle is checked every frame, so a style chosen in the settings window or the View menu
-        // takes effect immediately. Called outside ImGui.NewFrame() / ImGui.Render().
-        // The window opacity (GetWindowOpacity) is checked every frame as well.
-        private void ApplyUiStyleIfChanged()
+        // Applies UserSettings.UiStyle (with the current window opacity). Called after a change of the user settings
+        // (ApplyUserSettings) or of the ImGui context, outside ImGui.NewFrame() / ImGui.Render().
+        private void ApplyUiStyle()
         {
             string styleName = userSettings_.UiStyle;
-            float  opacity   = Math.Clamp(GetWindowOpacity(), 0.0f, 1.0f);
-            if (styleName == appliedUiStyle_ && opacity == appliedWindowOpacity_)
-                return;
+            appliedUiStyle_ = styleName;
+
+            if (!UiStyles.Apply(styleName))
+                Console.WriteLine("WARNING: Unknown UI style: {0}, the default style is used", styleName);
 
             ImGuiStylePtr style = ImGui.GetStyle();
 
-            if (styleName != appliedUiStyle_)
+            // platform windows (viewports) must be opaque and look like OS windows
+            if ((ImGui.GetIO().ConfigFlags & ImGuiConfigFlags.ViewportsEnable) != 0)
             {
-                appliedUiStyle_ = styleName;
-
-                if (!UiStyles.Apply(styleName))
-                    Console.WriteLine("WARNING: Unknown UI style: {0}, the default style is used", styleName);
-
-                // platform windows (viewports) must be opaque and look like OS windows
-                if ((ImGui.GetIO().ConfigFlags & ImGuiConfigFlags.ViewportsEnable) != 0)
-                {
-                    style.WindowRounding = 0.0f;
-                    style.Colors[(int)ImGuiCol.WindowBg].W = 1.0f;
-                }
-
-                styleWindowBgAlpha_ = style.Colors[(int)ImGuiCol.WindowBg].W;
+                style.WindowRounding = 0.0f;
+                style.Colors[(int)ImGuiCol.WindowBg].W = 1.0f;
             }
 
+            styleWindowBgAlpha_ = style.Colors[(int)ImGuiCol.WindowBg].W;
+
+            // the style has replaced the background alpha
+            appliedWindowOpacity_ = 1.0f;
+            ApplyWindowOpacityIfChanged();
+        }
+
+        // The window opacity (GetWindowOpacity) is checked every frame - it may depend on the application state
+        private void ApplyWindowOpacityIfChanged()
+        {
+            float opacity = Math.Clamp(GetWindowOpacity(), 0.0f, 1.0f);
+            if (opacity == appliedWindowOpacity_)
+                return;
+
             appliedWindowOpacity_ = opacity;
-            style.Colors[(int)ImGuiCol.WindowBg].W = styleWindowBgAlpha_ * opacity;
+            ImGui.GetStyle().Colors[(int)ImGuiCol.WindowBg].W = styleWindowBgAlpha_ * opacity;
         }
 
         // Opacity of the window backgrounds (multiplies the alpha of the style), e.g. UserSettings.WindowOpacity
