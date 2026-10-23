@@ -31,6 +31,7 @@ The project is heavily inspired by **Shadertoy** and the work of its community. 
 - preview modes: maximized (F12) and borderless fullscreen (F12 twice, Esc returns to the editor)
 - background preview: any render pass drawn under the editor windows, with adjustable window opacity
 - customizable layout
+- settings dialog (File → Settings..., Ctrl+,): categories, live preview, OK / Cancel / reset to default per category
 - easy integration of custom SDF functions
 - GLSL code generation preview
 - shader export: Shadertoy (single pass) and Unity (experimental), to the clipboard or to a file

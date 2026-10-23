@@ -95,6 +95,11 @@ namespace SingleDocAppFramework
             window_.RestoreDefaultUserSettings();
         }
 
+        public void OnUserSettingsChanged()
+        {
+            window_.NotifyUserSettingsChanged();
+        }
+
         public InputSystem? GetInputSystem()
         {
             return window_.Inputs;

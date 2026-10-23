@@ -7,7 +7,7 @@ using SingleDocAppFramework.Ui.Styles;
 namespace SingleDocAppFramework.Ui.Menu
 {
     // Main menu bar with the menus common to all applications:
-    //   File    - New, Open, Save, Save as, [BuildFileMenuExtras], Exit
+    //   File    - New, Open, Save, Save as, [BuildFileMenuExtras], Settings..., Exit
     //   Edit    - Undo, Redo, [BuildEditMenuExtras]
     //   [BuildAppMenus]  - application-specific menus (e.g. Tools)
     //   View    - windows visibility (grouped by view group), [BuildViewMenuExtras]
@@ -71,6 +71,12 @@ namespace SingleDocAppFramework.Ui.Menu
             if (ImGui.MenuItem("Save as"    , "CTRL+SHIFT+S"))                                  { Executor.OnSaveDocumentAs();  }
 
             BuildFileMenuExtras();
+
+            if (uiMgr_.IsSettingsDialogAvailable())
+            {
+                ImGui.Separator();
+                if (ImGui.MenuItem("Settings...", "CTRL+,"))                                    { uiMgr_.OpenSettingsDialog();  }
+            }
 
             ImGui.Separator();
             if (ImGui.MenuItem("Exit"       , "Alt+F4"))                                        { Executor.OnExitApp();         }
@@ -141,7 +147,10 @@ namespace SingleDocAppFramework.Ui.Menu
             {
                 bool selected = String.Equals(styleName, userSettings.UiStyle, StringComparison.OrdinalIgnoreCase);
                 if (ImGui.MenuItem(styleName, "", selected))
+                {
                     userSettings.UiStyle = styleName;
+                    Executor.OnUserSettingsChanged();
+                }
             }
             ImGui.EndMenu();
         }

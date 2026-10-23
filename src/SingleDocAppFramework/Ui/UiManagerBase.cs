@@ -2,6 +2,7 @@ using ImGuiNET;
 using SingleDocAppFramework.Layouts;
 using SingleDocAppFramework.Ui.Menu;
 using SingleDocAppFramework.Ui.Properties;
+using SingleDocAppFramework.Ui.Settings;
 
 namespace SingleDocAppFramework.Ui
 {
@@ -17,6 +18,7 @@ namespace SingleDocAppFramework.Ui
 
         private IUiExecutorFramework    executor_;
         private MainMenuBase?           mainMenu_               = null;
+        private SettingsDialog?         settingsDialog_         = null;     // created lazily (RegisterSettingsCategories)
 
         private List<UiWindowBase>      allWindows_             = new List<UiWindowBase>();
         private List<string>            viewGroups_             = new List<string>();     // in registration order
@@ -136,6 +138,42 @@ namespace SingleDocAppFramework.Ui
             return ImGuiDockNodeFlags.None;
         }
 
+        // Categories of the settings dialog (File > Settings...). The base implementation registers the framework
+        // categories (FrameworkSettingsCategories). Override to add application categories or to extend
+        // the framework ones (call the base implementation first); with no categories the dialog is not available.
+        protected virtual void RegisterSettingsCategories(SettingsRegistry registry)
+        {
+            FrameworkSettingsCategories.Register(registry);
+        }
+
+        // created lazily, so the derived class is fully constructed before RegisterSettingsCategories() is called
+        private SettingsDialog GetSettingsDialog()
+        {
+            if (settingsDialog_ == null)
+            {
+                SettingsRegistry registry = new SettingsRegistry();
+                RegisterSettingsCategories(registry);
+                settingsDialog_ = new SettingsDialog(executor_, registry);
+            }
+            return settingsDialog_;
+        }
+
+        public bool IsSettingsDialogAvailable()
+        {
+            return GetSettingsDialog().IsAvailable;
+        }
+
+        public void OpenSettingsDialog()
+        {
+            GetSettingsDialog().Open();
+        }
+
+        // True while a modal dialog is open - application shortcuts and window input are disabled
+        public bool IsModalDialogOpen()
+        {
+            return settingsDialog_ != null && settingsDialog_.IsOpen;
+        }
+
         public void SubmitUI()
         {
             if (AppSettings.EnableDocking)
@@ -145,6 +183,7 @@ namespace SingleDocAppFramework.Ui
 
             if (SubmitOverrideUI())
             {
+                settingsDialog_?.Build();
                 UndoEditTracker.EndFrame();
                 return;
             }
@@ -158,6 +197,9 @@ namespace SingleDocAppFramework.Ui
 
             foreach(UiWindowBase wnd in allWindows_)
                 wnd.Build();
+
+            // modal - after the windows
+            settingsDialog_?.Build();
 
             // an edited widget which was not submitted in this frame (e.g. selection changed) saves its undo action
             UndoEditTracker.EndFrame();

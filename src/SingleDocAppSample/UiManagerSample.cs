@@ -14,7 +14,8 @@ namespace SingleDocAppSample
             RegisterWindow(new WndEditor());
             RegisterWindow(new WndStats(), "Info");
             RegisterWindow(new WndLog(), "Info", false);
-            RegisterWindow(new WndUserSettingsBase(), "Info", false);
+
+            // user settings: framework settings dialog (File > Settings...), no window
         }
 
         public ISampleExecutor SampleExecutor { get { return (ISampleExecutor)Executor; } }

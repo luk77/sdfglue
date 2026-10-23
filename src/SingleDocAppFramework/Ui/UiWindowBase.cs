@@ -27,7 +27,12 @@ namespace SingleDocAppFramework.Ui
         // Width of the first (label) column in property grids, adjusted to the UI scaling
         public float GetDefaultFirstColumnWidth()
         {
-            float bonus = Executor.GetWindowsScaling() - 1.0f;
+            return GetDefaultFirstColumnWidth(Executor.GetWindowsScaling());
+        }
+
+        public static float GetDefaultFirstColumnWidth(float windowsScaling)
+        {
+            float bonus = windowsScaling - 1.0f;
 
             return 220.0f + bonus * 120.0f;
         }
