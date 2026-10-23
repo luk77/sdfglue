@@ -53,12 +53,6 @@ Size=2976,905
 Collapsed=0
 DockId=0x0000000C,0
 
-[Window][Settings]
-Pos=0,693
-Size=862,974
-Collapsed=0
-DockId=0x00000009,1
-
 [Window][Diagnostics]
 Pos=0,693
 Size=862,974
@@ -108,7 +102,6 @@ DockSpace       ID=0x7C6B3D9B Pos=0,38 Size=3456,1815 CentralNode=1 Selected=0x3
     <Visibility Window="Code view 3" Visible="False" />
     <Visibility Window="Code view 4" Visible="False" />
     <Visibility Window="Log" Visible="True" />
-    <Visibility Window="Settings" Visible="True" />
     <Visibility Window="Diagnostics" Visible="True" />
     <Visibility Window="Playback" Visible="True" />
   </WindowsVisibility>
