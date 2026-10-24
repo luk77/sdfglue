@@ -283,7 +283,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
 
         public void RenderFrame(DataModel model, bool renderEnabled, int prevPassTextureId)
         {
-            IntCoords resolution = model.Config.GetPreviewResolution();
+            IntCoords resolution = model.GetRenderResolution();
             resolution_.X = resolution.X;
             resolution_.Y = resolution.Y;
 

@@ -171,7 +171,19 @@ namespace SingleDocAppFramework.Ui
         // True while a modal dialog is open - application shortcuts and window input are disabled
         public bool IsModalDialogOpen()
         {
-            return settingsDialog_ != null && settingsDialog_.IsOpen;
+            return (settingsDialog_ != null && settingsDialog_.IsOpen) || IsAppModalDialogOpen();
+        }
+
+        // Override to build application modal dialogs (ImGui popups). Called after the windows and the settings dialog,
+        // also when SubmitOverrideUI() replaced the standard UI.
+        protected virtual void BuildAppModalDialogs()
+        {
+        }
+
+        // Override to report the application modal dialogs built in BuildAppModalDialogs() (see IsModalDialogOpen())
+        protected virtual bool IsAppModalDialogOpen()
+        {
+            return false;
         }
 
         public void SubmitUI()
@@ -184,6 +196,7 @@ namespace SingleDocAppFramework.Ui
             if (SubmitOverrideUI())
             {
                 settingsDialog_?.Build();
+                BuildAppModalDialogs();
                 UndoEditTracker.EndFrame();
                 return;
             }
@@ -200,6 +213,7 @@ namespace SingleDocAppFramework.Ui
 
             // modal - after the windows
             settingsDialog_?.Build();
+            BuildAppModalDialogs();
 
             // an edited widget which was not submitted in this frame (e.g. selection changed) saves its undo action
             UndoEditTracker.EndFrame();

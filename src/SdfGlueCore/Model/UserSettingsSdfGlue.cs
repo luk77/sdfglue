@@ -98,6 +98,15 @@ namespace SdfGlueCore.Model
             return Resolutions[CurrentResolutionIndex];
         }
 
+        // Resolution of the image sequence export (ExportAnimSettings.ResolutionIndex, -1 or out of range: preview resolution)
+        public IntCoords GetExportAnimResolution()
+        {
+            int index = ExportAnimSettings.ResolutionIndex;
+            if (index < 0 || index >= Resolutions.Count)
+                return GetPreviewResolution();
+            return Resolutions[index];
+        }
+
         // Not saved: EnableRendering (diagnostics), Resolutions (built in InitDefault())
         protected override void Serialize(XmlDocument xmlDoc, XmlNode node)
         {

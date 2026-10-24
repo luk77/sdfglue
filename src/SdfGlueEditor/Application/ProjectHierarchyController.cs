@@ -176,7 +176,7 @@ namespace SdfGlueEditor.Application
                     passData.RefreshDefinitionReference(GetModel().Renderers, GetModel().BackdropsDefinitions, GetModel().CameraControllers);
                 }
 
-                renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
+                renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
             }
 
             if (typeof(T) == typeof(SdfObject))
@@ -222,7 +222,7 @@ namespace SdfGlueEditor.Application
                             passData.RefreshDefinitionReference(GetModel().Renderers, GetModel().BackdropsDefinitions, GetModel().CameraControllers);
                         }
 
-                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
+                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
                     }
 
                     if (typeof(T) == typeof(SdfObject))
@@ -293,7 +293,7 @@ namespace SdfGlueEditor.Application
             //newNode.CameraOperators ?.RefreshDefinitionReference(GetModel().CameraControllers);
             newNode.RefreshDefinitionReference(GetModel().Renderers, GetModel().BackdropsDefinitions, GetModel().CameraControllers);
 
-            renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
+            renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
 
             //renderingSystem_.ReinitializeShader(codeGenerator_);
 
@@ -311,7 +311,7 @@ namespace SdfGlueEditor.Application
                 {
                     // redo
                     parent.AddChild(newNode);
-                    renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
+                    renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
                 }
                 ));
         }
@@ -503,7 +503,7 @@ namespace SdfGlueEditor.Application
                     renderingSystem_.ReinitializeShader(codeGenerator_);
 
                     if (node is RenderPassData)
-                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
+                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
 
                 },
                 delegate
@@ -564,7 +564,7 @@ namespace SdfGlueEditor.Application
             node.Parent.RemoveChild(node);
 
             if (node is RenderPassData)
-                renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
+                renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
 
             if (node is SdfObject)
                 renderingSystem_.ReinitializeShader(codeGenerator_);
@@ -591,7 +591,7 @@ namespace SdfGlueEditor.Application
                 return;
 
             if (node is RenderPassData)
-                renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
+                renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
 
             if (node is SdfObject || node is MaterialInstance)
                 renderingSystem_.ReinitializeShader(codeGenerator_);
@@ -604,7 +604,7 @@ namespace SdfGlueEditor.Application
                     node.Parent.MoveChildDown(node);
 
                     if (node is RenderPassData)
-                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
+                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
 
                     if (node is SdfObject || node is MaterialInstance)
                         renderingSystem_.ReinitializeShader(codeGenerator_);
@@ -615,7 +615,7 @@ namespace SdfGlueEditor.Application
                     node.Parent.MoveChildUp(node);
 
                     if (node is RenderPassData)
-                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
+                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
 
                     if (node is SdfObject || node is MaterialInstance)
                         renderingSystem_.ReinitializeShader(codeGenerator_);
@@ -638,7 +638,7 @@ namespace SdfGlueEditor.Application
                 return;
 
             if (node is RenderPassData)
-                renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
+                renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
 
             if (node is SdfObject || node is MaterialInstance)
                 renderingSystem_.ReinitializeShader(codeGenerator_);
@@ -651,7 +651,7 @@ namespace SdfGlueEditor.Application
                     node.Parent.MoveChildUp(node);
 
                     if (node is RenderPassData)
-                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
+                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
 
                     if (node is SdfObject || node is MaterialInstance)
                         renderingSystem_.ReinitializeShader(codeGenerator_);
@@ -662,7 +662,7 @@ namespace SdfGlueEditor.Application
                     node.Parent.MoveChildDown(node);
 
                     if (node is RenderPassData)
-                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().Config.GetPreviewResolution());
+                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
 
                     if (node is SdfObject || node is MaterialInstance)
                         renderingSystem_.ReinitializeShader(codeGenerator_);

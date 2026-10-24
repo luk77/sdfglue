@@ -30,7 +30,7 @@ namespace SdfGlueUi.Ui
         {
             ImGui.Separator();
             if (ImGui.MenuItem("Save image as", "CTRL+I"))                      { ExecutorSdfGlue.OnSaveImage(); }
-            if (ImGui.MenuItem("Export image sequence", ""))                    { ExecutorSdfGlue.OnExportAnimation(); }
+            if (ImGui.MenuItem("Export image sequence...", ""))                 { uiMgrSdfGlue_.OpenExportAnimationDialog(); }
 
             if (ImGui.BeginMenu("Export"))
             {

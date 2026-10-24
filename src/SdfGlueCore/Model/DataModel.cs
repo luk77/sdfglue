@@ -61,6 +61,9 @@ namespace SdfGlueCore.Model
         public bool                     IsPlaying               = true;
         public bool                     UseConstTimeStep        = false;    // TODO: needs polishing
 
+        // Resolution used instead of the preview resolution (image sequence export), not saved
+        public IntCoords?               RenderResolutionOverride = null;
+
         // root object
         public  SdfObject?              SdfRoot                 = null;
 
@@ -768,6 +771,50 @@ namespace SdfGlueCore.Model
 
             if (UseSignals)
                 Signals.Update(CurrentTime, deltaTime);
+        }
+
+        // Advances the time also when paused, without the FPS statistics (image sequence export)
+        public void AdvanceTime(double deltaTime)
+        {
+            LastDeltaTime = deltaTime;
+            CurrentTime += deltaTime;
+            CurrentFrame++;
+
+            if (UseSignals)
+                Signals.Update(CurrentTime, deltaTime);
+        }
+
+        public TimeState CaptureTimeState()
+        {
+            TimeState state = new TimeState();
+            state.LastDeltaTime     = LastDeltaTime;
+            state.CurrentTime       = CurrentTime;
+            state.CurrentFrame      = CurrentFrame;
+            state.AvgRenderTime     = AvgRenderTime;
+            state.Fps               = Fps;
+            state.FpsAccumTime      = FpsAccumTime;
+            state.FpsAccumFrames    = FpsAccumFrames;
+            state.IsPlaying         = IsPlaying;
+            return state;
+        }
+
+        // Note: the internal state of signals (e.g. smoothing) is not restored
+        public void RestoreTimeState(TimeState state)
+        {
+            LastDeltaTime   = state.LastDeltaTime;
+            CurrentTime     = state.CurrentTime;
+            CurrentFrame    = state.CurrentFrame;
+            AvgRenderTime   = state.AvgRenderTime;
+            Fps             = state.Fps;
+            FpsAccumTime    = state.FpsAccumTime;
+            FpsAccumFrames  = state.FpsAccumFrames;
+            IsPlaying       = state.IsPlaying;
+        }
+
+        // Resolution of the rendered frames: the preview resolution or RenderResolutionOverride
+        public IntCoords GetRenderResolution()
+        {
+            return RenderResolutionOverride ?? Config.GetPreviewResolution();
         }
 
         public override void ResetPrevVal()

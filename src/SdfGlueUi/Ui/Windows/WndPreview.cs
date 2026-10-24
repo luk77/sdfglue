@@ -168,7 +168,7 @@ namespace SdfGlueUi.Ui.Windows
                             Vector2 destRatioVec = new Vector2(imgSize.X, imgSize.Y);
                             float destRatio = destRatioVec.X / destRatioVec.Y;
 
-                            IntCoords previewRes = GetModel().Config.GetPreviewResolution();
+                            IntCoords previewRes = GetModel().GetRenderResolution();
 
                             Vector2 scale = new Vector2(1.0f, 1.0f);
                             float ratio = (previewRes.Y > 0.0f) ? (float)previewRes.X / (float)previewRes.Y : 1.0f;
@@ -252,7 +252,7 @@ namespace SdfGlueUi.Ui.Windows
         {
             UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
-            CalcScreenRect(new Vector2(uiMgr.MainWindowSizeX, uiMgr.MainWindowSizeY), GetModel().Config.GetPreviewResolution(),
+            CalcScreenRect(new Vector2(uiMgr.MainWindowSizeX, uiMgr.MainWindowSizeY), GetModel().GetRenderResolution(),
                            constAspectRatio_, out previewPos_, out previewSize_);
 
             if (exclusive)
@@ -327,7 +327,7 @@ namespace SdfGlueUi.Ui.Windows
                     Vector2 destRatioVec = new Vector2(imgSize.X, imgSize.Y);
                     float destRatio = destRatioVec.X / destRatioVec.Y;
 
-                    IntCoords previewRes = GetModel().Config.GetPreviewResolution();
+                    IntCoords previewRes = GetModel().GetRenderResolution();
 
                     Vector2 scale = new Vector2(1.0f, 1.0f);
                     float ratio = (previewRes.Y > 0.0f) ? (float)previewRes.X / (float)previewRes.Y : 1.0f;
@@ -486,7 +486,7 @@ namespace SdfGlueUi.Ui.Windows
 
         private void StoreMouseDataForShader()
         {
-            IntCoords resolution = GetModel().Config.GetPreviewResolution();
+            IntCoords resolution = GetModel().GetRenderResolution();
             float ratioX = resolution.X / (float)previewSize_.X;
             float ratioY = resolution.Y / (float)previewSize_.Y;
 

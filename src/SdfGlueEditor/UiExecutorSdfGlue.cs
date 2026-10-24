@@ -23,16 +23,18 @@ namespace SdfGlueEditor
         private SdfGlueAppContext               ctx_;
         private DocumentController              documents_;
         private RenderController                render_;
+        private AnimationExportController       animExport_;
         private ShaderExportController          shaderExport_;
         private CameraController                camera_;
         private ProjectHierarchyController      hierarchy_;
 
-        public UiExecutorSdfGlue(SdfGlueAppContext ctx, DocumentController documents, RenderController render, ShaderExportController shaderExport, CameraController camera, ProjectHierarchyController hierarchy)
+        public UiExecutorSdfGlue(SdfGlueAppContext ctx, DocumentController documents, RenderController render, AnimationExportController animExport, ShaderExportController shaderExport, CameraController camera, ProjectHierarchyController hierarchy)
             : base(ctx.Window)
         {
             ctx_        = ctx;
             documents_  = documents;
             render_     = render;
+            animExport_ = animExport;
             shaderExport_ = shaderExport;
             camera_     = camera;
             hierarchy_  = hierarchy;
@@ -56,7 +58,12 @@ namespace SdfGlueEditor
         public void OnResetFrameCounter         ()                  { render_.ResetFrameCounter();          }
         public void OnPreviewResolutionChanged  ()                  { render_.PreviewResolutionChanged();   }
         public void OnSaveImage                 ()                  { render_.SaveImage();                  }
-        public void OnExportAnimation           ()                  { render_.ExportAnimation();            }
+
+        // image sequence export
+        public bool StartAnimationExport        ()                  { return animExport_.Start();           }
+        public void CancelAnimationExport       ()                  { animExport_.Cancel();                 }
+        public AnimationExportProgress GetAnimationExportProgress() { return animExport_.GetProgress();     }
+        public string? SelectFolder             ()                  { return ctx_.Platform.SelectFolderDialog(); }
 
         // shader export
         public string? GenerateExportCode       (ShaderExportTarget target, RenderPassData pass, StringBuilder errors) { return shaderExport_.GenerateCode(target, pass, errors); }
