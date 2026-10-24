@@ -65,6 +65,10 @@ jobs:
     - name: Restore
       run: dotnet restore src/SdfGlue.sln
 
+    # Unit tests (the animation module); a failing test stops the build before anything is published
+    - name: Test
+      run: dotnet test src/SingleDocAppAnimation.Tests/SingleDocAppAnimation.Tests.csproj -c Release --no-restore
+
     - name: Publish
       shell: pwsh
       run: |
