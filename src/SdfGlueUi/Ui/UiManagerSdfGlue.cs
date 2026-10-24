@@ -68,6 +68,8 @@ namespace SdfGlueUi.Ui
                 RegisterWindow(new WndSignals()         , null, false);
                 RegisterWindow(new WndInputsSdfGlue()   , null, false);
             }
+            // the keyframe animation (appended: the order of the windows gives their shortcuts)
+            RegisterWindow(new WndSdfTimeline()         , null, false);
         }
 
         // Typed access to the executor passed to the constructor

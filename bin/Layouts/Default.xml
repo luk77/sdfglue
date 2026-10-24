@@ -69,13 +69,19 @@ DockId=0x00000009,0
 Pos=864,38
 Size=2592,1797
 Collapsed=0
-DockId=0x00000004,0
+DockId=0x0000000D,0
 
 [Window][Code view 1]
 Pos=865,948
 Size=2591,905
 Collapsed=0
 DockId=0x0000000C,0
+
+[Window][Timeline]
+Pos=864,1363
+Size=2592,472
+Collapsed=0
+DockId=0x0000000E,0
 
 [Docking][Data]
 DockSpace       ID=0x08BD597D Window=0x1BBC0F80 Pos=0,38 Size=3456,1797 Split=X Selected=0xBEB0E3EA
@@ -84,7 +90,9 @@ DockSpace       ID=0x08BD597D Window=0x1BBC0F80 Pos=0,38 Size=3456,1797 Split=X 
     DockNode    ID=0x00000006 Parent=0x00000003 SizeRef=862,1192 Split=Y Selected=0x893C342E
       DockNode  ID=0x00000009 Parent=0x00000006 SizeRef=862,900 Selected=0x893C342E
       DockNode  ID=0x0000000A Parent=0x00000006 SizeRef=862,290 Selected=0xEA90F76B
-  DockNode      ID=0x00000004 Parent=0x08BD597D SizeRef=2592,1797 CentralNode=1 Selected=0xBEB0E3EA
+  DockNode      ID=0x00000004 Parent=0x08BD597D SizeRef=2592,1797 Split=Y Selected=0xBEB0E3EA
+    DockNode    ID=0x0000000D Parent=0x00000004 SizeRef=2592,1323 CentralNode=1 Selected=0xBEB0E3EA
+    DockNode    ID=0x0000000E Parent=0x00000004 SizeRef=2592,472 Selected=0x4F89F0DC
 DockSpace       ID=0x7C6B3D9B Pos=0,38 Size=3456,1815 Split=X Selected=0x382916D5
   DockNode      ID=0x00000001 Parent=0x7C6B3D9B SizeRef=863,1815 Selected=0x77A0D9DF
   DockNode      ID=0x00000002 Parent=0x7C6B3D9B SizeRef=2591,1815 Split=Y Selected=0xE706C8D3
@@ -108,5 +116,8 @@ DockSpace       ID=0x7C6B3D9B Pos=0,38 Size=3456,1815 Split=X Selected=0x382916D
     <Visibility Window="Log" Visible="False" />
     <Visibility Window="Diagnostics" Visible="False" />
     <Visibility Window="Playback" Visible="True" />
+    <Visibility Window="Signals" Visible="False" />
+    <Visibility Window="Inputs" Visible="False" />
+    <Visibility Window="Timeline" Visible="False" />
   </WindowsVisibility>
 </LayoutData>

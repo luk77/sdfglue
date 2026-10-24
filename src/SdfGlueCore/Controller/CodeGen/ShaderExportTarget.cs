@@ -84,6 +84,8 @@ namespace SdfGlueCore.Controller
 
             if (ctx.Model.HasSignalBindings())
                 sb.AppendLine("// NOTE: parameters driven by signals are exported with their static values");
+            if (ctx.Model.Animation.IsAnimated)
+                sb.AppendLine("// NOTE: animated parameters are exported with their current values (the time of the Timeline)");
 
             int passesCount = 0;
             foreach (TreeNode node in ctx.Model.RenderingSysData.Children)
@@ -119,6 +121,8 @@ namespace SdfGlueCore.Controller
             sb.AppendLine(String.Format("// Pass: {0}", ctx.Pass.Name.Val));
             if (ctx.Model.HasSignalBindings())
                 sb.AppendLine("// NOTE: parameters driven by signals are exported with their static values");
+            if (ctx.Model.Animation.IsAnimated)
+                sb.AppendLine("// NOTE: animated parameters are exported with their current values (the time of the Timeline)");
             sb.AppendLine("// NOTE: the world space mode works with renderers that use sdfg_setupCamera()");
             sb.AppendLine("//-------------------------------------------------------------------------------");
             sb.AppendLine();

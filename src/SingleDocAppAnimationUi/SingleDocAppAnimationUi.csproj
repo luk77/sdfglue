@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The timeline window and the key buttons of the animation module (ImGui, SingleDocAppFramework): no dependency on
+       any application -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SingleDocAppAnimation.Ui</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SingleDocAppFramework\SingleDocAppFramework.csproj" />
+    <ProjectReference Include="..\SingleDocAppAnimation\SingleDocAppAnimation.csproj" />
+  </ItemGroup>
+
+</Project>

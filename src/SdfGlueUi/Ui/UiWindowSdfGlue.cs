@@ -26,6 +26,9 @@ namespace SdfGlueUi.Ui
         // SdfGlue windows are registered only by UiManagerSdfGlue
         protected UiManagerSdfGlue   UiMgrSdfGlue    { get { return (UiManagerSdfGlue)uiMgr_; } }
 
+        // the animation of the node whose parameters are built (key buttons, auto-key), null: none
+        protected SdfAnimKeys?       AnimKeys;
+
         public DataModel GetModel()
         {
             return ExecutorSdfGlue.GetModel();
@@ -196,7 +199,7 @@ namespace SdfGlueUi.Ui
                     //
                     //UiFloat.AddUndoHandler(param.DisplayName, exObj);
 
-                    UiFloatWithSignal.Build(ref index, displayName, exObj, param.ValSpeed, param.LimitsType, param.MinVal, param.MaxVal, param.EditInDegrees, GetModel().Signals, ExecutorSdfGlue.OnRebuildShader);
+                    UiFloatWithSignal.Build(ref index, displayName, exObj, param.ValSpeed, param.LimitsType, param.MinVal, param.MaxVal, param.EditInDegrees, GetModel().Signals, ExecutorSdfGlue.OnRebuildShader, AnimKeys);
                 }
                 else if (param.Type == SdfParamType.Int)
                 {
@@ -235,21 +238,21 @@ namespace SdfGlueUi.Ui
                     ExVector2? exObj = paramsValuesCollection[param.ParameterKey] as ExVector2;
                     if (exObj == null)
                         continue;
-                    UiVectorWithSignal.Build(ref index, displayName, exObj, param.ValSpeed, param.EditInDegrees, GetModel().Signals, ExecutorSdfGlue.OnRebuildShader);
+                    UiVectorWithSignal.Build(ref index, displayName, exObj, param.ValSpeed, param.EditInDegrees, GetModel().Signals, ExecutorSdfGlue.OnRebuildShader, AnimKeys);
                 }
                 else if (param.Type == SdfParamType.Vec3)
                 {
                     ExVector3? exObj = paramsValuesCollection[param.ParameterKey] as ExVector3;
                     if (exObj == null)
                         continue;
-                    UiVectorWithSignal.Build(ref index, displayName, exObj, param.ValSpeed, param.EditInDegrees, param.EditorType == ParamEditorType.Color, GetModel().Signals, ExecutorSdfGlue.OnRebuildShader);
+                    UiVectorWithSignal.Build(ref index, displayName, exObj, param.ValSpeed, param.EditInDegrees, param.EditorType == ParamEditorType.Color, GetModel().Signals, ExecutorSdfGlue.OnRebuildShader, AnimKeys);
                 }
                 else if (param.Type == SdfParamType.Vec4)
                 {
                     ExVector4? exObj = paramsValuesCollection[param.ParameterKey] as ExVector4;
                     if (exObj == null)
                         continue;
-                    UiVectorWithSignal.Build(ref index, displayName, exObj, param.ValSpeed, param.EditInDegrees, GetModel().Signals, ExecutorSdfGlue.OnRebuildShader);
+                    UiVectorWithSignal.Build(ref index, displayName, exObj, param.ValSpeed, param.EditInDegrees, GetModel().Signals, ExecutorSdfGlue.OnRebuildShader, AnimKeys);
                 }
                 //else if (param.Type == SdfParamType.Bool)
                 //{

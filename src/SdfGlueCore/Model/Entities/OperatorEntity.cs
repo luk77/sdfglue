@@ -16,6 +16,8 @@ namespace SdfGlueCore.Model.Entities
     public class OperatorEntity : FunctionEntity
     {
         public  ExBool                  Enabled = new ExBool(true);
+        // stable and unique in its collection (the animation tracks find the operator by it; not the index)
+        public  int                     Id;
 
         public OperatorEntity(string paramPrefix) : base(paramPrefix)
         {
@@ -23,6 +25,7 @@ namespace SdfGlueCore.Model.Entities
 
         public override void Deserialize(XmlNode parentNode, TreeNode? parentObject, FunctionDefinitionsSet? definitions)
         {
+            XmlUtils.DeserializeInt(parentNode, "Id", ref Id);
             XmlUtils.DeserializeBool(parentNode, "Enabled", ref Enabled.Val);
 
             base.Deserialize(parentNode, parentObject, definitions);
@@ -30,6 +33,7 @@ namespace SdfGlueCore.Model.Entities
 
         public override void Serialize(XmlDocument xmlDoc, XmlNode parentNode)
         {
+            XmlUtils.AddNodeInt(xmlDoc, parentNode, "Id", Id);
             XmlUtils.AddNodeBool(xmlDoc, parentNode, "Enabled", Enabled.Val);
 
             base.Serialize(xmlDoc, parentNode);

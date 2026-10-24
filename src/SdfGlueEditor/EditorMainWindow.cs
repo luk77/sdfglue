@@ -3,6 +3,7 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
+using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -260,7 +261,11 @@ namespace SdfGlueEditor
             double deltaTime = ctx_.Playback.UseConstTimeStep ? PlaybackState.ConstTimeStep : e.Time;
 
             if (!animExport_.IsActive)
+            {
                 ctx_.Update(deltaTime);
+                // the keyframe animation has its own time (real time, not the constant step of the shader time)
+                ctx_.Animation.Update(e.Time, ImGui.IsAnyItemActive());
+            }
 
             // These actions have to be executed outside of the UI building loop
             // (they modify the collections iterated there)

@@ -4,7 +4,6 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using SdfGlueCore.Model.CodeFragments;
-using SdfGlueCore.Model.DataNodes.Signals;
 using SdfGlueCore.Model.Entities;
 using SingleDocAppCore.Model.BaseTypes;
 using System.Text;
@@ -18,9 +17,7 @@ namespace SdfGlueCore.Controller.CodeGen
         public static void AppendUniformCode(CodeGenContext ctx, bool isFixed, SdfParamType type, string paramName, ISimpleType paramVal, string? valueSuffix = null)
         {
             // a parameter driven by a signal must stay a uniform, also in fixed objects
-            // (unless the target exports the static values)
-            if (isFixed && !ctx.Target.UseStaticSignalValues && SignalBinding.IsBound(paramVal))
-                isFixed = false;
+            isFixed = UniformRules.IsParamFixed(ctx.Target, isFixed, paramVal);
 
             StringBuilder sb = ctx.Code;
 

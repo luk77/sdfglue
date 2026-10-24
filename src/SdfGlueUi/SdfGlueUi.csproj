@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SdfGlueCore\SdfGlueCore.csproj" />
     <ProjectReference Include="..\SingleDocAppFramework\SingleDocAppFramework.csproj" />
+    <ProjectReference Include="..\SingleDocAppAnimationUi\SingleDocAppAnimationUi.csproj" />
   </ItemGroup>
 
 </Project>

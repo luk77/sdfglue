@@ -16,6 +16,7 @@ namespace SdfGlueCore.Model.Entities
         public          List<OperatorEntity>            Operators = new List<OperatorEntity>();
 
         private         string                          paramPrefix_ = "";
+        private         int                             nextId_      = 1;
 
         public OperatorsCollection(string paramPrefix)
         {
@@ -24,10 +25,58 @@ namespace SdfGlueCore.Model.Entities
 
         public OperatorEntity CreateNewEntity(string defName = "opEmpty")
         {
+            OperatorEntity opEntity = CreateEntity(defName);
+            opEntity.Id = NextId();
+            return opEntity;
+        }
+
+        private OperatorEntity CreateEntity(string defName)
+        {
             OperatorEntity opEntity = new OperatorEntity(paramPrefix_);
             opEntity.DefinitionName.Val = defName;
             opEntity.DefinitionName.ResetPrevVal();
             return opEntity;
+        }
+
+        // a new id: never one of the operators in the collection, nor one used before in this session (a deleted
+        // operator can come back by undo)
+        private int NextId()
+        {
+            foreach(OperatorEntity opent in Operators)
+                nextId_ = Math.Max(nextId_, opent.Id + 1);
+            return nextId_++;
+        }
+
+        // operators without an id (projects saved before the ids) or with a duplicated one get a new id
+        private void EnsureIds()
+        {
+            HashSet<int> used = new HashSet<int>();
+            foreach(OperatorEntity opent in Operators)
+            {
+                if (opent.Id > 0)
+                    used.Add(opent.Id);
+            }
+            HashSet<int> seen = new HashSet<int>();
+            foreach(OperatorEntity opent in Operators)
+            {
+                if (opent.Id > 0 && seen.Add(opent.Id))
+                    continue;
+                while (used.Contains(nextId_))
+                    nextId_++;
+                opent.Id = nextId_++;
+                used.Add(opent.Id);
+                seen.Add(opent.Id);
+            }
+        }
+
+        public OperatorEntity? FindOperator(int id)
+        {
+            foreach(OperatorEntity opent in Operators)
+            {
+                if (opent.Id == id)
+                    return opent;
+            }
+            return null;
         }
 
         public void RefreshDefinitionReference(FunctionDefinitionsSet definitionsSet)
@@ -52,6 +101,7 @@ namespace SdfGlueCore.Model.Entities
         public void Deserialize(XmlNode parentNode, SdfObject? parentObject, FunctionDefinitionsSet? definitions)
         {
             Operators.Clear();
+            nextId_ = 1;
 
             XmlNodeList? nodesList = parentNode.SelectNodes("OpEntity");
             if (nodesList == null)
@@ -59,10 +109,11 @@ namespace SdfGlueCore.Model.Entities
 
             foreach(XmlNode nodeOpEntity in nodesList)
             {
-                OperatorEntity opent = CreateNewEntity();
+                OperatorEntity opent = CreateEntity("opEmpty");
                 opent.Deserialize(nodeOpEntity, parentObject, definitions);
                 Operators.Add(opent);
             }
+            EnsureIds();
         }
 
         public void Serialize(XmlDocument xmlDoc, XmlNode parentNode, string collectionNodeName)

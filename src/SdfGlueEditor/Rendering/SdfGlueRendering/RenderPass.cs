@@ -362,9 +362,8 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             // Materials
             foreach(MaterialInstance mat in model.Materials.Children)
             {
-                // a material with a parameter driven by a signal is never fixed (see ShaderCodeGenerator)
-                bool isFixed = model.ProjSettings.FixAllObjects.Val || mat.IsFixed.Val;
-                if (isFixed && !mat.HasSignalBindings())
+                // a material with a parameter driven by a signal is never fixed (see UniformRules)
+                if (UniformRules.IsMaterialFixed(model, ShaderExportTarget.Preview, mat))
                     continue;
 
                 if (mat.MaterialProps.Definition == null)

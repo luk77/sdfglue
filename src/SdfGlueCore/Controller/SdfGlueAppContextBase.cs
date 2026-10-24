@@ -32,6 +32,9 @@ namespace SdfGlueCore.Controller
 
         public  EditorSelection             Selection               = new EditorSelection();
 
+        // Keyframe animation of the parameters (its own time, not Playback)
+        public  AnimationController         Animation;
+
         // Resolution used instead of the preview resolution (image sequence export)
         public  IntCoords?                  RenderResolutionOverride = null;
 
@@ -41,6 +44,7 @@ namespace SdfGlueCore.Controller
             Settings        = settings;
             Definitions     = Document.Definitions;
             CodeGenerator   = new ShaderCodeGenerator(settings);
+            Animation       = new AnimationController(this);
         }
 
         private static FunctionLibrary LoadDefinitions()
@@ -71,12 +75,15 @@ namespace SdfGlueCore.Controller
         // Recreates render passes/shaders after the list of passes has changed
         public void ReinitializeRenderPasses()
         {
+            Animation.OnShaderGenerating();
             RenderingSystem.Reinitialize(Document, CodeGenerator, GetRenderResolution());
         }
 
         // Regenerates and compiles the shaders of all passes
         public void ReinitializeShader()
         {
+            // the animated values before the code is generated (the fixed parameters get the value at 0 s)
+            Animation.OnShaderGenerating();
             RenderingSystem.ReinitializeShader(Document, CodeGenerator);
         }
 
@@ -120,6 +127,7 @@ namespace SdfGlueCore.Controller
         {
             Playback.Reset();
             Selection.Clear();
+            Animation.OnDocumentChanged();
 
             ReinitializeRenderingSystem();
         }

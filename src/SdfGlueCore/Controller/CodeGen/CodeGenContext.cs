@@ -54,19 +54,19 @@ namespace SdfGlueCore.Controller.CodeGen
         // Fixed parameters are generated as constants (#define), the others as uniforms
         public bool IsFixed(ExBool isFixed)
         {
-            return Target.ForceFixed || Model.ProjSettings.FixAllObjects.Val || isFixed.Val;
+            return UniformRules.IsFixed(Model, Target, isFixed);
         }
 
         public bool IsCameraFixed()
         {
-            return Target.ForceFixed || Model.ProjSettings.FixAllObjects.Val;
+            return UniformRules.IsCameraFixed(Model, Target);
         }
 
         // Fixed material - generated with constant values
         // (a material with a parameter driven by a signal is fixed only when the target uses static signal values)
         public bool IsMaterialFixed(MaterialInstance mat)
         {
-            return IsFixed(mat.IsFixed) && (Target.UseStaticSignalValues || !mat.HasSignalBindings());
+            return UniformRules.IsMaterialFixed(Model, Target, mat);
         }
 
         public string GetNodeId(TreeNode node)
