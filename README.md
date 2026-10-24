@@ -45,6 +45,11 @@ The project is heavily inspired by **Shadertoy** and the work of its community. 
 - boolean and smooth blending operators
 - material blending
 
+### Animation
+- keyframe animation of object, material and rendering parameters in the Timeline window (View → Timeline)
+- set keys with a click next to a parameter, or just change an animated value - a key is added at the current time
+- smooth or stepped transitions between keys, markers, playback with loop, undo / redo
+- animate an object by turning off its "Fixed" option (fixed objects keep their starting values)
 
 # Gallery
 
