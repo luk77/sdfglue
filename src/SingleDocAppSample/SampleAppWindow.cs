@@ -13,11 +13,12 @@ namespace SingleDocAppSample
     // User settings (UserSettings.xml next to the exe) use UserSettingsBase directly.
     public class SampleAppWindow : SdAppWindow
     {
-        public  TextDocument            Document                = new TextDocument();
+        public  SampleAppContext        AppContext;
 
         public SampleAppWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings, IPlatformServices platform)
             : base(gameWindowSettings, nativeWindowSettings, CreateAppSettings(), new UserSettingsBase(), platform)
         {
+            AppContext = new SampleAppContext(this);
         }
 
         private static SdAppSettings CreateAppSettings()
@@ -40,7 +41,7 @@ namespace SingleDocAppSample
 
         protected override string? GetDocumentDisplayName()
         {
-            return String.IsNullOrEmpty(Document.FilePath) ? "<Unnamed>" : Document.FilePath;
+            return String.IsNullOrEmpty(AppContext.DocumentFilePath) ? "<Unnamed>" : AppContext.DocumentFilePath;
         }
 
         // Background behind the ImGui windows (an application could render a 2D/3D scene here)

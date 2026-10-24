@@ -38,7 +38,7 @@ namespace SdfGlueCore.Controller.CodeGen
             UniformCodeWriter.AppendUniformCode(ctx, isFixed, SdfParamType.Float   , "cameraDistanceToTarget"     , cameraData.DistanceToTarget    );
             UniformCodeWriter.AppendUniformCode(ctx, isFixed, SdfParamType.Float   , "cameraZoom"                 , cameraData.Zoom                );
 
-            if (DataModel.UseCameraControllers && cameraOperators != null)
+            if (SdfGlueFeatures.UseCameraControllers && cameraOperators != null)
             {
                 Dictionary<string, string> functions = new Dictionary<string, string>();
                 cameraOperators.AddCodeToCollection(functions);

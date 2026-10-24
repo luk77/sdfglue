@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 using ImGuiNET;
 using SingleDocAppFramework.Input;
+using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
 using SdfGlueUi.Ui.Components;
 using SdfGlueUi.Ui.Properties;
@@ -51,10 +52,10 @@ namespace SdfGlueUi.Ui.Windows
 
                 // select on click
                 TreeNode? nodeToSelect = clickedNode;
-                if (GetModel().ImportantNodeToSelect != null)
+                if (GetSelection().ImportantNodeToSelect != null)
                 {
-                    nodeToSelect = GetModel().ImportantNodeToSelect;
-                    GetModel().ImportantNodeToSelect = null;
+                    nodeToSelect = GetSelection().ImportantNodeToSelect;
+                    GetSelection().ImportantNodeToSelect = null;
                 }
                 
                 if (nodeToSelect != null)
@@ -63,10 +64,10 @@ namespace SdfGlueUi.Ui.Windows
                     {
                         node.IsSelected = (node == nodeToSelect);
                     });
-                    //GetModel().SelectedNode = (SdfObject)nodeToSelect;
-                    GetModel().SelectedNode         = nodeToSelect;
+                    //GetSelection().SelectedNode = (SdfObject)nodeToSelect;
+                    GetSelection().SelectedNode         = nodeToSelect;
                     if (nodeToSelect is RenderPassData)
-                        GetModel().LastSelectedRPass    = nodeToSelect as RenderPassData;
+                        GetSelection().LastSelectedRPass    = nodeToSelect as RenderPassData;
 
                 }
             });
@@ -112,8 +113,8 @@ namespace SdfGlueUi.Ui.Windows
                         //if (ImGui.MenuItem("Insert new" , "CTRL+I"      ))  { uiMgr.ActionsExecutor.OnAddChildObject           (node as SdfObject, null); ImGui.CloseCurrentPopup(); }
                         if (ImGui.BeginMenu("Insert as child"))
                         {
-                            //FunctionDefinition? fd = MenuFunctionDefinition.Build("insert_child_"+node.Name, ((SdfObject)node).FunctionSdf, GetModel().SdfDefinitions);
-                            FunctionDefinition? fd = MenuFunctionDefinition.Build(GetModel().SdfDefinitions);
+                            //FunctionDefinition? fd = MenuFunctionDefinition.Build("insert_child_"+node.Name, ((SdfObject)node).FunctionSdf, GetModel().Definitions.Sdf);
+                            FunctionDefinition? fd = MenuFunctionDefinition.Build(GetModel().Definitions.Sdf);
                             if (fd != null)
                             {
                                 uiMgr.ActionsExecutor.OnAddChildObject(node as SdfObject, fd);
@@ -148,7 +149,7 @@ namespace SdfGlueUi.Ui.Windows
                 {
                     if (ImGui.BeginMenu("Add render pass"))
                     {
-                        FunctionDefinition? fd = MenuFunctionDefinition.Build(GetModel().Renderers);
+                        FunctionDefinition? fd = MenuFunctionDefinition.Build(GetModel().Definitions.Renderers);
                         if (fd != null)
                         {
                             uiMgr.ActionsExecutor.OnAddRenderPass(node as RenderingData, fd);
@@ -381,12 +382,12 @@ namespace SdfGlueUi.Ui.Windows
             bool isShiftKeyDown     = uiMgr.ActionsExecutor.IsKeyDown(UiKey.LeftShift)    || uiMgr.ActionsExecutor.IsKeyDown(UiKey.RightShift);
             //bool isAltKeyDown     = uiMgr.ActionsExecutor.IsKeyDown(UiKey.LeftAlt)      || uiMgr.ActionsExecutor.IsKeyDown(UiKey.RightAlt);
 
-            DataModel model = uiMgr.ActionsExecutor.GetModel();
+            EditorSelection selection = uiMgr.ActionsExecutor.GetAppContext().Selection;
 
             // Delete object
             if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.Delete))
             {
-                uiMgr.ActionsExecutor.OnDeleteNode(model.SelectedNode);
+                uiMgr.ActionsExecutor.OnDeleteNode(selection.SelectedNode);
             }
 
             if (isControlKeyDown)
@@ -394,48 +395,48 @@ namespace SdfGlueUi.Ui.Windows
                 // Cut, copy, paste
                 if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.X))
                 {
-                    if (GetModel().SelectedNode is RenderPassData)
-                        uiMgr.ActionsExecutor.OnCutRenderPass(GetModel().SelectedNode as RenderPassData);
-                    else if (GetModel().SelectedNode is MaterialInstance)
-                        uiMgr.ActionsExecutor.OnCutMaterial(GetModel().SelectedNode as MaterialInstance);
-                    else if (GetModel().SelectedNode is SignalInstance)
-                        uiMgr.ActionsExecutor.OnCutSignal(GetModel().SelectedNode as SignalInstance);
+                    if (GetSelection().SelectedNode is RenderPassData)
+                        uiMgr.ActionsExecutor.OnCutRenderPass(GetSelection().SelectedNode as RenderPassData);
+                    else if (GetSelection().SelectedNode is MaterialInstance)
+                        uiMgr.ActionsExecutor.OnCutMaterial(GetSelection().SelectedNode as MaterialInstance);
+                    else if (GetSelection().SelectedNode is SignalInstance)
+                        uiMgr.ActionsExecutor.OnCutSignal(GetSelection().SelectedNode as SignalInstance);
                     else
-                        uiMgr.ActionsExecutor.OnCutObject(GetModel().SelectedNode as SdfObject);
+                        uiMgr.ActionsExecutor.OnCutObject(GetSelection().SelectedNode as SdfObject);
                 }
                 if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.C))
                 {
-                    if (GetModel().SelectedNode is RenderPassData)
-                        uiMgr.ActionsExecutor.OnCopyRenderPass(GetModel().SelectedNode as RenderPassData);
-                    else if (GetModel().SelectedNode is MaterialInstance)
-                        uiMgr.ActionsExecutor.OnCopyMaterial(GetModel().SelectedNode as MaterialInstance);
-                    else if (GetModel().SelectedNode is SignalInstance)
-                        uiMgr.ActionsExecutor.OnCopySignal(GetModel().SelectedNode as SignalInstance);
+                    if (GetSelection().SelectedNode is RenderPassData)
+                        uiMgr.ActionsExecutor.OnCopyRenderPass(GetSelection().SelectedNode as RenderPassData);
+                    else if (GetSelection().SelectedNode is MaterialInstance)
+                        uiMgr.ActionsExecutor.OnCopyMaterial(GetSelection().SelectedNode as MaterialInstance);
+                    else if (GetSelection().SelectedNode is SignalInstance)
+                        uiMgr.ActionsExecutor.OnCopySignal(GetSelection().SelectedNode as SignalInstance);
                     else
-                        uiMgr.ActionsExecutor.OnCopyObject(GetModel().SelectedNode as SdfObject);
+                        uiMgr.ActionsExecutor.OnCopyObject(GetSelection().SelectedNode as SdfObject);
                 }
                 if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.V))
                 {
                     if (isShiftKeyDown)
                     {
                         // Pasting with shift adds object as child
-                        TryToPasteObject(GetModel().SelectedNode, true);
+                        TryToPasteObject(GetSelection().SelectedNode, true);
                     }
                     else
                     {
                         // We prefer to add object as sibling (to parent if it exist)
-                        TryToPasteObject(GetModel().SelectedNode, false);
+                        TryToPasteObject(GetSelection().SelectedNode, false);
                     }
                 }
 
                 // Move up / down
                 if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.Up))
                 {
-                    uiMgr.ActionsExecutor.OnMoveNodeUp(GetModel().SelectedNode);
+                    uiMgr.ActionsExecutor.OnMoveNodeUp(GetSelection().SelectedNode);
                 }
                 if (uiMgr.ActionsExecutor.IsKeyPressed(UiKey.Down))
                 {
-                    uiMgr.ActionsExecutor.OnMoveNodeDown(GetModel().SelectedNode);
+                    uiMgr.ActionsExecutor.OnMoveNodeDown(GetSelection().SelectedNode);
                 }
             }
         }

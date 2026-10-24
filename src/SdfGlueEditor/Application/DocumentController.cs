@@ -27,7 +27,7 @@ namespace SdfGlueEditor.Application
         public string GetDocumentDisplayName()
         {
             string projectPath = "<Unnamed project>";
-            string? filePath = GetModel().ProjectFilePath;
+            string? filePath = ctx_.DocumentFilePath;
             if (!String.IsNullOrEmpty(filePath))
                 projectPath = filePath;
 
@@ -36,7 +36,7 @@ namespace SdfGlueEditor.Application
 
         public bool HasProjectFilePath()
         {
-            return !String.IsNullOrEmpty(GetModel().ProjectFilePath);
+            return !String.IsNullOrEmpty(ctx_.DocumentFilePath);
         }
 
         // Asks whether to save unsaved changes; false - the operation should be cancelled
@@ -50,7 +50,7 @@ namespace SdfGlueEditor.Application
             if (!ConfirmDiscardChanges())
                 return;
 
-            SetCurrentModel(new DataModel(ctx_.Settings));
+            ctx_.SetDocument(ctx_.CreateModel(), null);
         }
 
         public void OpenProject()
@@ -90,26 +90,13 @@ namespace SdfGlueEditor.Application
                 return false;
             }
 
-            model.ProjectFilePath = filePath;
-            SetCurrentModel(model);
+            ctx_.SetDocument(model, filePath);
             return true;
-        }
-
-        private void SetCurrentModel(DataModel model)
-        {
-            ctx_.CodeGenerator.SetModel(model);
-
-            // undo actions refer to the objects of the previous model
-            UndoManager.Instance.ClearAll();
-
-            ctx_.ReinitializeRenderingSystem();
-
-            ctx_.Window.RefreshWindowTitle();
         }
 
         public void SaveProject()
         {
-            string? filePath = GetModel().ProjectFilePath;
+            string? filePath = ctx_.DocumentFilePath;
             if (String.IsNullOrEmpty(filePath))
                 return;
 
@@ -127,7 +114,7 @@ namespace SdfGlueEditor.Application
 
             if (SaveProjectToFile(GetModel(), filePath, true))
             {
-                GetModel().ProjectFilePath = filePath;
+                ctx_.DocumentFilePath = filePath;
                 UndoManager.Instance.MarkSavePoint();
             }
 
@@ -202,7 +189,7 @@ namespace SdfGlueEditor.Application
             }
         }
 
-        // Loads a project into a new model (function definitions are shared with the current model).
+        // Loads a project into a new model (function definitions are shared by all models).
         // Returns null on error (invalid XML, missing data).
         public DataModel? LoadProjectFromFile(string filePath, out string errorMessage)
         {
@@ -211,7 +198,7 @@ namespace SdfGlueEditor.Application
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.Load(filePath);
 
-                DataModel model = new DataModel(ctx_.Settings, GetModel());
+                DataModel model = ctx_.CreateModel();
                 if (!model.Deserialize(xmlDoc))
                 {
                     errorMessage = "Invalid or incomplete project file.";
@@ -220,7 +207,7 @@ namespace SdfGlueEditor.Application
 
                 model.CreateEmptyProjectHierarchy();
                 model.FixMaterialsReferences();
-                model.RenderingSysData.RefreshDefinitionReference(model.Renderers, model.BackdropsDefinitions, model.CameraControllers);
+                model.RenderingSysData.RefreshDefinitionReference(model.Definitions.Renderers, model.Definitions.Backdrops, model.Definitions.CameraControllers);
                 model.RefreshMaterialDefinition();
                 model.ResetPrevValRecursive();
 

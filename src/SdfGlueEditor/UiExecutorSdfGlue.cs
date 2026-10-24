@@ -49,6 +49,7 @@ namespace SdfGlueEditor
         public override bool CanSaveDocument    ()                  { return documents_.HasProjectFilePath(); }
 
         public DataModel GetModel               ()                  { return ctx_.GetModel();               }
+        public SdfGlueAppContextBase GetAppContext()                { return ctx_;                          }
         public void OnBatchProcessAllProjects   ()                  { documents_.BatchProcessAllProjects(); }
 
         // rendering

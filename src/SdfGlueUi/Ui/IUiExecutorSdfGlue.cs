@@ -18,6 +18,8 @@ namespace SdfGlueUi.Ui
     public interface IUiExecutorSdfGlue : IUiExecutorFramework
     {
         DataModel GetModel();
+        // State of the application (settings, playback, selection...); GetModel() == GetAppContext().Document
+        SdfGlueAppContextBase GetAppContext();
 
         void OnReloadSdfDefinitions();
         void OnRebuildShader();

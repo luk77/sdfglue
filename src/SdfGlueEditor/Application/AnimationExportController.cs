@@ -3,6 +3,7 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
+using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
 using SdfGlueUi.Ui;
 using SingleDocAppCore.Model.BaseTypes;
@@ -46,7 +47,7 @@ namespace SdfGlueEditor.Application
         public AnimationExportProgress GetProgress()
         {
             progress_.Elapsed       = stopwatch_.Elapsed;
-            progress_.CurrentTime   = GetModel().CurrentTime;
+            progress_.CurrentTime   = ctx_.Playback.CurrentTime;
             return progress_;
         }
 
@@ -65,21 +66,21 @@ namespace SdfGlueEditor.Application
             settings_.OutputFolder = outputFolder;
             deltaTime_ = 1.0 / settings_.Fps;
 
-            DataModel model = GetModel();
-            savedTimeState_ = model.CaptureTimeState();
+            PlaybackState playback = ctx_.Playback;
+            savedTimeState_ = playback.CaptureTimeState();
 
             // resolution (the frame counter is reset - accumulation of frames starts from scratch)
             if (settings_.ResolutionIndex >= 0)
             {
-                model.RenderResolutionOverride = ctx_.Settings.GetExportAnimResolution();
+                ctx_.RenderResolutionOverride = ctx_.Settings.GetExportAnimResolution();
                 render_.PreviewResolutionChanged();
             }
 
             // time
-            double startTime = settings_.UseStartTime ? settings_.StartTime : model.CurrentTime;
+            double startTime = settings_.UseStartTime ? settings_.StartTime : playback.CurrentTime;
             if (settings_.UseStartTime)
-                model.ResetFrameCounter();
-            model.CurrentTime = startTime - settings_.NumOfFramesToPrerender * deltaTime_;
+                playback.ResetFrameCounter();
+            playback.CurrentTime = startTime - settings_.NumOfFramesToPrerender * deltaTime_;
 
             progress_                           = new AnimationExportProgress();
             progress_.IsActive                  = true;
@@ -90,7 +91,7 @@ namespace SdfGlueEditor.Application
 
             stopwatch_.Restart();
 
-            IntCoords resolution = model.GetRenderResolution();
+            IntCoords resolution = ctx_.GetRenderResolution();
             Console.WriteLine("Export image sequence: {0} frames ({1} prerendered), {2}x{3}, {4} fps, start time {5:0.###} s -> {6}",
                 settings_.NumOfFramesToExport, settings_.NumOfFramesToPrerender, resolution.X, resolution.Y, settings_.Fps, startTime,
                 Path.Combine(outputFolder, settings_.GetFileName(0)));
@@ -124,22 +125,20 @@ namespace SdfGlueEditor.Application
         // false - the export was finished (completed or failed)
         private bool RenderNextFrame()
         {
-            DataModel model = GetModel();
-
             render_.RenderFrame();
 
             if (progress_.IsPrerendering)
             {
-                model.AdvanceTime(deltaTime_);
+                ctx_.AdvanceTime(deltaTime_);
                 progress_.NumOfPrerenderedFrames++;
                 if (progress_.NumOfPrerenderedFrames >= progress_.NumOfFramesToPrerender)
                     progress_.IsPrerendering = false;
             }
             else
             {
-                model.AdvanceTime(deltaTime_);
+                ctx_.AdvanceTime(deltaTime_);
 
-                using Bitmap? bmp = model.GetRPassDataForPreview()?.GetFrameAsBitmap();
+                using Bitmap? bmp = GetModel().GetRPassDataForPreview()?.GetFrameAsBitmap();
                 if (bmp == null)
                 {
                     Fail("Unable to get bitmap data.");
@@ -179,22 +178,20 @@ namespace SdfGlueEditor.Application
             stopwatch_.Stop();
             progress_.IsActive = false;
 
-            DataModel model = GetModel();
-
-            if (model.RenderResolutionOverride != null)
+            if (ctx_.RenderResolutionOverride != null)
             {
-                model.RenderResolutionOverride = null;
+                ctx_.RenderResolutionOverride = null;
                 render_.PreviewResolutionChanged();
             }
 
             if (savedTimeState_ != null)
             {
-                model.RestoreTimeState(savedTimeState_);
+                ctx_.Playback.RestoreTimeState(savedTimeState_);
                 savedTimeState_ = null;
             }
 
             // the frame buffers contain exported frames - accumulation of frames starts from scratch
-            model.ResetFrameCounter();
+            ctx_.Playback.ResetFrameCounter();
 
             Console.WriteLine(message);
         }

@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using ImGuiNET;
+using SdfGlueCore;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.BaseTypes;
 using SdfGlueCore.Model.DataNodes.Signals;
@@ -18,7 +19,7 @@ using System.Numerics;
 namespace SdfGlueUi.Ui.Properties
 {
     // Vector (vec2/vec3/vec4) editor with optional bindings of every channel (X, Y, Z, W) to signals
-    // (only with DataModel.UseSignals, otherwise it is the plain UiVector2/3/4 / UiColor3 editor).
+    // (only with SdfGlueFeatures.UseSignals, otherwise it is the plain UiVector2/3/4 / UiColor3 editor).
     //
     // Main row:  [>] Name   [~] [ X | Y | Z ]        - "~" opens a menu with a submenu per channel,
     //                                                  a bound channel shows the current value (read only)
@@ -33,7 +34,7 @@ namespace SdfGlueUi.Ui.Properties
         // onBindingChanged - called after a binding is changed (also on undo/redo), e.g. to rebuild the shader
         public static void Build(ref int id, string name, ExVector2 obj, float speed, bool editInDegrees, SignalsCollection? signals = null, OnValueChanged? onBindingChanged = null)
         {
-            if (!DataModel.UseSignals || signals == null || obj is not ExVector2WithSignal objWithSignal)
+            if (!SdfGlueFeatures.UseSignals || signals == null || obj is not ExVector2WithSignal objWithSignal)
             {
                 Vector2 valV = obj.Val;
                 if (editInDegrees)
@@ -58,7 +59,7 @@ namespace SdfGlueUi.Ui.Properties
 
         public static void Build(ref int id, string name, ExVector3 obj, float speed, bool editInDegrees, bool isColor, SignalsCollection? signals = null, OnValueChanged? onBindingChanged = null)
         {
-            if (!DataModel.UseSignals || signals == null || obj is not ExVector3WithSignal objWithSignal)
+            if (!SdfGlueFeatures.UseSignals || signals == null || obj is not ExVector3WithSignal objWithSignal)
             {
                 Vector3 valV = obj.Val;
                 if (isColor)
@@ -88,7 +89,7 @@ namespace SdfGlueUi.Ui.Properties
 
         public static void Build(ref int id, string name, ExVector4 obj, float speed, bool editInDegrees, SignalsCollection? signals = null, OnValueChanged? onBindingChanged = null)
         {
-            if (!DataModel.UseSignals || signals == null || obj is not ExVector4WithSignal objWithSignal)
+            if (!SdfGlueFeatures.UseSignals || signals == null || obj is not ExVector4WithSignal objWithSignal)
             {
                 Vector4 valV = obj.Val;
                 if (editInDegrees)

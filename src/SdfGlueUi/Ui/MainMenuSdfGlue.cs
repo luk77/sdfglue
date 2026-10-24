@@ -63,7 +63,7 @@ namespace SdfGlueUi.Ui
 
         protected override void BuildEditMenuExtras()
         {
-            TreeNode? selectedNode = ExecutorSdfGlue.GetModel().SelectedNode;
+            TreeNode? selectedNode = ExecutorSdfGlue.GetAppContext().Selection.SelectedNode;
 
             ImGui.Separator();
             if (selectedNode is RenderPassData || selectedNode is RenderingData)

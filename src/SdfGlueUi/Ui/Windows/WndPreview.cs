@@ -80,7 +80,7 @@ namespace SdfGlueUi.Ui.Windows
                 int id = 1;
 
                 // resolution (label)
-                string[] resolutions = GetModel().Config.ResolutionsAsStrings;
+                string[] resolutions = GetSettings().ResolutionsAsStrings;
                 ImGui.PushID(id++);
                 ImGui.SameLine();
                 ImGui.Text("Resolution:");
@@ -90,9 +90,9 @@ namespace SdfGlueUi.Ui.Windows
                 ImGui.PushID(id++);
                 ImGui.SameLine();
                 ImGui.SetNextItemWidth(200);
-                int lastResolutionIndex = GetModel().Config.CurrentResolutionIndex;
-                ImGui.Combo("", ref GetModel().Config.CurrentResolutionIndex, resolutions, resolutions.Length, resolutions.Length);
-                if (lastResolutionIndex != GetModel().Config.CurrentResolutionIndex)
+                int lastResolutionIndex = GetSettings().CurrentResolutionIndex;
+                ImGui.Combo("", ref GetSettings().CurrentResolutionIndex, resolutions, resolutions.Length, resolutions.Length);
+                if (lastResolutionIndex != GetSettings().CurrentResolutionIndex)
                 {
                     uiMgr.ActionsExecutor.OnPreviewResolutionChanged();
                 }
@@ -109,7 +109,7 @@ namespace SdfGlueUi.Ui.Windows
                 ImGui.SameLine();
 
                 ImGui.PushID(id++);
-                MenuRenderPass.Build(GetModel(), ref previewMode_, ref selectedPass_);
+                MenuRenderPass.Build(GetAppContext(), ref previewMode_, ref selectedPass_);
                 ImGui.PopID();
 
                 //ImGui.SameLine();
@@ -120,7 +120,7 @@ namespace SdfGlueUi.Ui.Windows
 
 
 
-                //if (!GetModel().Config.PreviewLastSelectedPass)
+                //if (!GetSettings().PreviewLastSelectedPass)
                 //{
                 //    List<TreeNode> passesList = GetModel().RenderingSysData.Children.ToList();
                 //
@@ -168,7 +168,7 @@ namespace SdfGlueUi.Ui.Windows
                             Vector2 destRatioVec = new Vector2(imgSize.X, imgSize.Y);
                             float destRatio = destRatioVec.X / destRatioVec.Y;
 
-                            IntCoords previewRes = GetModel().GetRenderResolution();
+                            IntCoords previewRes = GetAppContext().GetRenderResolution();
 
                             Vector2 scale = new Vector2(1.0f, 1.0f);
                             float ratio = (previewRes.Y > 0.0f) ? (float)previewRes.X / (float)previewRes.Y : 1.0f;
@@ -235,7 +235,7 @@ namespace SdfGlueUi.Ui.Windows
             if (!isBackground_)
                 return GetModel().GetRPassDataForPreview();
 
-            MenuRenderPass.ResolveSelectedPass(GetModel(), previewMode_, ref selectedPass_);
+            MenuRenderPass.ResolveSelectedPass(GetAppContext(), previewMode_, ref selectedPass_);
 
             // a chosen pass may have been deleted (or another project loaded)
             if (selectedPass_ != null && !GetModel().RenderingSysData.Children.Contains(selectedPass_))
@@ -252,7 +252,7 @@ namespace SdfGlueUi.Ui.Windows
         {
             UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
-            CalcScreenRect(new Vector2(uiMgr.MainWindowSizeX, uiMgr.MainWindowSizeY), GetModel().GetRenderResolution(),
+            CalcScreenRect(new Vector2(uiMgr.MainWindowSizeX, uiMgr.MainWindowSizeY), GetAppContext().GetRenderResolution(),
                            constAspectRatio_, out previewPos_, out previewSize_);
 
             if (exclusive)
@@ -327,7 +327,7 @@ namespace SdfGlueUi.Ui.Windows
                     Vector2 destRatioVec = new Vector2(imgSize.X, imgSize.Y);
                     float destRatio = destRatioVec.X / destRatioVec.Y;
 
-                    IntCoords previewRes = GetModel().GetRenderResolution();
+                    IntCoords previewRes = GetAppContext().GetRenderResolution();
 
                     Vector2 scale = new Vector2(1.0f, 1.0f);
                     float ratio = (previewRes.Y > 0.0f) ? (float)previewRes.X / (float)previewRes.Y : 1.0f;
@@ -391,7 +391,7 @@ namespace SdfGlueUi.Ui.Windows
             if (frame != lastSmoothingFrame_)
             {
                 lastSmoothingFrame_ = frame;
-                GetModel().CameraDat.UpdateSmoothing(deltaTime, GetModel().Config);
+                GetModel().CameraDat.UpdateSmoothing(deltaTime, GetSettings());
             }
 
             // the background preview does not override the mouse data of preview windows
@@ -410,11 +410,11 @@ namespace SdfGlueUi.Ui.Windows
 
             if (IsHovered)
             {
-                bool keyDown = GetModel().Config.UseShiftKeyToZoom ? (input.IsKeyDown(UiKey.LeftShift) || input.IsKeyDown(UiKey.RightShift)) : true;
+                bool keyDown = GetSettings().UseShiftKeyToZoom ? (input.IsKeyDown(UiKey.LeftShift) || input.IsKeyDown(UiKey.RightShift)) : true;
                 if (keyDown)
                 {
                     float deltaWheel = input.GetWheelPrecise() - lastMouseWheelPos_;
-                    float deltaDist = -0.3f * GetModel().Config.MouseWheelSpeed * deltaWheel;
+                    float deltaDist = -0.3f * GetSettings().MouseWheelSpeed * deltaWheel;
 
                     if (Math.Abs(deltaWheel) > 0.0001)
                         ResetFrameCounterIfNeeded();
@@ -431,21 +431,21 @@ namespace SdfGlueUi.Ui.Windows
 
             IUiInput input = uiMgr.ActionsExecutor;
 
-            if (GetModel().Config.UseAltRmbForCameraRotation)
+            if (GetSettings().UseAltRmbForCameraRotation)
             {
                 // "Unity style" camera controller:
                 // RMB      - pan
                 // Alt+RMB  - rotation
-                mouseInputChannelPan_       .Update(input.IsRmbDown(), !input.IsDownAnyAlt(), GetModel().Config, input, GetModel().CameraDat, IsHovered);
-                mouseInputChannelRotate_    .Update(input.IsRmbDown(), input.IsDownAnyAlt(),  GetModel().Config, input, GetModel().CameraDat, IsHovered);
+                mouseInputChannelPan_       .Update(input.IsRmbDown(), !input.IsDownAnyAlt(), GetSettings(), input, GetModel().CameraDat, IsHovered);
+                mouseInputChannelRotate_    .Update(input.IsRmbDown(), input.IsDownAnyAlt(),  GetSettings(), input, GetModel().CameraDat, IsHovered);
             }
             else
             {
                 // Default controller:
                 // RMB - pan
                 // LMB - rotation
-                mouseInputChannelPan_       .Update(input.IsRmbDown(), true, GetModel().Config, input, GetModel().CameraDat, IsHovered);
-                mouseInputChannelRotate_    .Update(input.IsLmbDown(), true, GetModel().Config, input, GetModel().CameraDat, IsHovered);
+                mouseInputChannelPan_       .Update(input.IsRmbDown(), true, GetSettings(), input, GetModel().CameraDat, IsHovered);
+                mouseInputChannelRotate_    .Update(input.IsLmbDown(), true, GetSettings(), input, GetModel().CameraDat, IsHovered);
             }
 
             bool stateRmb = input.IsRmbDown();
@@ -486,7 +486,7 @@ namespace SdfGlueUi.Ui.Windows
 
         private void StoreMouseDataForShader()
         {
-            IntCoords resolution = GetModel().GetRenderResolution();
+            IntCoords resolution = GetAppContext().GetRenderResolution();
             float ratioX = resolution.X / (float)previewSize_.X;
             float ratioY = resolution.Y / (float)previewSize_.Y;
 
@@ -584,14 +584,14 @@ namespace SdfGlueUi.Ui.Windows
         {
             //GetModel().ResetFrameCounterIfNeeded = true;
 
-            RenderPassData? lastSelectedRPass = GetModel().LastSelectedRPass;
+            RenderPassData? lastSelectedRPass = GetSelection().LastSelectedRPass;
             if (lastSelectedRPass == null)
                 return;
 
             if (!lastSelectedRPass.AutoResetFrameCounter.Val)
                 return;
 
-            GetModel().ResetFrameCounter();
+            GetPlayback().ResetFrameCounter();
 
             //GetModel().LastSelectedRPass.RenderingPass.ResetFrameCounter();
             //GetModel().LastSelectedRPass.ForceClear = true;

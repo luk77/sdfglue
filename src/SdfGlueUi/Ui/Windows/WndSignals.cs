@@ -12,7 +12,7 @@ using System.Numerics;
 
 namespace SdfGlueUi.Ui.Windows
 {
-    // Plot of all signals (registered only with DataModel.UseSignals)
+    // Plot of all signals (registered only with SdfGlueFeatures.UseSignals)
     public class WndSignals : UiWindowSdfGlue
     {
         public override string Title => "Signals";
@@ -66,8 +66,8 @@ namespace SdfGlueUi.Ui.Windows
 
                         string label = MenuSignals.GetSignalLabel(signals, signal.Id);
                         string valueText = signal.Enabled.Val ? signal.GetCurrentValue().ToString("0.###", CultureInfo.InvariantCulture) : "off";
-                        if (ImGui.Selectable(String.Format("{0} = {1}", label, valueText), GetModel().SelectedNode == signal))
-                            GetModel().ImportantNodeToSelect = signal;
+                        if (ImGui.Selectable(String.Format("{0} = {1}", label, valueText), GetSelection().SelectedNode == signal))
+                            GetSelection().ImportantNodeToSelect = signal;
                         ImGui.PopID();
 
                         if (visible && signal.Enabled.Val)

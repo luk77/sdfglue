@@ -25,7 +25,7 @@ namespace SingleDocAppSample
 
         public TextDocument GetDocument()
         {
-            return appWindow_.Document;
+            return appWindow_.AppContext.Document;
         }
 
         // document commands required by the framework
@@ -35,7 +35,7 @@ namespace SingleDocAppSample
             if (!ConfirmDiscardChanges())
                 return;
 
-            SetDocument(new TextDocument());
+            appWindow_.AppContext.SetDocument(new TextDocument(), null);
         }
 
         public override void OnOpenDocument()
@@ -55,7 +55,7 @@ namespace SingleDocAppSample
             TextDocument document = new TextDocument();
             document.Load(filePath);
 
-            SetDocument(document);
+            appWindow_.AppContext.SetDocument(document, filePath);
         }
 
         public override void OnSaveDocument()
@@ -63,7 +63,7 @@ namespace SingleDocAppSample
             if (!CanSaveDocument())
                 return;
 
-            GetDocument().Save(GetDocument().FilePath!);
+            GetDocument().Save(appWindow_.AppContext.DocumentFilePath!);
             UndoManager.Instance.MarkSavePoint();
             window_.RefreshWindowTitle();
         }
@@ -75,13 +75,14 @@ namespace SingleDocAppSample
                 return;
 
             GetDocument().Save(filePath);
+            appWindow_.AppContext.DocumentFilePath = filePath;
             UndoManager.Instance.MarkSavePoint();
             window_.RefreshWindowTitle();
         }
 
         public override bool CanSaveDocument()
         {
-            return !String.IsNullOrEmpty(GetDocument().FilePath);
+            return !String.IsNullOrEmpty(appWindow_.AppContext.DocumentFilePath);
         }
 
         // application commands (undoable)
@@ -106,16 +107,6 @@ namespace SingleDocAppSample
 
             // ActionString stores PrevVal -> Val, so the change can be undone/redone
             UndoManager.Instance.SaveAction(new ActionString(document.Text));
-        }
-
-        private void SetDocument(TextDocument document)
-        {
-            appWindow_.Document = document;
-
-            // undo actions refer to the objects of the previous document
-            UndoManager.Instance.ClearAll();
-
-            window_.RefreshWindowTitle();
         }
     }
 }

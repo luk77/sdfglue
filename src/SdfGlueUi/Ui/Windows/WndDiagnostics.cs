@@ -20,7 +20,7 @@ namespace SdfGlueUi.Ui.Windows
             {
                 if (ImGui.CollapsingHeader("Rendering", ImGuiTreeNodeFlags.DefaultOpen))
                 {
-                    ImGui.Checkbox("Enable shader rendering", ref GetModel().Config.EnableRendering);
+                    ImGui.Checkbox("Enable shader rendering", ref GetSettings().EnableRendering);
                 }
 
                 if (ImGui.CollapsingHeader("Mouse", ImGuiTreeNodeFlags.DefaultOpen))

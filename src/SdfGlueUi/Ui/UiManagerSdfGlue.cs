@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using ImGuiNET;
+using SdfGlueCore;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueUi.Ui.Dialogs;
@@ -20,6 +21,9 @@ namespace SdfGlueUi.Ui
     {
         public  const string            ViewGroupPreviews       = "Previews";
         public  const string            ViewGroupCode           = "Code";
+
+        public  const int               NumOfPreviews           = 4;
+        public  const int               NumOfCodeViews          = 4;
 
         public  bool                    EnabledDemoMode         = false;
 
@@ -45,21 +49,21 @@ namespace SdfGlueUi.Ui
             // The first preview is the main one (the only one visible on start, used by maximized / fullscreen preview)
             WindowPreview           = new WndPreview("Preview 1");
             RegisterWindow(WindowPreview, ViewGroupPreviews, true);
-            for(int i=1; i<DataModel.NumOfPreviews; i++)
+            for(int i=1; i<NumOfPreviews; i++)
             {
                 RegisterWindow(new WndPreview(String.Format("Preview {0}", i+1)), ViewGroupPreviews, false);
             }
             RegisterWindow(new WndExplorer());
             RegisterWindow(new WndInspector());
             RegisterWindow(new WndGeneratedCode("Code view 1"), ViewGroupCode, false);
-            for(int i=1; i<DataModel.NumOfCodeViews; i++)
+            for(int i=1; i<NumOfCodeViews; i++)
             {
                 RegisterWindow(new WndGeneratedCode(String.Format("Code view {0}", i+1)), ViewGroupCode, false);
             }
             RegisterWindow(new WndLog()                 , null, false);
             RegisterWindow(new WndDiagnostics()         , null, false);
             RegisterWindow(new WndPlayback());
-            if (DataModel.UseSignals)
+            if (SdfGlueFeatures.UseSignals)
             {
                 RegisterWindow(new WndSignals()         , null, false);
                 RegisterWindow(new WndInputsSdfGlue()   , null, false);

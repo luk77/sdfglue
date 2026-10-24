@@ -44,7 +44,7 @@ namespace SdfGlueUi.Ui.Dialogs
 
         public void Build()
         {
-            UserSettingsSdfGlue config = executor_.GetModel().Config;
+            UserSettingsSdfGlue config = executor_.GetAppContext().Settings;
 
             if (openRequested_)
             {
@@ -170,7 +170,7 @@ namespace SdfGlueUi.Ui.Dialogs
 
             // summary
             ImGui.TextDisabled(String.Format("Files: {0} ... {1}", edited_.GetFileName(0), edited_.GetFileName(Math.Max(0, edited_.NumOfFramesToExport - 1))));
-            double startTime = edited_.UseStartTime ? edited_.StartTime : executor_.GetModel().CurrentTime;
+            double startTime = edited_.UseStartTime ? edited_.StartTime : executor_.GetAppContext().Playback.CurrentTime;
             ImGui.TextDisabled(String.Format("Time: {0:0.###} s ... {1:0.###} s{2}", startTime, startTime + edited_.GetDuration(),
                                              edited_.UseStartTime ? "" : " (from the current time)"));
 

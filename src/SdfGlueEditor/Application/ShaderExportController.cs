@@ -66,12 +66,12 @@ namespace SdfGlueEditor.Application
         public string? GenerateCode(ShaderExportTarget target, RenderPassData pass, StringBuilder errors, string? exportName = null)
         {
             CodeGenResult result = new CodeGenResult();
-            return ctx_.CodeGenerator.GenerateShader(errors, target, pass, result, exportName ?? GetProjectName(GetModel()));
+            return ctx_.CodeGenerator.GenerateShader(GetModel(), errors, target, pass, result, exportName ?? GetProjectName());
         }
 
-        private static string? GetProjectName(DataModel model)
+        private string? GetProjectName()
         {
-            return String.IsNullOrEmpty(model.ProjectFilePath) ? null : Path.GetFileNameWithoutExtension(model.ProjectFilePath);
+            return String.IsNullOrEmpty(ctx_.DocumentFilePath) ? null : Path.GetFileNameWithoutExtension(ctx_.DocumentFilePath);
         }
 
         public void ExportToClipboard(ShaderExportTarget target)
@@ -186,15 +186,15 @@ namespace SdfGlueEditor.Application
             if (pass == null)
                 return "No primary render pass.";
 
-            ShaderCodeGenerator generator = new ShaderCodeGenerator(model);
+            ShaderCodeGenerator generator = ctx_.CodeGenerator;
 
             StringBuilder unityErrors = new StringBuilder();
-            string? unityCode = generator.GenerateShader(unityErrors, ShaderExportTarget.Unity, pass, new CodeGenResult(), Path.GetFileNameWithoutExtension(projectPath));
+            string? unityCode = generator.GenerateShader(model, unityErrors, ShaderExportTarget.Unity, pass, new CodeGenResult(), Path.GetFileNameWithoutExtension(projectPath));
             if (unityCode != null)
                 File.WriteAllText(outputBaseName + "." + ShaderExportTarget.Unity.FileExtension, unityCode);
 
             StringBuilder errors = new StringBuilder();
-            string? code = generator.GenerateShader(errors, ShaderExportTarget.Shadertoy, pass, new CodeGenResult());
+            string? code = generator.GenerateShader(model, errors, ShaderExportTarget.Shadertoy, pass, new CodeGenResult());
             if (code == null || errors.Length > 0)
                 return "Code generation errors:\n" + errors.ToString();
 

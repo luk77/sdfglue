@@ -115,27 +115,27 @@ namespace SdfGlueCore.Model.DataNodes
             SignalBinding.DeserializeBinding(nodeThis.SelectSingleNode("MatBlendFactor")  , MaterialBlendFactor   );
             SignalBinding.DeserializeBinding(nodeThis.SelectSingleNode("BlendFactor")     , BlendFactor           );
 
-            FunctionSdf.Deserialize(nodeThis, this, model.SdfDefinitions);
+            FunctionSdf.Deserialize(nodeThis, this, model.Definitions.Sdf);
 
             // TODO: temporary
-            FunctionMixOp.RefreshDefinitionReference(model.MixOpDefinitions);
+            FunctionMixOp.RefreshDefinitionReference(model.Definitions.MixOps);
 
             XmlNode? nodeMixOp = nodeThis.SelectSingleNode("MixOp");
             if (nodeMixOp != null)
             {
-                FunctionMixOp.Deserialize(nodeMixOp, this, model.MixOpDefinitions);
+                FunctionMixOp.Deserialize(nodeMixOp, this, model.Definitions.MixOps);
             }
 
             XmlNode? nodePositionOperators = nodeThis.SelectSingleNode("PositionOperators");
             if (nodePositionOperators != null)
             {
-                PositionOperators.Deserialize(nodePositionOperators, this, model.PositionOpDefinitions);
+                PositionOperators.Deserialize(nodePositionOperators, this, model.Definitions.PositionOps);
             }
 
             XmlNode? nodeDistanceOperators = nodeThis.SelectSingleNode("DistanceOperators");
             if (nodeDistanceOperators != null)
             {
-                DistanceOperators.Deserialize(nodeDistanceOperators, this, model.DistanceOpDefinitions);
+                DistanceOperators.Deserialize(nodeDistanceOperators, this, model.Definitions.DistanceOps);
             }
 
             XmlNode? nodeChildren = nodeThis.SelectSingleNode("Children");

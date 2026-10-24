@@ -30,7 +30,7 @@ namespace SdfGlueEditor.Application
 
         public void FocusSelectedObject()
         {
-            FocusObject(ctx_.GetModel().SelectedNode as SdfObject);
+            FocusObject(ctx_.Selection.SelectedNode as SdfObject);
         }
 
         public void RecalculateCamera()

@@ -54,18 +54,6 @@ namespace SdfGlueCore.Model.DataNodes
             XmlUtils.DeserializeString  (nodeThis, "Name"           , ref Name.Val              );
             XmlUtils.DeserializeBool    (nodeThis, "IsFixed"        , ref IsFixed.Val           );
 
-            //if (DataModel.ImportOldMaterials)
-            //{
-            //    MaterialProps.SetParameterVec3  ("colorAmbient"     , ColorAmbient .Val, true);
-            //    MaterialProps.SetParameterVec3  ("colorDiffuse"     , ColorDiffuse .Val, true);
-            //    MaterialProps.SetParameterVec3  ("colorSpecular"    , ColorSpecular.Val, true);
-            //    MaterialProps.SetParameterVec3  ("colorRim"         , ColorRim     .Val, true);
-            //    MaterialProps.SetParameterFloat ("shininess"        , Shininess    .Val, true);
-            //    MaterialProps.SetParameterFloat ("rimStrength"      , RimStrength  .Val, true);
-            //    MaterialProps.SetParameterFloat ("rimWidth"         , RimWidth     .Val, true);
-            //    MaterialProps.SetParameterFloat ("reflectance"      , Reflectance  .Val, true);
-            //}
-
             MaterialProps.Deserialize(nodeThis, this, null);
 
             return true;
