@@ -14,7 +14,7 @@ namespace SdfGlueCore.Model.DataNodes.Signals
 {
     // Binding of float and vector parameters (ISignalBindable: ExFloatWithSignal, ExVector2/3/4WithSignal) to signals.
     // Every channel of a vector has its own binding.
-    // Bindings are always loaded and saved; with DataModel.UseSignals = false they are ignored
+    // Bindings are always loaded and saved; with SdfGlueFeatures.UseSignals = false they are ignored
     // (the static value is used and the generated code does not change).
     public static class SignalBinding
     {
@@ -28,7 +28,7 @@ namespace SdfGlueCore.Model.DataNodes.Signals
             return (val is ISignalBindable bindable && channel < bindable.ChannelCount) ? bindable.GetSignalId(channel) : 0;
         }
 
-        // True if any channel has a binding (regardless of DataModel.UseSignals)
+        // True if any channel has a binding (regardless of SdfGlueFeatures.UseSignals)
         public static bool HasBinding(ISimpleType? val)
         {
             return val is ISignalBindable bindable && HasBinding(bindable);
@@ -48,12 +48,12 @@ namespace SdfGlueCore.Model.DataNodes.Signals
         // also in fixed objects (the binding is enough: a disabled or deleted signal gives the static value)
         public static bool IsBound(ISimpleType? val)
         {
-            return DataModel.UseSignals && HasBinding(val);
+            return SdfGlueFeatures.UseSignals && HasBinding(val);
         }
 
         public static bool HasBoundParameters(Dictionary<string, ISimpleType> values)
         {
-            if (!DataModel.UseSignals)
+            if (!SdfGlueFeatures.UseSignals)
                 return false;
 
             foreach(ISimpleType val in values.Values)
@@ -68,7 +68,7 @@ namespace SdfGlueCore.Model.DataNodes.Signals
         // or the signal is missing or disabled
         public static float GetChannelValue(ISignalBindable obj, int channel, float staticVal, SignalsCollection? signals)
         {
-            if (!DataModel.UseSignals || signals == null)
+            if (!SdfGlueFeatures.UseSignals || signals == null)
                 return staticVal;
 
             int signalId = obj.GetSignalId(channel);

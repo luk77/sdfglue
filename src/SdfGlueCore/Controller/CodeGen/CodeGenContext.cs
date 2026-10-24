@@ -22,6 +22,8 @@ namespace SdfGlueCore.Controller.CodeGen
         public  readonly ShaderExportTarget Target;
         // Name of the exported shader (e.g. the file name), may be null
         public  readonly string?            ExportName;
+        // Identifiers of the objects: names or ids (user settings)
+        public  readonly bool               UseNamesAsIds;
 
         // Features of the pass (secondary passes have no backdrop, camera, materials and SDF tree)
         public  readonly bool               UsesBackdrop;
@@ -29,13 +31,14 @@ namespace SdfGlueCore.Controller.CodeGen
         public  readonly bool               UsesMaterials;
         public  readonly bool               UsesSdfTree;
 
-        public CodeGenContext(DataModel model, RenderPassData pass, StringBuilder errors, ShaderExportTarget target, string? exportName = null)
+        public CodeGenContext(DataModel model, RenderPassData pass, StringBuilder errors, ShaderExportTarget target, bool useNamesAsIds, string? exportName = null)
         {
             Model       = model;
             Pass        = pass;
             Errors      = errors;
             Target      = target;
             ExportName  = exportName;
+            UseNamesAsIds = useNamesAsIds;
 
             UsesBackdrop    = pass.IsPrimaryPass;
             UsesCamera      = pass.IsPrimaryPass;
@@ -68,7 +71,7 @@ namespace SdfGlueCore.Controller.CodeGen
 
         public string GetNodeId(TreeNode node)
         {
-            return ShaderNames.GetNodeId(Model, node);
+            return ShaderNames.GetNodeId(UseNamesAsIds, node);
         }
 
         // Definition of the material parameters (comes from the renderer of the first primary pass).

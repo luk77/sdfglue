@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 using ImGuiNET;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.BaseTypes;
 using SdfGlueCore.Model.CodeFragments;
@@ -28,6 +29,26 @@ namespace SdfGlueUi.Ui
         public DataModel GetModel()
         {
             return ExecutorSdfGlue.GetModel();
+        }
+
+        public SdfGlueAppContextBase GetAppContext()
+        {
+            return ExecutorSdfGlue.GetAppContext();
+        }
+
+        public UserSettingsSdfGlue GetSettings()
+        {
+            return ExecutorSdfGlue.GetAppContext().Settings;
+        }
+
+        public PlaybackState GetPlayback()
+        {
+            return ExecutorSdfGlue.GetAppContext().Playback;
+        }
+
+        public EditorSelection GetSelection()
+        {
+            return ExecutorSdfGlue.GetAppContext().Selection;
         }
 
         public static void BuildPropertiesForCompilationParameters(ref int index, FunctionEntity functionEntity, OnValueChanged? onValueChanged = null)

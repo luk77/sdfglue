@@ -78,7 +78,7 @@ namespace SdfGlueCore.Model.DataNodes
                 CameraOperators.Operators.Insert(0, defaultCamera);
             }
 
-            //RendererFunc.RefreshDefinitionReference(model.Renderers);
+            //RendererFunc.RefreshDefinitionReference(model.Definitions.Renderers);
         }
 
         public int GetTextureId()

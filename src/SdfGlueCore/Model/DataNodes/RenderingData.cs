@@ -27,11 +27,11 @@ namespace SdfGlueCore.Model.DataNodes
 
             AddChild(new RenderPassData(DataModel.NodeIdRenderingData - 1, "Primary pass", null, true));
 
-            //FunctionDefinition rpColorCorrection = model.Renderers.FindDefinitionByName("SecPassTonemapACES");
+            //FunctionDefinition rpColorCorrection = model.Definitions.Renderers.FindDefinitionByName("SecPassTonemapACES");
             //if (rpColorCorrection != null)
             //    AddChild(new RenderPassData(DataModel.NodeIdRenderingData - 2, "Color correction", rpColorCorrection, false));
 
-            FunctionDefinition? rpAvFrames = model.Renderers.FindDefinitionByName("SecPassAverageFramesHistory");
+            FunctionDefinition? rpAvFrames = model.Definitions.Renderers.FindDefinitionByName("SecPassAverageFramesHistory");
             if (rpAvFrames != null)
             {
                 RenderPassData rp = new RenderPassData(DataModel.NodeIdRenderingData - 3, "Average frames", rpAvFrames, false);

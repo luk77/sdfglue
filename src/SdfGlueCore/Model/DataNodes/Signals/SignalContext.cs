@@ -40,7 +40,7 @@ namespace SdfGlueCore.Model.DataNodes.Signals
     // Data passed to signal evaluation in a single update
     public class SignalContext
     {
-        public  double                  Time            = 0.0;      // project time (DataModel.CurrentTime, the same as iTime)
+        public  double                  Time            = 0.0;      // project time (PlaybackState.CurrentTime, the same as iTime)
         public  double                  RealTime        = 0.0;      // time since the application start (used by the history/plots)
         public  int                     UpdateIndex     = 0;        // incremented on every update (evaluation cache)
         public  ISignalInputProvider?   Inputs          = null;

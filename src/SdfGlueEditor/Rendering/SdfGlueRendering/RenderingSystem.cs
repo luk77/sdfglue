@@ -22,13 +22,13 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
         {
         }
 
-        public void Reinitialize(RenderingData renderingData, ShaderCodeGenerator codeGenerator, IntCoords previewResolution)
+        public void Reinitialize(DataModel model, ShaderCodeGenerator codeGenerator, IntCoords previewResolution)
         {
             Dispose();
 
             RenderPass? prevPass = null;
 
-            foreach(TreeNode node in renderingData.Children)
+            foreach(TreeNode node in model.RenderingSysData.Children)
             {
                 RenderPassData? passData = node as RenderPassData;
                 if (passData == null)
@@ -52,7 +52,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
                 //}
 
                 // Unification - Same template for primary/secondary passess
-                RenderPass pass = new RenderPass(codeGenerator, passData, previewResolution, "Shaders/Template.vert", "Shaders/Template.frag");
+                RenderPass pass = new RenderPass(model, codeGenerator, passData, previewResolution, "Shaders/Template.vert", "Shaders/Template.frag");
                 passes_.Add(pass);
                 passData.RenderingPass = pass;
                 prevPass = pass;
@@ -73,7 +73,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
         //Stopwatch swPass_   = new Stopwatch();
 
         //public void RenderFrame(float deltaTime, DataModel model, int appViewportWidth, int appViewportHeight)
-        public void RenderFrame(DataModel model, int appViewportWidth, int appViewportHeight)
+        public void RenderFrame(DataModel model, FrameRenderParams frame, int appViewportWidth, int appViewportHeight)
         {
             //swFrame_.Restart();
 
@@ -92,7 +92,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
 
             // Set the viewport for the preview in the window
-            IntCoords previewResolution = model.GetRenderResolution();
+            IntCoords previewResolution = frame.Resolution;
             GL.Viewport(0, 0, previewResolution.X, previewResolution.Y);
 
             RenderPass? prevEnabledPass = null;
@@ -112,7 +112,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
                 int prevPassTextureId = (prevEnabledPass != null) ? prevEnabledPass.GetTextureId() : 0;
 
                 //pass.RenderFrame(deltaTime, model, model.IsAbleToRender(), appViewportWidth, appViewportHeight, prevPassTextureId);
-                pass.RenderFrame(model, model.IsAbleToRender(), prevPassTextureId);
+                pass.RenderFrame(model, frame, prevPassTextureId);
                 //swPass_.Stop();
                 //pass.PassData.SetLastRenderTime(swPass_.ElapsedMilliseconds);
 
@@ -133,11 +133,11 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             GL.Clear(ClearBufferMask.ColorBufferBit);
         }
 
-        public void ReinitializeShader(ShaderCodeGenerator codeGenerator)
+        public void ReinitializeShader(DataModel model, ShaderCodeGenerator codeGenerator)
         {
             foreach(RenderPass pass in passes_)
             {
-                pass.ReinitializeShader(codeGenerator);
+                pass.ReinitializeShader(model, codeGenerator);
             }
         }
 

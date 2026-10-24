@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using ImGuiNET;
+using SdfGlueCore;
 using SdfGlueCore.Model.BaseTypes;
 using SdfGlueCore.Model.DataNodes.Signals;
 using SdfGlueUi.Ui.Components;
@@ -18,7 +19,7 @@ using System.Numerics;
 
 namespace SdfGlueUi.Ui.Properties
 {
-    // Float editor with an optional binding to a signal (only with DataModel.UseSignals).
+    // Float editor with an optional binding to a signal (only with SdfGlueFeatures.UseSignals).
     // A bound parameter shows the signal (name, sparkline, current value) instead of the value editor.
     // The binding helpers work on a single channel of ISignalBindable, so they are shared with UiVectorWithSignal.
     public class UiFloatWithSignal : UiFloat
@@ -38,7 +39,7 @@ namespace SdfGlueUi.Ui.Properties
             ImGui.NextColumn();
 
             ExFloatWithSignal? objWithSignal = null;
-            if (SdfGlueCore.Model.DataModel.UseSignals && signals != null)
+            if (SdfGlueFeatures.UseSignals && signals != null)
             {
                 objWithSignal = obj as ExFloatWithSignal;
                 if (objWithSignal != null)

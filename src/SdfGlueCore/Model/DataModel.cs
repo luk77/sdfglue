@@ -12,7 +12,6 @@ using SdfGlueCore.Model.BaseTypes;
 using SingleDocAppCore.Utils;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using System.Reflection;
 using System.Text;
 using System.Xml;
 using SingleDocAppCore.Model;
@@ -20,15 +19,13 @@ using SingleDocAppCore.Model.DataNodes;
 
 namespace SdfGlueCore.Model
 {
+    // The document (project): only the data saved in the project file + a reference to the shared function definitions.
+    // State of the application (time, selection, user settings, file path) is in SdfGlueAppContextBase.
     public class DataModel : TreeNode, IAbstractDocument
     {
         // Version management moved to Directory.Build.props file
         //public static readonly int      VersionMajor                = 0;
         //public static readonly int      VersionMinor                = 378;
-
-        public static readonly bool     UseCameraControllers        = true;
-        public static readonly bool     ImportOldMaterials          = false;
-        public static readonly bool     UseSignals                  = true;
 
         public static readonly int      NodeIdDataModel             = -10000;
         public static readonly int      NodeIdRenderingData         = -1000;
@@ -36,11 +33,6 @@ namespace SdfGlueCore.Model
         public static readonly int      NodeIdMaterialsCollection   = -3000;
         public static readonly int      NodeIdSignalsCollection     = -4000;
         public static readonly int      NodeIdProjectSettings       = -5000;
-
-        public static readonly float    ConstTimeStep               = 1.0f / 10.0f;
-
-        public static readonly int      NumOfPreviews               = 4;
-        public static readonly int      NumOfCodeViews              = 4;
 
         public  int                     NextAvailableId             = 1;
         public  int                     NextAvailableMaterialId     = 1;
@@ -50,34 +42,8 @@ namespace SdfGlueCore.Model
         public  ProjectSettings         ProjSettings;
         public  RenderingData           RenderingSysData;
 
-        // time step managment
-        public double                   LastDeltaTime           = 0.0;
-        public double                   CurrentTime             = 0.0;
-        public int                      CurrentFrame            = 0;
-        public double                   AvgRenderTime           = 0.0;
-        public double                   Fps                     = 0.0;
-        public double                   FpsAccumTime            = 0.0;
-        public int                      FpsAccumFrames          = 0;
-        public bool                     IsPlaying               = true;
-        public bool                     UseConstTimeStep        = false;    // TODO: needs polishing
-
-        // Resolution used instead of the preview resolution (image sequence export), not saved
-        public IntCoords?               RenderResolutionOverride = null;
-
         // root object
         public  SdfObject?              SdfRoot                 = null;
-
-        // editor helpers
-        public  String?                 ProjectFilePath         = null;
-        public  TreeNode?               SelectedNode            = null;
-        public  TreeNode?               ImportantNodeToSelect   = null;
-        public  RenderPassData?         LastSelectedRPass       = null;
-        public  TreeNode?               NodeToDelete            = null;
-        public  TreeNode?               NodeToMoveUp            = null;
-        public  TreeNode?               NodeToMoveDown          = null;
-
-        // User settings (owned by the application, shared by consecutive models)
-        public  UserSettingsSdfGlue     Config;
 
         // Camera (polar-style)
         public  CameraData              CameraDat               = new CameraData();
@@ -85,13 +51,8 @@ namespace SdfGlueCore.Model
         public  MaterialsCollection         Materials                   = new MaterialsCollection();
         public  SignalsCollection           Signals                     = new SignalsCollection();
 
-        public FunctionDefinitionsSet   Renderers               = new FunctionDefinitionsSet();
-        public FunctionDefinitionsSet   BackdropsDefinitions    = new FunctionDefinitionsSet();
-        public FunctionDefinitionsSet   CameraControllers       = new FunctionDefinitionsSet();
-        public FunctionDefinitionsSet   SdfDefinitions          = new FunctionDefinitionsSet();
-        public FunctionDefinitionsSet   MixOpDefinitions        = new FunctionDefinitionsSet();
-        public FunctionDefinitionsSet   PositionOpDefinitions   = new FunctionDefinitionsSet();
-        public FunctionDefinitionsSet   DistanceOpDefinitions   = new FunctionDefinitionsSet();
+        // Function definitions (shared by all models, owned by the application context)
+        public  readonly FunctionLibrary    Definitions;
 
         //public  CodeGenResult? LastGenCode
         //{
@@ -117,49 +78,21 @@ namespace SdfGlueCore.Model
         //    }
         //}
 
-        public static string GetAppVersion()
+        // definitions: function definitions of the application (already loaded).
+        // Note: the undo stack is not cleared here - the model may be a temporary one;
+        // the application clears it when the model becomes the current document.
+        public DataModel(FunctionLibrary definitions) : base(NodeIdDataModel, "Project")
         {
-            //return Assembly
-            //.GetEntryAssembly()?
-            //.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-            //?.InformationalVersion
-            //?? "unknown";
-
-            String version = Assembly.GetExecutingAssembly()?.GetName().Version?.ToString() ?? "";
-
-            return version;
-        }
-
-        // Version for display (window title). CI builds set InformationalVersion, e.g. "1.1.6.12-pr9+a1b2c3d"
-        // for pull request builds; local builds fall back to the assembly version.
-        // Do not use it in saved files - GetAppVersion() is the numeric version stored in projects.
-        public static string GetAppDisplayVersion()
-        {
-            String? version = Assembly.GetExecutingAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-
-            return String.IsNullOrEmpty(version) ? GetAppVersion() : version;
-        }
-
-        // definitionsSource: model whose function definitions are shared instead of being reloaded from disk
-        // (e.g. a project loaded into a new model). Note: the undo stack is not cleared here - the model
-        // may be a temporary one; the application clears it when the model becomes the current document.
-        public DataModel(UserSettingsSdfGlue config, DataModel? definitionsSource = null) : base(NodeIdDataModel, "Project")
-        {
-            Config              = config;
+            Definitions         = definitions;
             ProjSettings        = new ProjectSettings(this);
             //RenderingSysData    = new RenderingData(this); // this is done in InitDefaultData()
-
-            if (definitionsSource != null)
-                ShareDefinitions(definitionsSource);
-            else
-                ReloadDefinitions();
 
             InitDefaultData();
             InitDefaultSdfObjects();
 
             RefreshDefinitions();
 
-            RenderingSysData.RefreshDefinitionReference(Renderers, BackdropsDefinitions,  CameraControllers);
+            RenderingSysData.RefreshDefinitionReference(Definitions.Renderers, Definitions.Backdrops, Definitions.CameraControllers);
 
             RefreshMaterialDefinition();
 
@@ -174,7 +107,7 @@ namespace SdfGlueCore.Model
             EmptyChildrenList();
 
             //AddChild(ProjSettings);
-            if (UseSignals)
+            if (SdfGlueFeatures.UseSignals)
                 AddChild(Signals);
             AddChild(RenderingSysData);
             AddChild(CameraDat);
@@ -193,13 +126,6 @@ namespace SdfGlueCore.Model
             NextAvailableMaterialId     = 1;
             NextAvailableSignalId       = 1;
             NextAvailableRenderPassId   = 1;
-
-            SelectedNode            = null;
-            ImportantNodeToSelect   = null;
-            LastSelectedRPass       = null;
-            NodeToDelete            = null;
-            NodeToMoveUp            = null;
-            NodeToMoveDown          = null;
 
             //---------------------------------------------------------------
             // Materials
@@ -228,30 +154,13 @@ namespace SdfGlueCore.Model
 
             // Rendering
             RenderingSysData = new RenderingData(this);
-            RenderingSysData.RefreshDefinitionReference(Renderers, BackdropsDefinitions, CameraControllers);
+            RenderingSysData.RefreshDefinitionReference(Definitions.Renderers, Definitions.Backdrops, Definitions.CameraControllers);
 
-            // Signals (the collection is always loaded and saved, but used only with UseSignals)
+            // Signals (the collection is always loaded and saved, but used only with SdfGlueFeatures.UseSignals)
             Signals = new SignalsCollection();
 
 
             CreateEmptyProjectHierarchy();
-        }
-
-        public void SetDefaultRenderPass()
-        {
-            //if (RenderingSysData == null)
-            //{
-            //    Console.WriteLine("WARNING: SetDefaultRenderPass() failed.");
-            //    return;
-            //}
-
-            if (RenderingSysData.GetChildrenCount() == 0)
-            {
-                Console.WriteLine("WARNING: SetDefaultRenderPass() failed.");
-                return;
-            }
-
-            LastSelectedRPass   = RenderingSysData.GetChildrenAt(0) as RenderPassData;
         }
 
         private void InitDefaultSdfObjects()
@@ -292,30 +201,6 @@ namespace SdfGlueCore.Model
             }
         }
 
-
-        public void ReloadDefinitions()
-        {
-            Renderers               .Reload("Functions/Renderers/");
-            BackdropsDefinitions    .Reload("Functions/Backdrops/");
-            CameraControllers       .Reload("Functions/CameraOperators/");
-            SdfDefinitions          .Reload("Functions/Sdf/");
-            MixOpDefinitions        .Reload("Functions/MixOperators/");
-            PositionOpDefinitions   .Reload("Functions/PositionOperators/");
-            DistanceOpDefinitions   .Reload("Functions/DistanceOperators/");
-        }
-
-        // Definitions do not depend on the project, so the sets can be shared
-        // (Reload() on one model refreshes them for all models sharing them)
-        private void ShareDefinitions(DataModel source)
-        {
-            Renderers               = source.Renderers;
-            BackdropsDefinitions    = source.BackdropsDefinitions;
-            CameraControllers       = source.CameraControllers;
-            SdfDefinitions          = source.SdfDefinitions;
-            MixOpDefinitions        = source.MixOpDefinitions;
-            PositionOpDefinitions   = source.PositionOpDefinitions;
-            DistanceOpDefinitions   = source.DistanceOpDefinitions;
-        }
 
 
         // Returns false if the project could not be loaded - the model is then in an undefined state
@@ -432,7 +317,7 @@ namespace SdfGlueCore.Model
 
             //XmlUtils.AddNodeInt(xmlDoc, nodeData, "VersionMajor", VersionMajor);
             //XmlUtils.AddNodeInt(xmlDoc, nodeData, "VersionMinor", VersionMinor);
-            XmlUtils.AddNodeString(xmlDoc, nodeData, "Version", GetAppVersion());
+            XmlUtils.AddNodeString(xmlDoc, nodeData, "Version", AppVersion.GetAppVersion());
 
             XmlUtils.AddNodeInt(xmlDoc, nodeData, "NextAvailableId"             , NextAvailableId               );
             XmlUtils.AddNodeInt(xmlDoc, nodeData, "NextAvailableMaterialId"     , NextAvailableMaterialId       );
@@ -482,24 +367,13 @@ namespace SdfGlueCore.Model
                 if (sdfObj == null)
                     return;
 
-                sdfObj.FunctionSdf          .RefreshDefinitionReference(SdfDefinitions);
-                sdfObj.FunctionMixOp        .RefreshDefinitionReference(MixOpDefinitions);
-                sdfObj.PositionOperators    .RefreshDefinitionReference(PositionOpDefinitions);
-                sdfObj.DistanceOperators    .RefreshDefinitionReference(DistanceOpDefinitions);
+                sdfObj.FunctionSdf          .RefreshDefinitionReference(Definitions.Sdf);
+                sdfObj.FunctionMixOp        .RefreshDefinitionReference(Definitions.MixOps);
+                sdfObj.PositionOperators    .RefreshDefinitionReference(Definitions.PositionOps);
+                sdfObj.DistanceOperators    .RefreshDefinitionReference(Definitions.DistanceOps);
             });
 
-            RenderingSysData?.RefreshDefinitionReference(Renderers, BackdropsDefinitions, CameraControllers);
-        }
-
-        public bool IsAbleToRender()
-        {
-            if (!Config.EnableRendering)
-                return false;
-
-            //if (!String.IsNullOrEmpty(LastErrorMessage))
-            //    return false;
-
-            return true;
+            RenderingSysData?.RefreshDefinitionReference(Definitions.Renderers, Definitions.Backdrops, Definitions.CameraControllers);
         }
 
         public int FindMaterialIdByName(string name)
@@ -656,7 +530,7 @@ namespace SdfGlueCore.Model
         // True if any parameter is driven by a signal (and signals are enabled)
         public bool HasSignalBindings()
         {
-            if (!UseSignals)
+            if (!SdfGlueFeatures.UseSignals)
                 return false;
 
             bool found = false;
@@ -713,110 +587,6 @@ namespace SdfGlueCore.Model
             return GetFinalRPass();
         }
 
-        public void ResetFrameCounter()
-        {
-            CurrentFrame = 0;
-        }
-
-        public void ResetTime()
-        {
-            CurrentTime = 0.0;
-        }
-
-        public void TimeStepBack()
-        {
-            CurrentTime -= ConstTimeStep;
-            if (CurrentTime < 0.0)
-                CurrentTime = 0.0;
-        }
-
-        public void TimeStepForward()
-        {
-            CurrentTime += ConstTimeStep;
-        }
-
-        private void UpdateTime(double deltaTime)
-        {
-            LastDeltaTime = deltaTime;
-
-            if (IsPlaying)
-            {
-                CurrentTime += deltaTime;
-                CurrentFrame++;
-            }
-
-            FpsAccumTime += deltaTime;
-            FpsAccumFrames++;
-
-            double fpsCheckPeriod = 0.5;
-
-            if (FpsAccumTime > fpsCheckPeriod)
-            {
-                AvgRenderTime = 0.0;
-                Fps = 0.0;
-                if (FpsAccumFrames > 0)
-                {
-                    AvgRenderTime = FpsAccumTime / FpsAccumFrames;
-                    Fps = 1.0 / AvgRenderTime;
-                }
-
-                FpsAccumTime -= fpsCheckPeriod;
-                FpsAccumFrames = 0;
-            }
-        }
-
-        public void Update(double deltaTime)
-        {
-            UpdateTime(deltaTime);
-
-            if (UseSignals)
-                Signals.Update(CurrentTime, deltaTime);
-        }
-
-        // Advances the time also when paused, without the FPS statistics (image sequence export)
-        public void AdvanceTime(double deltaTime)
-        {
-            LastDeltaTime = deltaTime;
-            CurrentTime += deltaTime;
-            CurrentFrame++;
-
-            if (UseSignals)
-                Signals.Update(CurrentTime, deltaTime);
-        }
-
-        public TimeState CaptureTimeState()
-        {
-            TimeState state = new TimeState();
-            state.LastDeltaTime     = LastDeltaTime;
-            state.CurrentTime       = CurrentTime;
-            state.CurrentFrame      = CurrentFrame;
-            state.AvgRenderTime     = AvgRenderTime;
-            state.Fps               = Fps;
-            state.FpsAccumTime      = FpsAccumTime;
-            state.FpsAccumFrames    = FpsAccumFrames;
-            state.IsPlaying         = IsPlaying;
-            return state;
-        }
-
-        // Note: the internal state of signals (e.g. smoothing) is not restored
-        public void RestoreTimeState(TimeState state)
-        {
-            LastDeltaTime   = state.LastDeltaTime;
-            CurrentTime     = state.CurrentTime;
-            CurrentFrame    = state.CurrentFrame;
-            AvgRenderTime   = state.AvgRenderTime;
-            Fps             = state.Fps;
-            FpsAccumTime    = state.FpsAccumTime;
-            FpsAccumFrames  = state.FpsAccumFrames;
-            IsPlaying       = state.IsPlaying;
-        }
-
-        // Resolution of the rendered frames: the preview resolution or RenderResolutionOverride
-        public IntCoords GetRenderResolution()
-        {
-            return RenderResolutionOverride ?? Config.GetPreviewResolution();
-        }
-
         public override void ResetPrevVal()
         {
             base.ResetPrevVal();
@@ -853,6 +623,4 @@ namespace SdfGlueCore.Model
         }
 
     }
-
-    public class IncludesCollection : Dictionary<string, string> {}
 }

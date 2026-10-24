@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using SdfGlueCore.Model.DataNodes;
+using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
 using ImGuiNET;
 using System.Numerics;
@@ -25,7 +26,7 @@ namespace SdfGlueUi.Ui.Components
             None        // nothing is displayed (background preview)
         }
 
-        public static void Build(DataModel model, ref PreviewMode previewMode, ref RenderPassData? selectedPass)
+        public static void Build(SdfGlueAppContextBase ctx, ref PreviewMode previewMode, ref RenderPassData? selectedPass)
         {
             /*
             ImGui.SetNextItemWidth(300);
@@ -58,11 +59,11 @@ namespace SdfGlueUi.Ui.Components
             }
             if (ImGui.BeginPopup("menu_render_passes"))
             {
-                BuildMenuItems(model, ref previewMode, ref selectedPass, false);
+                BuildMenuItems(ctx.Document, ref previewMode, ref selectedPass, false);
                 ImGui.EndPopup();
             }
 
-            ResolveSelectedPass(model, previewMode, ref selectedPass);
+            ResolveSelectedPass(ctx, previewMode, ref selectedPass);
         }
 
         // Menu items: [none], last selected pass, all passes, final pass (inside a popup or a menu)
@@ -105,8 +106,8 @@ namespace SdfGlueUi.Ui.Components
             }
         }
 
-        // The pass to display for the mode (LastSelectedPass / FinalPass follow the model, None - null)
-        public static void ResolveSelectedPass(DataModel model, PreviewMode previewMode, ref RenderPassData? selectedPass)
+        // The pass to display for the mode (LastSelectedPass / FinalPass follow the selection / model, None - null)
+        public static void ResolveSelectedPass(SdfGlueAppContextBase ctx, PreviewMode previewMode, ref RenderPassData? selectedPass)
         {
             if (previewMode == PreviewMode.None)
             {
@@ -114,11 +115,11 @@ namespace SdfGlueUi.Ui.Components
             }
             else if (previewMode == MenuRenderPass.PreviewMode.LastSelectedPass)
             {
-                selectedPass = model.LastSelectedRPass;
+                selectedPass = ctx.Selection.LastSelectedRPass;
             }
             else if (previewMode == MenuRenderPass.PreviewMode.FinalPass)
             {
-                selectedPass = model.GetFinalRPass();
+                selectedPass = ctx.Document.GetFinalRPass();
             }
             else
             {

@@ -30,7 +30,7 @@ namespace SdfGlueEditor.Application
 
         public void RenderFrame()
         {
-            ctx_.RenderingSystem.RenderFrame(GetModel(), ctx_.Window.Size.X, ctx_.Window.Size.Y);
+            ctx_.RenderingSystem.RenderFrame(GetModel(), ctx_.GetFrameRenderParams(), ctx_.Window.Size.X, ctx_.Window.Size.Y);
         }
 
         // Pass image drawn directly into the application window, under the UI (fullscreen preview, background preview).
@@ -42,7 +42,7 @@ namespace SdfGlueEditor.Application
 
             int windowSizeX = ctx_.Window.ClientSize.X;
             int windowSizeY = ctx_.Window.ClientSize.Y;
-            IntCoords previewRes = GetModel().GetRenderResolution();
+            IntCoords previewRes = ctx_.GetRenderResolution();
 
             WndPreview.CalcScreenRect(new System.Numerics.Vector2(windowSizeX, windowSizeY), previewRes, keepAspectRatio,
                                       out System.Numerics.Vector2 pos, out System.Numerics.Vector2 size);
@@ -64,7 +64,7 @@ namespace SdfGlueEditor.Application
         {
             DataModel model = GetModel();
 
-            model.ReloadDefinitions();
+            ctx_.Definitions.Reload();
             model.RefreshDefinitions();
             model.RefreshMaterialDefinition();  // materials refer to the renderer definition (<MaterialDefinition>)
 
@@ -81,19 +81,19 @@ namespace SdfGlueEditor.Application
 
         public void CompileShader()
         {
-            ctx_.RenderingSystem.ReinitializeShader(ctx_.CodeGenerator);
+            ctx_.ReinitializeShader();
         }
 
         public void ResetFrameCounter()
         {
-            GetModel().ResetFrameCounter();
+            ctx_.Playback.ResetFrameCounter();
         }
 
         public void PreviewResolutionChanged()
         {
-            ctx_.RenderingSystem.ReinitializePreviewFrameBuffer(GetModel().GetRenderResolution());
+            ctx_.RenderingSystem.ReinitializePreviewFrameBuffer(ctx_.GetRenderResolution());
 
-            GetModel().ResetFrameCounter();
+            ctx_.Playback.ResetFrameCounter();
         }
 
         public void SaveImage()

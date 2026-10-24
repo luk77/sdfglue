@@ -58,7 +58,7 @@ namespace SdfGlueUi.Ui.Windows
                 ImGui.PopID();
                 ImGui.SameLine();
 
-                MenuRenderPass.Build(GetModel(), ref previewMode_, ref selectedPass_);
+                MenuRenderPass.Build(GetAppContext(), ref previewMode_, ref selectedPass_);
 
                 // fixed options + sections of the generated code (CodeGenResult.Sections)
                 List<string> options = new List<string> { OptionFullShader, OptionFullShaderToy, OptionFullShaderUnity };

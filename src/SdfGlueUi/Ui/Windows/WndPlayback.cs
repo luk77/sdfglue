@@ -21,17 +21,17 @@ namespace SdfGlueUi.Ui.Windows
 
                 if (ImGui.Button("<<", butSize))
                 {
-                    GetModel().TimeStepBack();
+                    GetPlayback().TimeStepBack();
                 }
                 ImGui.SameLine();
-                if (ImGui.Button(GetModel().IsPlaying ? "||" : ">", butSize))
+                if (ImGui.Button(GetPlayback().IsPlaying ? "||" : ">", butSize))
                 {
-                    GetModel().IsPlaying = !GetModel().IsPlaying;
+                    GetPlayback().IsPlaying = !GetPlayback().IsPlaying;
                 }
                 ImGui.SameLine();
                 if (ImGui.Button(">>", butSize))
                 {
-                    GetModel().TimeStepForward();
+                    GetPlayback().TimeStepForward();
                 }
 
                 //ImGui.Separator();
@@ -56,7 +56,7 @@ namespace SdfGlueUi.Ui.Windows
                 ImGui.PushID(index++);
                 //ImGui.SetNextItemWidth(100);
                 ImGui.SetColumnWidth(1, columnWidth1);
-                string timeVal = GetModel().CurrentTime.ToString("0.00", CultureInfo.InvariantCulture);
+                string timeVal = GetPlayback().CurrentTime.ToString("0.00", CultureInfo.InvariantCulture);
                 ImGui.Text(String.Format("{0} s", timeVal));
                 ImGui.PopID();
                 ImGui.NextColumn();
@@ -65,7 +65,7 @@ namespace SdfGlueUi.Ui.Windows
                 ImGui.SetNextItemWidth(-1);
                 if (ImGui.Button("Reset"))
                 {
-                    GetModel().ResetTime();
+                    GetPlayback().ResetTime();
                 }
                 ImGui.PopID();
                 ImGui.NextColumn();
@@ -81,7 +81,7 @@ namespace SdfGlueUi.Ui.Windows
                 ImGui.PushID(index++);
                 //ImGui.SetNextItemWidth(100);
                 ImGui.SetColumnWidth(1, columnWidth1);
-                string frameVal = GetModel().CurrentFrame.ToString(CultureInfo.InvariantCulture);
+                string frameVal = GetPlayback().CurrentFrame.ToString(CultureInfo.InvariantCulture);
                 ImGui.Text(frameVal);
                 ImGui.PopID();
                 ImGui.NextColumn();
@@ -90,7 +90,7 @@ namespace SdfGlueUi.Ui.Windows
                 ImGui.SetNextItemWidth(-1);
                 if (ImGui.Button("Reset"))
                 {
-                    GetModel().ResetFrameCounter();
+                    GetPlayback().ResetFrameCounter();
                 }
                 ImGui.PopID();
                 ImGui.NextColumn();
@@ -105,7 +105,7 @@ namespace SdfGlueUi.Ui.Windows
                 ImGui.PushID(index++);
                 //ImGui.SetNextItemWidth(100);
                 ImGui.SetColumnWidth(1, columnWidth1);
-                string avgVal = GetModel().AvgRenderTime.ToString("0.000", CultureInfo.InvariantCulture);
+                string avgVal = GetPlayback().AvgRenderTime.ToString("0.000", CultureInfo.InvariantCulture);
                 ImGui.Text(String.Format("{0} s", avgVal));
                 ImGui.PopID();
                 ImGui.NextColumn();
@@ -121,7 +121,7 @@ namespace SdfGlueUi.Ui.Windows
                 ImGui.PushID(index++);
                 //ImGui.SetNextItemWidth(100);
                 ImGui.SetColumnWidth(1, columnWidth1);
-                string fpsVal = GetModel().Fps.ToString("0.00", CultureInfo.InvariantCulture);
+                string fpsVal = GetPlayback().Fps.ToString("0.00", CultureInfo.InvariantCulture);
                 ImGui.Text(fpsVal);
                 ImGui.PopID();
                 ImGui.NextColumn();

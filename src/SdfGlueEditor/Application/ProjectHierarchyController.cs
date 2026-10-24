@@ -3,7 +3,6 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
-using SdfGlueCore.AbstractRenderer;
 using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
 using SingleDocAppCore.Model.BaseTypes;
@@ -20,18 +19,21 @@ namespace SdfGlueEditor.Application
 {
     public class ProjectHierarchyController
     {
-        private readonly IRenderingSystem       renderingSystem_;
-        private readonly ShaderCodeGenerator    codeGenerator_;
+        private readonly SdfGlueAppContextBase  ctx_;
 
-        public ProjectHierarchyController(IRenderingSystem renderingSystem, ShaderCodeGenerator codeGenerator)
+        // Deferred operations - executed outside of the UI building loop (HandleDeleteNode() etc.)
+        private TreeNode?                       nodeToDelete_           = null;
+        private TreeNode?                       nodeToMoveUp_           = null;
+        private TreeNode?                       nodeToMoveDown_         = null;
+
+        public ProjectHierarchyController(SdfGlueAppContextBase ctx)
         {
-            renderingSystem_    = renderingSystem;
-            codeGenerator_      = codeGenerator;
+            ctx_ = ctx;
         }
 
         private DataModel GetModel()
         {
-            return codeGenerator_.GetModel();
+            return ctx_.GetModel();
         }
 
 
@@ -46,14 +48,14 @@ namespace SdfGlueEditor.Application
 
             newNode.FixMaterialReference(GetModel());
 
-            newNode.FunctionSdf         .RefreshDefinitionReference(GetModel().SdfDefinitions);
-            newNode.FunctionMixOp       .RefreshDefinitionReference(GetModel().MixOpDefinitions);
-            newNode.PositionOperators   .RefreshDefinitionReference(GetModel().PositionOpDefinitions);
-            newNode.DistanceOperators   .RefreshDefinitionReference(GetModel().DistanceOpDefinitions);
+            newNode.FunctionSdf         .RefreshDefinitionReference(GetModel().Definitions.Sdf);
+            newNode.FunctionMixOp       .RefreshDefinitionReference(GetModel().Definitions.MixOps);
+            newNode.PositionOperators   .RefreshDefinitionReference(GetModel().Definitions.PositionOps);
+            newNode.DistanceOperators   .RefreshDefinitionReference(GetModel().Definitions.DistanceOps);
 
-            renderingSystem_.ReinitializeShader(codeGenerator_);
+            ctx_.ReinitializeShader();
 
-            GetModel().ImportantNodeToSelect = newNode;
+            ctx_.Selection.ImportantNodeToSelect = newNode;
 
             // undo/redo support
             UndoManager.Instance.SaveAction(new ActionDelegates(
@@ -66,7 +68,7 @@ namespace SdfGlueEditor.Application
                 {
                     // redo
                     node.AddChild(newNode);
-                    renderingSystem_.ReinitializeShader(codeGenerator_);
+                    ctx_.ReinitializeShader();
                 }
                 ));
         }
@@ -79,10 +81,10 @@ namespace SdfGlueEditor.Application
             if (!CanDeleteNode(node))
                 return;
 
-            GetModel().NodeToDelete = node;
+            nodeToDelete_ = node;
 
-            GetModel().SelectedNode = null;
-            GetModel().ImportantNodeToSelect = node.Parent;
+            ctx_.Selection.SelectedNode = null;
+            ctx_.Selection.ImportantNodeToSelect = node.Parent;
         }
 
         public void OnCopyObject(SdfObject? node)
@@ -173,24 +175,24 @@ namespace SdfGlueEditor.Application
             {
                 if (obj is RenderPassData passData)
                 {
-                    passData.RefreshDefinitionReference(GetModel().Renderers, GetModel().BackdropsDefinitions, GetModel().CameraControllers);
+                    passData.RefreshDefinitionReference(GetModel().Definitions.Renderers, GetModel().Definitions.Backdrops, GetModel().Definitions.CameraControllers);
                 }
 
-                renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
+                ctx_.ReinitializeRenderPasses();
             }
 
             if (typeof(T) == typeof(SdfObject))
             {
                 // the object may come from another project or refer to a deleted material
                 GetModel().FixMaterialsReferences(obj);
-                renderingSystem_.ReinitializeShader(codeGenerator_);
+                ctx_.ReinitializeShader();
             }
 
             if (typeof(T) == typeof(MaterialInstance))
             {
                 (obj as MaterialInstance)?.RefreshDefinitionReference(GetModel().GetRenderPassForMaterials()?.RendererFunc?.Definition);
                 //GetModel().FixMaterialsReferences();
-                renderingSystem_.ReinitializeShader(codeGenerator_);
+                ctx_.ReinitializeShader();
             }
 
             // PrevVal of the deserialized values = current values, otherwise the first edit of the pasted node
@@ -200,7 +202,7 @@ namespace SdfGlueEditor.Application
                 node.ResetPrevVal();
             });
 
-            GetModel().ImportantNodeToSelect = obj;
+            ctx_.Selection.ImportantNodeToSelect = obj;
 
             // undo/redo support
             UndoManager.Instance.SaveAction(new ActionDelegates(
@@ -219,23 +221,23 @@ namespace SdfGlueEditor.Application
                     {
                         if (obj is RenderPassData passData)
                         {
-                            passData.RefreshDefinitionReference(GetModel().Renderers, GetModel().BackdropsDefinitions, GetModel().CameraControllers);
+                            passData.RefreshDefinitionReference(GetModel().Definitions.Renderers, GetModel().Definitions.Backdrops, GetModel().Definitions.CameraControllers);
                         }
 
-                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
+                        ctx_.ReinitializeRenderPasses();
                     }
 
                     if (typeof(T) == typeof(SdfObject))
                     {
                         GetModel().FixMaterialsReferences(obj);
-                        renderingSystem_.ReinitializeShader(codeGenerator_);
+                        ctx_.ReinitializeShader();
                     }
 
                     if (typeof(T) == typeof(MaterialInstance))
                     {
                         (obj as MaterialInstance)?.RefreshDefinitionReference(GetModel().GetRenderPassForMaterials()?.RendererFunc?.Definition);
                         //GetModel().FixMaterialsReferences();
-                        renderingSystem_.ReinitializeShader(codeGenerator_);
+                        ctx_.ReinitializeShader();
                     }
                 }
                 ));
@@ -267,7 +269,7 @@ namespace SdfGlueEditor.Application
             if (node == null)
                 return;
 
-            GetModel().NodeToMoveUp = node;
+            nodeToMoveUp_ = node;
         }
 
         public void OnMoveNodeDown(TreeNode? node)
@@ -275,7 +277,7 @@ namespace SdfGlueEditor.Application
             if (node == null)
                 return;
 
-            GetModel().NodeToMoveDown = node;
+            nodeToMoveDown_ = node;
         }
 
         public void OnAddRenderPass(RenderingData? parent, FunctionDefinition definition)
@@ -288,16 +290,16 @@ namespace SdfGlueEditor.Application
 
             parent.AddChild(newNode);
 
-            //newNode.RendererFunc    ?.RefreshDefinitionReference(GetModel().Renderers);
-            ////newNode.CameraCtrlFunc  ?.RefreshDefinitionReference(GetModel().CameraControllers);
-            //newNode.CameraOperators ?.RefreshDefinitionReference(GetModel().CameraControllers);
-            newNode.RefreshDefinitionReference(GetModel().Renderers, GetModel().BackdropsDefinitions, GetModel().CameraControllers);
+            //newNode.RendererFunc    ?.RefreshDefinitionReference(GetModel().Definitions.Renderers);
+            ////newNode.CameraCtrlFunc  ?.RefreshDefinitionReference(GetModel().Definitions.CameraControllers);
+            //newNode.CameraOperators ?.RefreshDefinitionReference(GetModel().Definitions.CameraControllers);
+            newNode.RefreshDefinitionReference(GetModel().Definitions.Renderers, GetModel().Definitions.Backdrops, GetModel().Definitions.CameraControllers);
 
-            renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
+            ctx_.ReinitializeRenderPasses();
 
-            //renderingSystem_.ReinitializeShader(codeGenerator_);
+            //ctx_.ReinitializeShader();
 
-            GetModel().ImportantNodeToSelect = newNode;
+            ctx_.Selection.ImportantNodeToSelect = newNode;
 
             // undo/redo support
             UndoManager.Instance.SaveAction(new ActionDelegates(
@@ -305,13 +307,13 @@ namespace SdfGlueEditor.Application
                 {
                     // undo
                     DeleteNodeInternal(newNode);
-                    GetModel().ImportantNodeToSelect = null;
+                    ctx_.Selection.ImportantNodeToSelect = null;
                 },
                 delegate
                 {
                     // redo
                     parent.AddChild(newNode);
-                    renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
+                    ctx_.ReinitializeRenderPasses();
                 }
                 ));
         }
@@ -363,7 +365,7 @@ namespace SdfGlueEditor.Application
             MaterialInstance newMat = GetModel().AddNewMaterial("New material " + GetModel().NextAvailableMaterialId);
             RefreshAddedMaterial(newMat);
 
-            GetModel().ImportantNodeToSelect = newMat;
+            ctx_.Selection.ImportantNodeToSelect = newMat;
 
             // undo/redo support
             UndoManager.Instance.SaveAction(new ActionDelegates(
@@ -384,7 +386,7 @@ namespace SdfGlueEditor.Application
         private void RefreshAddedMaterial(MaterialInstance mat)
         {
             mat.RefreshDefinitionReference(GetModel().GetRenderPassForMaterials()?.RendererFunc?.Definition);
-            renderingSystem_.ReinitializeShader(codeGenerator_);
+            ctx_.ReinitializeShader();
         }
 
         public void OnCopyMaterial(MaterialInstance? node)
@@ -421,7 +423,7 @@ namespace SdfGlueEditor.Application
             SignalInstance newSignal = GetModel().AddNewSignal("Signal " + GetModel().NextAvailableSignalId);
             newSignal.ResetPrevVal();
 
-            GetModel().ImportantNodeToSelect = newSignal;
+            ctx_.Selection.ImportantNodeToSelect = newSignal;
 
             // undo/redo support
             UndoManager.Instance.SaveAction(new ActionDelegates(
@@ -469,11 +471,11 @@ namespace SdfGlueEditor.Application
 
         public void HandleDeleteNode()
         {
-            TreeNode? node = GetModel().NodeToDelete;
+            TreeNode? node = nodeToDelete_;
             if (node == null)
                 return;
 
-            GetModel().NodeToDelete = null;
+            nodeToDelete_ = null;
 
             if (!CanDeleteNode(node))
                 return;
@@ -500,10 +502,10 @@ namespace SdfGlueEditor.Application
                     foreach(SdfObject sdfObj in materialUsers)
                         sdfObj.MaterialId.Val = deletedMaterialId;
 
-                    renderingSystem_.ReinitializeShader(codeGenerator_);
+                    ctx_.ReinitializeShader();
 
                     if (node is RenderPassData)
-                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
+                        ctx_.ReinitializeRenderPasses();
 
                 },
                 delegate
@@ -564,24 +566,24 @@ namespace SdfGlueEditor.Application
             node.Parent.RemoveChild(node);
 
             if (node is RenderPassData)
-                renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
+                ctx_.ReinitializeRenderPasses();
 
             if (node is SdfObject)
-                renderingSystem_.ReinitializeShader(codeGenerator_);
+                ctx_.ReinitializeShader();
 
             if (node is MaterialInstance)
             {
                 GetModel().FixMaterialsReferences();
-                renderingSystem_.ReinitializeShader(codeGenerator_);
+                ctx_.ReinitializeShader();
             }
         }
 
         public void HandleMoveNodeUp()
         {
-            TreeNode? node = GetModel().NodeToMoveUp;
+            TreeNode? node = nodeToMoveUp_;
             if (node == null)
                 return;
-            GetModel().NodeToMoveUp = null;
+            nodeToMoveUp_ = null;
 
             if (node.Parent == null)
                 return;
@@ -591,10 +593,10 @@ namespace SdfGlueEditor.Application
                 return;
 
             if (node is RenderPassData)
-                renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
+                ctx_.ReinitializeRenderPasses();
 
             if (node is SdfObject || node is MaterialInstance)
-                renderingSystem_.ReinitializeShader(codeGenerator_);
+                ctx_.ReinitializeShader();
 
             // undo/redo support
             UndoManager.Instance.SaveAction(new ActionDelegates(
@@ -604,10 +606,10 @@ namespace SdfGlueEditor.Application
                     node.Parent.MoveChildDown(node);
 
                     if (node is RenderPassData)
-                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
+                        ctx_.ReinitializeRenderPasses();
 
                     if (node is SdfObject || node is MaterialInstance)
-                        renderingSystem_.ReinitializeShader(codeGenerator_);
+                        ctx_.ReinitializeShader();
                 },
                 delegate
                 {
@@ -615,20 +617,20 @@ namespace SdfGlueEditor.Application
                     node.Parent.MoveChildUp(node);
 
                     if (node is RenderPassData)
-                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
+                        ctx_.ReinitializeRenderPasses();
 
                     if (node is SdfObject || node is MaterialInstance)
-                        renderingSystem_.ReinitializeShader(codeGenerator_);
+                        ctx_.ReinitializeShader();
                 }
                 ));
         }
 
         public void HandleMoveNodeDown()
         {
-            TreeNode? node = GetModel().NodeToMoveDown;
+            TreeNode? node = nodeToMoveDown_;
             if (node == null)
                 return;
-            GetModel().NodeToMoveDown = null;
+            nodeToMoveDown_ = null;
 
             if (node.Parent == null)
                 return;
@@ -638,10 +640,10 @@ namespace SdfGlueEditor.Application
                 return;
 
             if (node is RenderPassData)
-                renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
+                ctx_.ReinitializeRenderPasses();
 
             if (node is SdfObject || node is MaterialInstance)
-                renderingSystem_.ReinitializeShader(codeGenerator_);
+                ctx_.ReinitializeShader();
 
             // undo/redo support
             UndoManager.Instance.SaveAction(new ActionDelegates(
@@ -651,10 +653,10 @@ namespace SdfGlueEditor.Application
                     node.Parent.MoveChildUp(node);
 
                     if (node is RenderPassData)
-                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
+                        ctx_.ReinitializeRenderPasses();
 
                     if (node is SdfObject || node is MaterialInstance)
-                        renderingSystem_.ReinitializeShader(codeGenerator_);
+                        ctx_.ReinitializeShader();
                 },
                 delegate
                 {
@@ -662,10 +664,10 @@ namespace SdfGlueEditor.Application
                     node.Parent.MoveChildDown(node);
 
                     if (node is RenderPassData)
-                        renderingSystem_.Reinitialize(GetModel().RenderingSysData, codeGenerator_, GetModel().GetRenderResolution());
+                        ctx_.ReinitializeRenderPasses();
 
                     if (node is SdfObject || node is MaterialInstance)
-                        renderingSystem_.ReinitializeShader(codeGenerator_);
+                        ctx_.ReinitializeShader();
                 }
                 ));
 

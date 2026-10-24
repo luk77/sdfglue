@@ -9,7 +9,7 @@ using SingleDocAppFramework.Ui.Windows;
 
 namespace SdfGlueUi.Ui.Windows
 {
-    // "Inputs" window (registered only with DataModel.UseSignals): shows which signals of the project use a channel
+    // "Inputs" window (registered only with SdfGlueFeatures.UseSignals): shows which signals of the project use a channel
     public class WndInputsSdfGlue : WndInputs
     {
         private IUiExecutorSdfGlue ExecutorSdfGlue { get { return (IUiExecutorSdfGlue)Executor; } }

@@ -6,6 +6,8 @@
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
+using SdfGlueCore;
+using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueCore.Model.DataNodes.Signals;
@@ -68,7 +70,7 @@ namespace SdfGlueEditor
             settings.AppName            = "SDF Glue";
             settings.DocumentFileFilter = new FileFilter("Project files", "*.xml");
             settings.EnableDocking      = true;
-            settings.EnableInputSystem  = DataModel.UseSignals;     // input channels are used by signals only
+            settings.EnableInputSystem  = SdfGlueFeatures.UseSignals;     // input channels are used by signals only
             return settings;
         }
 
@@ -91,7 +93,7 @@ namespace SdfGlueEditor
             debugVersion = true;
 #endif
 
-            return String.Format("{0} v.{1} {2}", AppSettings.AppName, DataModel.GetAppDisplayVersion(), debugVersion ? " (debug)" : "");
+            return String.Format("{0} v.{1} {2}", AppSettings.AppName, AppVersion.GetAppDisplayVersion(), debugVersion ? " (debug)" : "");
         }
 
         protected override string GetAppTitle()
@@ -144,7 +146,7 @@ namespace SdfGlueEditor
             camera_     = new CameraController(ctx_);
             demoMode_   = new DemoModeController(documents_);
             shaderExport_ = new ShaderExportController(ctx_, documents_);
-            hierarchy_  = new ProjectHierarchyController(ctx_.RenderingSystem, ctx_.CodeGenerator);
+            hierarchy_  = new ProjectHierarchyController(ctx_);
 
             base.OnLoad();
 
@@ -153,7 +155,7 @@ namespace SdfGlueEditor
                 SignalInputs.Provider = new InputSystemSignalProvider(Inputs);
         }
 
-        // input system (only with DataModel.UseSignals)
+        // input system (only with SdfGlueFeatures.UseSignals)
 
         protected override IEnumerable<IInputDevice> CreateInputDevices()
         {
@@ -196,7 +198,7 @@ namespace SdfGlueEditor
             // monitor file system changes (a change is kept until the image sequence export is finished)
             if (fileChangeMonitor_ != null && !animExport_.IsActive && fileChangeMonitor_.ConsumeChange())
             {
-                if (GetModel().Config.MonitorFileSystemChanges)
+                if (ctx_.Settings.MonitorFileSystemChanges)
                 {
                     render_.ReloadSdfDefinitions();
                 }
@@ -216,7 +218,7 @@ namespace SdfGlueEditor
                 return;
 
             // identifiers in the generated code
-            if (prev.UseNamesAsIds != GetModel().Config.UseNamesAsIds)
+            if (prev.UseNamesAsIds != ctx_.Settings.UseNamesAsIds)
                 render_.RebuildShader();
         }
 
@@ -255,10 +257,10 @@ namespace SdfGlueEditor
             if (!IsImGuiInitialized())
                 return;
 
-            double deltaTime = GetModel().UseConstTimeStep ? DataModel.ConstTimeStep : e.Time;
+            double deltaTime = ctx_.Playback.UseConstTimeStep ? PlaybackState.ConstTimeStep : e.Time;
 
             if (!animExport_.IsActive)
-                GetModel().Update(deltaTime);
+                ctx_.Update(deltaTime);
 
             // These actions have to be executed outside of the UI building loop
             // (they modify the collections iterated there)

@@ -9,6 +9,7 @@
 
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL4;
+using SdfGlueCore;
 using SdfGlueCore.Controller;
 using SdfGlueCore.Controller.CodeGen;
 using SdfGlueCore.Model;
@@ -48,6 +49,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
         private     string                      pathShaderVert_;
         private     string                      pathShaderFrag_;
         private     SignalsCollection?          signals_                        = null;     // signals of the model being rendered
+        private     bool                        useNamesAsIds_                  = false;    // identifiers used by the compiled shader
 
         private readonly float[] vertices_ =
         {
@@ -66,7 +68,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
 
         public RenderPassData PassData { get { return passData_; } }
 
-        public RenderPass(ShaderCodeGenerator codeGenerator, RenderPassData passData, IntCoords previewResolution, string pathShaderVert, string pathShaderFrag)
+        public RenderPass(DataModel model, ShaderCodeGenerator codeGenerator, RenderPassData passData, IntCoords previewResolution, string pathShaderVert, string pathShaderFrag)
         {
             passData_               = passData;
             pathShaderVert_         = pathShaderVert;
@@ -86,7 +88,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
 
             vertexArrayObject_ = GL.GenVertexArray();
 
-            ReinitializeShader(codeGenerator);
+            ReinitializeShader(model, codeGenerator);
         }
 
         public void Dispose()
@@ -205,7 +207,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
         }
 
 
-        public void ReinitializeShader(ShaderCodeGenerator codeGenerator)
+        public void ReinitializeShader(DataModel model, ShaderCodeGenerator codeGenerator)
         {
             CleanupShader();
 
@@ -213,7 +215,8 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
 
             string shaderVert = File.ReadAllText(pathShaderVert_);
             string shaderFrag = File.ReadAllText(pathShaderFrag_);
-            shaderFrag = codeGenerator.ModifyFragShaderSource(sbErrors, shaderFrag, passData_.LastGenCode, ShaderExportTarget.Preview, passData_);
+            useNamesAsIds_ = codeGenerator.UseNamesAsIds;
+            shaderFrag = codeGenerator.ModifyFragShaderSource(model, sbErrors, shaderFrag, passData_.LastGenCode, ShaderExportTarget.Preview, passData_);
 
             bool compiled = shader_.Reinitialize(sbErrors, shaderVert, shaderFrag, passData_.Name.Val ?? "");
             if (!compiled && sbErrors.Length == 0)
@@ -281,13 +284,12 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
 
-        public void RenderFrame(DataModel model, bool renderEnabled, int prevPassTextureId)
+        public void RenderFrame(DataModel model, FrameRenderParams frame, int prevPassTextureId)
         {
-            IntCoords resolution = model.GetRenderResolution();
-            resolution_.X = resolution.X;
-            resolution_.Y = resolution.Y;
+            resolution_.X = frame.Resolution.X;
+            resolution_.Y = frame.Resolution.Y;
 
-            if (renderEnabled)
+            if (frame.RenderEnabled)
             {
                 // Bind the vertex array object (VAO)
                 GL.BindVertexArray(vertexArrayObject_);
@@ -312,14 +314,14 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
                 }
 
                 // Render the shader
-                RenderShader(model, prevPassTextureId);
+                RenderShader(model, frame, prevPassTextureId);
 
                 // Switch back to rendering to the default framebuffer (the screen)
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             }
         }
 
-        private void RenderShader(DataModel model, int prevPassTextureId)
+        private void RenderShader(DataModel model, FrameRenderParams frame, int prevPassTextureId)
         {
             if (!passData_.Enabled.Val)
                 return;
@@ -329,8 +331,8 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             signals_ = model.Signals;
 
             // Shadertoy compatible uniforms
-            shader_.SetFloat("iTime", (float)model.CurrentTime);
-            shader_.SetInt("iFrame", model.CurrentFrame);
+            shader_.SetFloat("iTime", (float)frame.Time);
+            shader_.SetInt("iFrame", frame.Frame);
             shader_.SetVector3("iResolution", resolution_);
             shader_.SetVector4("iMouse", MathUtils.ToGlVec4(model.RenderingSysData.MouseData));
 
@@ -390,7 +392,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
                 SetShaderParametersForFunctionEntity(passData_.BackdropFunc, null);
             }
 
-            if (DataModel.UseCameraControllers)
+            if (SdfGlueFeatures.UseCameraControllers)
             {
                 SetShaderParametersForOperatorsCollection(passData_.CameraOperators, null);
             }
@@ -398,7 +400,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             // Objects
             TreeNode.CallRecursive(model.SdfRoot, delegate(TreeNode node)
             {
-                string  nodeId  = ShaderNames.GetNodeId(model, node);
+                string  nodeId  = ShaderNames.GetNodeId(useNamesAsIds_, node);
 
                 SdfObject? sdfObj = node as SdfObject;
                 if (sdfObj == null)

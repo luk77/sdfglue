@@ -12,9 +12,10 @@ namespace SdfGlueCore.Controller.CodeGen
     // Names of the generated GLSL identifiers - shared by the code generator and the code that sets the uniforms
     public static class ShaderNames
     {
-        public static string GetNodeId(DataModel model, TreeNode node)
+        // useNamesAsIds: UserSettingsSdfGlue.UseNamesAsIds (see ShaderCodeGenerator.UseNamesAsIds)
+        public static string GetNodeId(bool useNamesAsIds, TreeNode node)
         {
-            return (model.Config.UseNamesAsIds ? node.Name.Val : node.Id.ToString()) ?? "";
+            return (useNamesAsIds ? node.Name.Val : node.Id.ToString()) ?? "";
         }
 
         // nodeId: null/empty for parameters that do not belong to an object (renderer, backdrop, camera operators)

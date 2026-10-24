@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using ImGuiNET;
+using SdfGlueCore;
 using SdfGlueCore.Model;
 using SdfGlueUi.Ui.Components;
 using SdfGlueUi.Ui.Properties;
@@ -47,7 +48,7 @@ namespace SdfGlueUi.Ui.Windows
         {
             UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
-            TreeNode? selectedNode = GetModel().SelectedNode;
+            TreeNode? selectedNode = GetSelection().SelectedNode;
             nodeScopeId_ = selectedNode != null ? String.Format("{0}:{1}", selectedNode.GetType().Name, selectedNode.Id) : "";
 
             int index = 1;
@@ -89,12 +90,12 @@ namespace SdfGlueUi.Ui.Windows
                         UiBool.Build(ref index, "Use Shape"     , selectedSdfNode.UseShape, uiMgr.ActionsExecutor.OnRebuildShader);
                         if (selectedSdfNode.UseShape.Val)
                         {
-                            UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Shape definition", selectedSdfNode.FunctionSdf, GetModel().SdfDefinitions);
+                            UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Shape definition", selectedSdfNode.FunctionSdf, GetModel().Definitions.Sdf);
                             BuildPropertiesForParameters(ref index, selectedSdfNode.FunctionSdf);
                         }
                         ImGui.Separator();
 
-                        UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Mix operator", selectedSdfNode.FunctionMixOp, GetModel().MixOpDefinitions);
+                        UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Mix operator", selectedSdfNode.FunctionMixOp, GetModel().Definitions.MixOps);
                         BuildPropertiesForParameters(ref index, selectedSdfNode.FunctionMixOp);
 
                         UiFloatWithSignal.Build(ref index, "Blending"      , selectedSdfNode.BlendFactor, 0.01f, LimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals, uiMgr.ActionsExecutor.OnRebuildShader);
@@ -126,9 +127,9 @@ namespace SdfGlueUi.Ui.Windows
                         //}
 
                         //index = GroupIdPosOp;
-                        BuildEditorForOperatorsCollection(ref index, "Position operators", selectedSdfNode.PositionOperators, GetModel().PositionOpDefinitions, selectedSdfNode.InsertNewPositionOp);
+                        BuildEditorForOperatorsCollection(ref index, "Position operators", selectedSdfNode.PositionOperators, GetModel().Definitions.PositionOps, selectedSdfNode.InsertNewPositionOp);
                         //index = GroupIdDistOp;
-                        BuildEditorForOperatorsCollection(ref index, "Distance operators", selectedSdfNode.DistanceOperators, GetModel().DistanceOpDefinitions, selectedSdfNode.InsertNewDistanceOp);
+                        BuildEditorForOperatorsCollection(ref index, "Distance operators", selectedSdfNode.DistanceOperators, GetModel().Definitions.DistanceOps, selectedSdfNode.InsertNewDistanceOp);
                     }
 
                     //this is a bug!! ImGui.End();
@@ -152,7 +153,7 @@ namespace SdfGlueUi.Ui.Windows
                         BeginNodePropertyGrid(GetDefaultFirstColumnWidth());
 
                         // renderer
-                        UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Pass type", passData.RendererFunc, GetModel().Renderers);
+                        UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Pass type", passData.RendererFunc, GetModel().Definitions.Renderers);
 
                         UiString.Build(ref index, "Name"                 , passData.Name);
 
@@ -185,7 +186,7 @@ namespace SdfGlueUi.Ui.Windows
                         {
                             BeginNodePropertyGrid(GetDefaultFirstColumnWidth());
 
-                            UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Backdrop type", passData.BackdropFunc, GetModel().BackdropsDefinitions);
+                            UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Backdrop type", passData.BackdropFunc, GetModel().Definitions.Backdrops);
 
                             if (passData.BackdropFunc.HasAnyParameters())
                             {
@@ -200,11 +201,11 @@ namespace SdfGlueUi.Ui.Windows
 
 
                     // camera controller
-                    if (DataModel.UseCameraControllers)
+                    if (SdfGlueFeatures.UseCameraControllers)
                     {
                         if (passData.IsPrimaryPass)
                         {
-                            BuildEditorForOperatorsCollection(ref index, "Camera operators", passData.CameraOperators, GetModel().CameraControllers, passData.InsertNewCameraOp);
+                            BuildEditorForOperatorsCollection(ref index, "Camera operators", passData.CameraOperators, GetModel().Definitions.CameraControllers, passData.InsertNewCameraOp);
                         }
                     }
 
