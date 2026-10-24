@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using SdfGlueCore.Model;
+using SdfGlueUi.Ui.Dialogs;
 using SingleDocAppCore.Settings;
 using SingleDocAppFramework.Ui.Properties;
 using SingleDocAppFramework.Ui.Settings;
@@ -85,11 +86,10 @@ namespace SdfGlueUi.Ui.Settings
 
         private static void BuildExportAnimation(SettingsBuildContext ctx)
         {
-            ExportAnimationSettings exportAnim = ctx.GetSettings<UserSettingsSdfGlue>().ExportAnimSettings;
+            UserSettingsSdfGlue settings = ctx.GetSettings<UserSettingsSdfGlue>();
 
-            UiInt.Build     (ref ctx.Index, "FPS"                               , ref exportAnim.Fps                       , 0.1f, 1, 240);
-            UiInt.Build     (ref ctx.Index, "Frames to prerender"               , ref exportAnim.NumOfFramesToPrerender    , 0.1f, 0, 1000);
-            UiInt.Build     (ref ctx.Index, "Frames to export"                  , ref exportAnim.NumOfFramesToExport       , 0.1f, 0, 10000000);
+            // the same properties as in the export dialog (File > Export image sequence...)
+            DlgExportAnimation.BuildProperties(ref ctx.Index, settings.ExportAnimSettings, settings, ctx.Executor as IUiExecutorSdfGlue);
         }
 
         // fields are copied - the ExportAnimationSettings instance stays the same
@@ -98,9 +98,7 @@ namespace SdfGlueUi.Ui.Settings
             ExportAnimationSettings exportAnim  = ((UserSettingsSdfGlue)settingsBase).ExportAnimSettings;
             ExportAnimationSettings defaults    = ((UserSettingsSdfGlue)defaultsBase).ExportAnimSettings;
 
-            exportAnim.Fps                      = defaults.Fps;
-            exportAnim.NumOfFramesToPrerender   = defaults.NumOfFramesToPrerender;
-            exportAnim.NumOfFramesToExport      = defaults.NumOfFramesToExport;
+            exportAnim.CopyFrom(defaults);
         }
     }
 }

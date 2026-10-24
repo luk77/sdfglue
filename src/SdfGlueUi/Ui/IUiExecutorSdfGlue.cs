@@ -26,7 +26,15 @@ namespace SdfGlueUi.Ui
         void OnPreviewResolutionChanged();
         void OnBatchProcessAllProjects();
         void OnSaveImage();
-        void OnExportAnimation();
+
+        // Image sequence export (File > Export image sequence..., DlgExportAnimation) with the settings from
+        // UserSettingsSdfGlue.ExportAnimSettings, done in steps (one per frame).
+        // Start returns false if the export was not started (errors are shown to the user).
+        bool                    StartAnimationExport        ();
+        void                    CancelAnimationExport       ();
+        AnimationExportProgress GetAnimationExportProgress  ();
+        // null when cancelled
+        string?                 SelectFolder                ();
 
         // Code of the pass for an export target, generated on demand (null on error - see errors)
         string? GenerateExportCode  (ShaderExportTarget target, RenderPassData pass, StringBuilder errors);

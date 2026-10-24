@@ -6,6 +6,7 @@
 using ImGuiNET;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.DataNodes;
+using SdfGlueUi.Ui.Dialogs;
 using SdfGlueUi.Ui.Settings;
 using SdfGlueUi.Ui.Windows;
 using SingleDocAppFramework.Ui;
@@ -30,11 +31,16 @@ namespace SdfGlueUi.Ui
         // Not a registered window (no ImGui window, not in layouts); the choice is not saved.
         private WndPreview              backgroundPreview_;
 
+        // File > Export image sequence... (modal)
+        private DlgExportAnimation      exportAnimationDialog_;
+
         public UiManagerSdfGlue(IUiExecutorSdfGlue uiActionsExecutor)
             : base(uiActionsExecutor)
         {
             backgroundPreview_      = new WndPreview("Background preview", true);
             backgroundPreview_.SetUiManager(this);
+
+            exportAnimationDialog_  = new DlgExportAnimation(uiActionsExecutor);
 
             // The first preview is the main one (the only one visible on start, used by maximized / fullscreen preview)
             WindowPreview           = new WndPreview("Preview 1");
@@ -82,6 +88,21 @@ namespace SdfGlueUi.Ui
                 case PreviewViewMode.Maximized: previewViewMode_ = PreviewViewMode.Fullscreen;  break;
                 default:                        previewViewMode_ = PreviewViewMode.Editor;      break;
             }
+        }
+
+        public void OpenExportAnimationDialog()
+        {
+            exportAnimationDialog_.Open();
+        }
+
+        protected override void BuildAppModalDialogs()
+        {
+            exportAnimationDialog_.Build();
+        }
+
+        protected override bool IsAppModalDialogOpen()
+        {
+            return exportAnimationDialog_.IsOpen;
         }
 
         protected override MainMenuBase CreateMainMenu()

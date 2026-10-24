@@ -11,7 +11,7 @@ using SingleDocAppFramework.Platform;
 
 namespace SdfGlueEditor.Application
 {
-    // Shaders, preview and image/animation export
+    // Shaders, preview and image export (image sequence export: AnimationExportController)
     public class RenderController
     {
         private static readonly FileFilter  ImageFileFilter     = new FileFilter("PNG file", "*.png");
@@ -42,7 +42,7 @@ namespace SdfGlueEditor.Application
 
             int windowSizeX = ctx_.Window.ClientSize.X;
             int windowSizeY = ctx_.Window.ClientSize.Y;
-            IntCoords previewRes = GetModel().Config.GetPreviewResolution();
+            IntCoords previewRes = GetModel().GetRenderResolution();
 
             WndPreview.CalcScreenRect(new System.Numerics.Vector2(windowSizeX, windowSizeY), previewRes, keepAspectRatio,
                                       out System.Numerics.Vector2 pos, out System.Numerics.Vector2 size);
@@ -91,7 +91,7 @@ namespace SdfGlueEditor.Application
 
         public void PreviewResolutionChanged()
         {
-            ctx_.RenderingSystem.ReinitializePreviewFrameBuffer(GetModel().Config.GetPreviewResolution());
+            ctx_.RenderingSystem.ReinitializePreviewFrameBuffer(GetModel().GetRenderResolution());
 
             GetModel().ResetFrameCounter();
         }
@@ -119,55 +119,8 @@ namespace SdfGlueEditor.Application
             SaveImageToFile(bmp, filePath);
         }
 
-        public void ExportAnimation()
-        {
-            if (GetModel().GetRPassDataForPreview() == null)
-            {
-                Console.WriteLine("No image to export.");
-                return;
-            }
-
-            string? baseDir = ctx_.Platform.SelectFolderDialog();
-            if (String.IsNullOrEmpty(baseDir))
-                return;
-
-            double deltaTime = 1.0 / GetModel().Config.ExportAnimSettings.Fps;
-
-            // prerender (no save)
-            for (int f=0; f<GetModel().Config.ExportAnimSettings.NumOfFramesToPrerender; f++)
-            {
-                // render
-                RenderFrame();
-
-                // update time
-                GetModel().Update(deltaTime);
-            }
-
-            // actual render and save
-            for (int f=0; f<GetModel().Config.ExportAnimSettings.NumOfFramesToExport; f++)
-            {
-                // render
-                RenderFrame();
-
-                // update time
-                GetModel().Update(deltaTime);
-
-                // get image
-                using Bitmap? bmp = GetModel().GetRPassDataForPreview()?.GetFrameAsBitmap();
-                if (bmp == null)
-                {
-                    Console.WriteLine("Unable to get bitmap data.");
-                    break;
-                }
-
-                // save image (stop on the first error instead of reporting it for every frame)
-                string filePath = Path.Combine(baseDir, String.Format("frame_{0}.png", f.ToString("D8")));
-                if (!SaveImageToFile(bmp, filePath))
-                    break;
-            }
-        }
-
-        private bool SaveImageToFile(Bitmap bmp, string filePath)
+        // Errors are reported to the user
+        public bool SaveImageToFile(Bitmap bmp, string filePath)
         {
             try
             {

@@ -36,6 +36,7 @@ namespace SdfGlueEditor
         // created in OnLoad() (require the OpenGL context / rendering system)
         private DocumentController              documents_              = null!;
         private RenderController                render_                 = null!;
+        private AnimationExportController       animExport_             = null!;
         private ShaderExportController          shaderExport_           = null!;
         private CameraController                camera_                 = null!;
         private DemoModeController              demoMode_               = null!;
@@ -115,7 +116,7 @@ namespace SdfGlueEditor
 
         protected override UiExecutorFrameworkBase CreateExecutor()
         {
-            return new UiExecutorSdfGlue(ctx_, documents_, render_, shaderExport_, camera_, hierarchy_);
+            return new UiExecutorSdfGlue(ctx_, documents_, render_, animExport_, shaderExport_, camera_, hierarchy_);
         }
 
         protected override UiManagerBase CreateUiManager(UiExecutorFrameworkBase executor)
@@ -139,6 +140,7 @@ namespace SdfGlueEditor
 
             documents_  = new DocumentController(ctx_);
             render_     = new RenderController(ctx_);
+            animExport_ = new AnimationExportController(ctx_, render_);
             camera_     = new CameraController(ctx_);
             demoMode_   = new DemoModeController(documents_);
             shaderExport_ = new ShaderExportController(ctx_, documents_);
@@ -191,8 +193,8 @@ namespace SdfGlueEditor
 
             camera_.RecalculateCamera();
 
-            // monitor file system changes
-            if (fileChangeMonitor_ != null && fileChangeMonitor_.ConsumeChange())
+            // monitor file system changes (a change is kept until the image sequence export is finished)
+            if (fileChangeMonitor_ != null && !animExport_.IsActive && fileChangeMonitor_.ConsumeChange())
             {
                 if (GetModel().Config.MonitorFileSystemChanges)
                 {
@@ -200,7 +202,8 @@ namespace SdfGlueEditor
                 }
             }
 
-            demoMode_.Update(e.Time, ref GetUiManager().EnabledDemoMode);
+            if (!animExport_.IsActive)
+                demoMode_.Update(e.Time, ref GetUiManager().EnabledDemoMode);
         }
 
         // Called only after the user settings were changed (settings dialog, revert, restore defaults)
@@ -233,7 +236,11 @@ namespace SdfGlueEditor
 
         protected override void OnRender3d()
         {
-            render_.RenderFrame();
+            // the image sequence export renders its frames instead (and advances the time itself)
+            if (animExport_.IsActive)
+                animExport_.Step();
+            else
+                render_.RenderFrame();
 
             // fullscreen / background preview: drawn directly into the window (under the UI); the mode is from the previous UI frame
             RenderPassData? screenPass = GetUiManager().GetScreenPreviewPass(out bool keepAspectRatio);
@@ -250,7 +257,8 @@ namespace SdfGlueEditor
 
             double deltaTime = GetModel().UseConstTimeStep ? DataModel.ConstTimeStep : e.Time;
 
-            GetModel().Update(deltaTime);
+            if (!animExport_.IsActive)
+                GetModel().Update(deltaTime);
 
             // These actions have to be executed outside of the UI building loop
             // (they modify the collections iterated there)

@@ -92,7 +92,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
 
             // Set the viewport for the preview in the window
-            IntCoords previewResolution = model.Config.GetPreviewResolution();
+            IntCoords previewResolution = model.GetRenderResolution();
             GL.Viewport(0, 0, previewResolution.X, previewResolution.Y);
 
             RenderPass? prevEnabledPass = null;

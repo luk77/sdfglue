@@ -42,7 +42,7 @@ namespace SdfGlueEditor.Application
         // Recreates render passes/shaders for the current model (after new/open project etc.)
         public void ReinitializeRenderingSystem()
         {
-            RenderingSystem.Reinitialize(GetModel().RenderingSysData, CodeGenerator, GetModel().Config.GetPreviewResolution());
+            RenderingSystem.Reinitialize(GetModel().RenderingSysData, CodeGenerator, GetModel().GetRenderResolution());
             GetModel().SetDefaultRenderPass();
         }
     }
