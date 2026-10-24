@@ -49,6 +49,7 @@ namespace SdfGlueUi.Ui.Windows
             UiManagerSdfGlue uiMgr = UiMgrSdfGlue;
 
             TreeNode? selectedNode = GetSelection().SelectedNode;
+            AnimKeys = SdfAnimKeys.For(GetAppContext().Animation, selectedNode);
             nodeScopeId_ = selectedNode != null ? String.Format("{0}:{1}", selectedNode.GetType().Name, selectedNode.Id) : "";
 
             int index = 1;
@@ -98,7 +99,7 @@ namespace SdfGlueUi.Ui.Windows
                         UiFunctionDefinition.Build(uiMgr.ActionsExecutor, ref index, "Mix operator", selectedSdfNode.FunctionMixOp, GetModel().Definitions.MixOps);
                         BuildPropertiesForParameters(ref index, selectedSdfNode.FunctionMixOp);
 
-                        UiFloatWithSignal.Build(ref index, "Blending"      , selectedSdfNode.BlendFactor, 0.01f, LimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals, uiMgr.ActionsExecutor.OnRebuildShader);
+                        UiFloatWithSignal.Build(ref index, "Blending"      , selectedSdfNode.BlendFactor, 0.01f, LimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals, uiMgr.ActionsExecutor.OnRebuildShader, AnimKeys);
                     }
                     EndNodePropertyGrid();
 
@@ -119,7 +120,7 @@ namespace SdfGlueUi.Ui.Windows
                                 // Material Id
                                 BuildPropertyMaterial(index++, "Material", selectedSdfNode);
 
-                                UiFloatWithSignal.Build(ref index, "Material Blending"      , selectedSdfNode.MaterialBlendFactor, 0.01f, LimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals, uiMgr.ActionsExecutor.OnRebuildShader);
+                                UiFloatWithSignal.Build(ref index, "Material Blending"      , selectedSdfNode.MaterialBlendFactor, 0.01f, LimitsType.None, 0.0f, 0.0f, false,  GetModel().Signals, uiMgr.ActionsExecutor.OnRebuildShader, AnimKeys);
 
                                 EndNodePropertyGrid();
                             }

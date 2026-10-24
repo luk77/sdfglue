@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using SingleDocAppCore.Model.BaseTypes;
+using SdfGlueCore.Model.Animation;
 using SdfGlueCore.Model.CodeFragments;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueCore.Model.DataNodes.Signals;
@@ -50,6 +51,8 @@ namespace SdfGlueCore.Model
 
         public  MaterialsCollection         Materials                   = new MaterialsCollection();
         public  SignalsCollection           Signals                     = new SignalsCollection();
+        // keyframe animation of the parameters (CPU side, its own time)
+        public  ProjectAnimation            Animation                   = new ProjectAnimation();
 
         // Function definitions (shared by all models, owned by the application context)
         public  readonly FunctionLibrary    Definitions;
@@ -159,6 +162,7 @@ namespace SdfGlueCore.Model
             // Signals (the collection is always loaded and saved, but used only with SdfGlueFeatures.UseSignals)
             Signals = new SignalsCollection();
 
+            Animation = new ProjectAnimation();
 
             CreateEmptyProjectHierarchy();
         }
@@ -261,6 +265,11 @@ namespace SdfGlueCore.Model
                 }
             }
 
+            // animation
+            XmlNode? nodeAnimation = nodeData.SelectSingleNode("Animation");
+            if (nodeAnimation != null)
+                Animation.Deserialize(nodeAnimation);
+
             // materials
             XmlNode? nodeMaterials = nodeData.SelectSingleNode("Materials");
             if (nodeMaterials != null)
@@ -349,6 +358,10 @@ namespace SdfGlueCore.Model
                         signal.Serialize(xmlDoc, nodeSignals);
                 }
             }
+
+            // animation (only if there is any - projects without an animation do not change)
+            if (!Animation.IsEmpty)
+                Animation.Serialize(xmlDoc, nodeData, id => SdfAnimTargets.FindNode(this, id) != null);
 
             // sdf objects
             SdfRoot?.Serialize(xmlDoc, nodeData);

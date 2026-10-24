@@ -25,7 +25,8 @@ namespace SdfGlueUi.Ui.Properties
     public class UiFloatWithSignal : UiFloat
     {
         // onBindingChanged - called after the binding is changed (also on undo/redo), e.g. to rebuild the shader
-        public static void Build(ref int id, string name, ExFloat obj, float speed, LimitsType limitsType, float minVal, float maxVal, bool editInDegrees, SignalsCollection? signals = null, OnValueChanged? onBindingChanged = null)
+        // anim             - the animation of the node (the key button, an edit of an animated value is a key), null: none
+        public static void Build(ref int id, string name, ExFloat obj, float speed, LimitsType limitsType, float minVal, float maxVal, bool editInDegrees, SignalsCollection? signals = null, OnValueChanged? onBindingChanged = null, SdfAnimKeys? anim = null)
         {
             float valF = obj.Val;
             if (editInDegrees)
@@ -37,6 +38,8 @@ namespace SdfGlueUi.Ui.Properties
             ImGui.Text(name);
             ImGui.PopID();
             ImGui.NextColumn();
+
+            anim?.BuildKeyButton(ref id, obj);
 
             ExFloatWithSignal? objWithSignal = null;
             if (SdfGlueFeatures.UseSignals && signals != null)
@@ -55,12 +58,14 @@ namespace SdfGlueUi.Ui.Properties
             else
             {
                 ImGui.PushID(id++);
+                int animColors = anim?.PushColors(obj) ?? 0;
                 switch(limitsType)
                 {
                     case LimitsType.None:       ImGui.DragFloat("##value", ref valF, speed);                     break;
                     case LimitsType.Min:        ImGui.DragFloat("##value", ref valF, speed, minVal);             break;
                     case LimitsType.MinMax:     ImGui.DragFloat("##value", ref valF, speed, minVal, maxVal);     break;
                 }
+                SdfAnimKeys.PopColors(animColors);
                 ImGui.PopID();
 
                 if (editInDegrees)
@@ -68,7 +73,8 @@ namespace SdfGlueUi.Ui.Properties
 
                 obj.Val = valF;
 
-                AddUndoHandler(name, obj);
+                if (anim == null || !anim.HandleUndo(obj))
+                    AddUndoHandler(name, obj);
             }
             ImGui.NextColumn();
         }

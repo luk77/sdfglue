@@ -32,7 +32,8 @@ namespace SdfGlueUi.Ui.Properties
         private static readonly string[]    ColorChannelNames       = { "R", "G", "B", "A" };
 
         // onBindingChanged - called after a binding is changed (also on undo/redo), e.g. to rebuild the shader
-        public static void Build(ref int id, string name, ExVector2 obj, float speed, bool editInDegrees, SignalsCollection? signals = null, OnValueChanged? onBindingChanged = null)
+        // anim             - the animation of the node (the key buttons, an edit of an animated value is a key), null: none
+        public static void Build(ref int id, string name, ExVector2 obj, float speed, bool editInDegrees, SignalsCollection? signals = null, OnValueChanged? onBindingChanged = null, SdfAnimKeys? anim = null)
         {
             if (!SdfGlueFeatures.UseSignals || signals == null || obj is not ExVector2WithSignal objWithSignal)
             {
@@ -44,20 +45,22 @@ namespace SdfGlueUi.Ui.Properties
                     valV *= GMath.DegToRad;
                 obj.Val = valV;
 
-                UiVector2.AddUndoHandler(name, obj);
+                if (anim == null || !anim.HandleUndo(obj))
+                    UiVector2.AddUndoHandler(name, obj);
                 return;
             }
 
             float[] values = { obj.Val.X, obj.Val.Y };
-            BuildRows(ref id, name, objWithSignal, values, speed, editInDegrees, false, signals, onBindingChanged,
+            BuildRows(ref id, name, objWithSignal, values, speed, editInDegrees, false, signals, onBindingChanged, anim,
                 delegate
                 {
                     obj.Val = new Vector2(values[0], values[1]);
-                    UiVector2.AddUndoHandler(name, obj);
+                    if (anim == null || !anim.HandleUndo(obj))
+                        UiVector2.AddUndoHandler(name, obj);
                 });
         }
 
-        public static void Build(ref int id, string name, ExVector3 obj, float speed, bool editInDegrees, bool isColor, SignalsCollection? signals = null, OnValueChanged? onBindingChanged = null)
+        public static void Build(ref int id, string name, ExVector3 obj, float speed, bool editInDegrees, bool isColor, SignalsCollection? signals = null, OnValueChanged? onBindingChanged = null, SdfAnimKeys? anim = null)
         {
             if (!SdfGlueFeatures.UseSignals || signals == null || obj is not ExVector3WithSignal objWithSignal)
             {
@@ -74,20 +77,22 @@ namespace SdfGlueUi.Ui.Properties
                 }
                 obj.Val = valV;
 
-                UiVector3.AddUndoHandler(name, obj);
+                if (anim == null || !anim.HandleUndo(obj))
+                    UiVector3.AddUndoHandler(name, obj);
                 return;
             }
 
             float[] values = { obj.Val.X, obj.Val.Y, obj.Val.Z };
-            BuildRows(ref id, name, objWithSignal, values, speed, editInDegrees, isColor, signals, onBindingChanged,
+            BuildRows(ref id, name, objWithSignal, values, speed, editInDegrees, isColor, signals, onBindingChanged, anim,
                 delegate
                 {
                     obj.Val = new Vector3(values[0], values[1], values[2]);
-                    UiVector3.AddUndoHandler(name, obj);
+                    if (anim == null || !anim.HandleUndo(obj))
+                        UiVector3.AddUndoHandler(name, obj);
                 });
         }
 
-        public static void Build(ref int id, string name, ExVector4 obj, float speed, bool editInDegrees, SignalsCollection? signals = null, OnValueChanged? onBindingChanged = null)
+        public static void Build(ref int id, string name, ExVector4 obj, float speed, bool editInDegrees, SignalsCollection? signals = null, OnValueChanged? onBindingChanged = null, SdfAnimKeys? anim = null)
         {
             if (!SdfGlueFeatures.UseSignals || signals == null || obj is not ExVector4WithSignal objWithSignal)
             {
@@ -99,24 +104,27 @@ namespace SdfGlueUi.Ui.Properties
                     valV *= GMath.DegToRad;
                 obj.Val = valV;
 
-                UiVector4.AddUndoHandler(name, obj);
+                if (anim == null || !anim.HandleUndo(obj))
+                    UiVector4.AddUndoHandler(name, obj);
                 return;
             }
 
             float[] values = { obj.Val.X, obj.Val.Y, obj.Val.Z, obj.Val.W };
-            BuildRows(ref id, name, objWithSignal, values, speed, editInDegrees, false, signals, onBindingChanged,
+            BuildRows(ref id, name, objWithSignal, values, speed, editInDegrees, false, signals, onBindingChanged, anim,
                 delegate
                 {
                     obj.Val = new Vector4(values[0], values[1], values[2], values[3]);
-                    UiVector4.AddUndoHandler(name, obj);
+                    if (anim == null || !anim.HandleUndo(obj))
+                        UiVector4.AddUndoHandler(name, obj);
                 });
         }
 
         // values        - static values of the channels (in radians if editInDegrees), modified by the editors
         // onValueEdited - writes the values back to the object and handles undo; called right after every value widget
         private static void BuildRows(ref int id, string name, ISignalBindable obj, float[] values, float speed, bool editInDegrees, bool isColor,
-                                      SignalsCollection signals, OnValueChanged? onBindingChanged, Action onValueEdited)
+                                      SignalsCollection signals, OnValueChanged? onBindingChanged, SdfAnimKeys? anim, Action onValueEdited)
         {
+            ISimpleType value = (ISimpleType)obj;
             string[] channelNames = isColor ? ColorChannelNames : SignalBinding.ChannelNames;
             bool     anyBound     = SignalBinding.HasBinding(obj);
             int      localId      = 0;
@@ -130,7 +138,8 @@ namespace SdfGlueUi.Ui.Properties
             uint treeNodeId = ImGui.GetItemID();
             ImGui.NextColumn();
 
-            // main row - bindings menu and values
+            // main row - the key button (all channels), bindings menu and values
+            anim?.BuildKeyButton(ref localId, value);
             if (BuildChannelsMenuButton(ref localId, obj, channelNames, signals, onBindingChanged))
             {
                 // a channel was bound - show its signal in the sub-rows
@@ -139,6 +148,7 @@ namespace SdfGlueUi.Ui.Properties
                 anyBound = SignalBinding.HasBinding(obj);
             }
 
+            int animColors = anim?.PushColors(value) ?? 0;
             if (isColor && !anyBound)
             {
                 Vector3 color = new Vector3(values[0], values[1], values[2]);
@@ -157,6 +167,7 @@ namespace SdfGlueUi.Ui.Properties
             {
                 BuildChannelsInline(ref localId, obj, channelNames, values, speed, editInDegrees, signals, onValueEdited);
             }
+            SdfAnimKeys.PopColors(animColors);
             ImGui.NextColumn();
 
             // sub-rows - one per channel
@@ -170,6 +181,7 @@ namespace SdfGlueUi.Ui.Properties
                     ImGui.PopID();
                     ImGui.NextColumn();
 
+                    anim?.BuildKeyButton(ref localId, value, ch);
                     UiFloatWithSignal.BuildBindingButton(ref localId, obj, ch, signals, onBindingChanged);
                     ImGui.SetNextItemWidth(-1);
 
@@ -182,8 +194,10 @@ namespace SdfGlueUi.Ui.Properties
                     {
                         float valF = editInDegrees ? values[ch] * GMath.RadToDeg : values[ch];
                         ImGui.PushID(localId++);
+                        int channelColors = anim?.PushColors(value, ch) ?? 0;
                         if (ImGui.DragFloat("##value", ref valF, speed))
                             values[ch] = editInDegrees ? valF * GMath.DegToRad : valF;
+                        SdfAnimKeys.PopColors(channelColors);
                         ImGui.PopID();
                         onValueEdited();
                     }
