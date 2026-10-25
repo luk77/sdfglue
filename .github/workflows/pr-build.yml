@@ -84,6 +84,22 @@ jobs:
           "-p:InformationalVersion=${{ steps.version.outputs.info }}" `
           -o bin
 
+    # The application does not start without the workspace (bin/Workspace) - check the folders and files it requires
+    # (lists RequiredDirectories / RequiredFiles in src/SdfGlueCore/SdfGlueWorkspace.cs)
+    - name: Check workspace
+      shell: pwsh
+      run: |
+        $code = Get-Content -Raw src/SdfGlueCore/SdfGlueWorkspace.cs
+        $missing = @()
+        foreach ($list in "RequiredDirectories", "RequiredFiles") {
+          $block = [regex]::Match($code, "$list\s*=\s*\{(.*?)\};", "Singleline").Groups[1].Value
+          $items = [regex]::Matches($block, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+          if ($items.Count -eq 0) { throw "Cannot read $list from SdfGlueWorkspace.cs" }
+          $missing += $items | Where-Object { -not (Test-Path (Join-Path bin/Workspace $_)) }
+        }
+        if (-not (Test-Path bin/Layouts/Default.xml)) { $missing += "bin/Layouts/Default.xml" }
+        if ($missing) { throw "Missing in bin/Workspace: $($missing -join ', ')" }
+
     - name: Upload artifact
       id: upload
       uses: actions/upload-artifact@v7

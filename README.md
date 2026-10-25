@@ -83,7 +83,12 @@ Simply clone the repository, open the solution (```src/SdfGlue.sln```) in Visual
 
 The project has several dependencies (mainly **Dear ImGui** and **OpenTK**) which should be automatically restored via NuGet during the build process.
 
-The application also requires additional configuration files (primarily XML and GLSL files) located in the ```bin\\``` directory. After building, the generated .exe and .dll files should be copied into this directory.
+The application also requires additional files located in the ```bin\\``` directory. After building, the generated .exe and .dll files should be copied into this directory.
+- ```bin/Workspace/``` - the workspace: function definitions (```Functions```), GLSL includes (```Includes```), shader templates (```Shaders```), example projects (```Examples```)
+- ```bin/Layouts/``` - window layouts
+
+A different workspace folder can be selected at startup: ```SdfGlue.exe --workspace=<path>``` (absolute, or relative to the working directory).
+If the folder does not exist or required files are missing, the application shows an error message and does not start.
 
 To automate the build and file copying process, you can use the provided script: ```src\publish.cmd```
 
@@ -115,4 +120,4 @@ Special thanks to the following tools, resources, and communities:
 # License
 This project is licensed under the **MIT License**. See the [LICENSE.md](LICENSE.md) file for details.
 
-Example projects in the `bin/Examples/` directory are licensed separately under the [Creative Commons Attribution 4.0 International License (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
+Example projects in the `bin/Workspace/Examples/` directory are licensed separately under the [Creative Commons Attribution 4.0 International License (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
