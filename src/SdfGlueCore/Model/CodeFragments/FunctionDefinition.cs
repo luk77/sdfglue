@@ -164,7 +164,7 @@ namespace SdfGlueCore.Model.CodeFragments
                 string code;
                 try
                 {
-                    code = File.ReadAllText("Includes/" + name, System.Text.Encoding.UTF8);
+                    code = File.ReadAllText(SdfGlueWorkspace.GetPath("Includes/" + name), System.Text.Encoding.UTF8);
                 }
                 catch (Exception ex)
                 {

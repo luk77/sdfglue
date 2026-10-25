@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using ImGuiNET;
+using SdfGlueCore;
 using SdfGlueCore.Controller;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueCore.Model.DataNodes.Signals;
@@ -41,11 +42,12 @@ namespace SdfGlueUi.Ui
             }
 
             ImGui.Separator();
-            if (Directory.Exists("Examples"))
+            string examplesPath = SdfGlueWorkspace.GetPath(SdfGlueWorkspace.ExamplesDirectory);
+            if (Directory.Exists(examplesPath))
             {
                 if (ImGui.BeginMenu("Examples"))
                 {
-                    string exampleToOpen = MenuFileTree.Build("Examples", "*.xml");
+                    string exampleToOpen = MenuFileTree.Build(examplesPath, "*.xml");
                     if (!String.IsNullOrEmpty(exampleToOpen))
                     {
                         ExecutorSdfGlue.OnOpenDocument(exampleToOpen);

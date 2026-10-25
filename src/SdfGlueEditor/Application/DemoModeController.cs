@@ -3,12 +3,13 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
+using SdfGlueCore;
+
 namespace SdfGlueEditor.Application
 {
-    // Demo mode: periodically opens a random example project
+    // Demo mode: periodically opens a random example project (Examples folder of the workspace)
     public class DemoModeController
     {
-        private static readonly string  ExamplesDirectory       = "Examples";
         private static readonly string  ProjectSearchPattern    = "*.xml";
 
         private DocumentController      documents_;
@@ -42,7 +43,7 @@ namespace SdfGlueEditor.Application
                     return;
                 }
 
-                LoadRandomProject(ExamplesDirectory, ProjectSearchPattern);
+                LoadRandomProject(SdfGlueWorkspace.GetPath(SdfGlueWorkspace.ExamplesDirectory), ProjectSearchPattern);
             }
         }
 

@@ -5,7 +5,7 @@
 //---------------------------------------------------------------------------
 namespace SdfGlueCore.Model.CodeFragments
 {
-    // Function definitions loaded from the Functions/ folder. They do not depend on the project,
+    // Function definitions loaded from the Functions/ folder of the workspace (SdfGlueWorkspace). They do not depend on the project,
     // so one library (owned by the application context) is shared by all models - current and temporary ones.
     // After Reload() the models refresh their references (DataModel.RefreshDefinitions()).
     public class FunctionLibrary
@@ -20,13 +20,13 @@ namespace SdfGlueCore.Model.CodeFragments
 
         public void Reload()
         {
-            Renderers               .Reload("Functions/Renderers/");
-            Backdrops               .Reload("Functions/Backdrops/");
-            CameraControllers       .Reload("Functions/CameraOperators/");
-            Sdf                     .Reload("Functions/Sdf/");
-            MixOps                  .Reload("Functions/MixOperators/");
-            PositionOps             .Reload("Functions/PositionOperators/");
-            DistanceOps             .Reload("Functions/DistanceOperators/");
+            Renderers               .Reload(SdfGlueWorkspace.GetPath("Functions/Renderers/"));
+            Backdrops               .Reload(SdfGlueWorkspace.GetPath("Functions/Backdrops/"));
+            CameraControllers       .Reload(SdfGlueWorkspace.GetPath("Functions/CameraOperators/"));
+            Sdf                     .Reload(SdfGlueWorkspace.GetPath("Functions/Sdf/"));
+            MixOps                  .Reload(SdfGlueWorkspace.GetPath("Functions/MixOperators/"));
+            PositionOps             .Reload(SdfGlueWorkspace.GetPath("Functions/PositionOperators/"));
+            DistanceOps             .Reload(SdfGlueWorkspace.GetPath("Functions/DistanceOperators/"));
         }
     }
 }
