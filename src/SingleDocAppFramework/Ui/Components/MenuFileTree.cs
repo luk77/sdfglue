@@ -9,6 +9,7 @@ namespace SingleDocAppFramework.Ui.Components
 {
     public class MenuFileTree
     {
+        // Menu items with the files in rootPath (labels relative to rootPath); returns the path of the selected file
         public static string Build(string rootPath, string searchPattern)
         {
             if (!Directory.Exists(rootPath))
@@ -18,7 +19,7 @@ namespace SingleDocAppFramework.Ui.Components
 
             foreach (string path in files)
             {
-                if (ImGui.MenuItem(String.Format("{0}", path)))
+                if (ImGui.MenuItem(Path.GetRelativePath(rootPath, path)))
                 {
                     return path;
                 }

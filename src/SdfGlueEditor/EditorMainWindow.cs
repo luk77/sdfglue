@@ -57,12 +57,13 @@ namespace SdfGlueEditor
             Console.WriteLine("-----------------------------------------------------------------------------");
             Console.WriteLine("ImGui v.{0}", GetImGuiVersion());
             Console.WriteLine("OpenGL v.{0}", GL.GetString(StringName.Version));
+            Console.WriteLine("Workspace: {0}", Path.GetFullPath(SdfGlueWorkspace.RootDirectory));
             Console.WriteLine("-----------------------------------------------------------------------------");
 
             // user settings are already loaded by the base constructor
             ctx_                = new SdfGlueAppContext(this, platform, (UserSettingsSdfGlue)UserSettings);
 
-            fileChangeMonitor_  = new FileChangeMonitor(".", new string[] {"*.xml", "*.glsl", "*.vert", "*.frag", "*.shader"}, 300);
+            fileChangeMonitor_  = new FileChangeMonitor(SdfGlueWorkspace.RootDirectory, new string[] {"*.xml", "*.glsl", "*.vert", "*.frag", "*.shader"}, 300);
         }
 
         private static SdAppSettings CreateAppSettings()

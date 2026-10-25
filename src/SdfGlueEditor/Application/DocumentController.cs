@@ -3,6 +3,7 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
+using SdfGlueCore;
 using SdfGlueCore.Model;
 using SingleDocAppCore.UndoSystem;
 using System.Xml;
@@ -121,7 +122,7 @@ namespace SdfGlueEditor.Application
             ctx_.Window.RefreshWindowTitle();
         }
 
-        private static readonly string[]    BatchProjectDirectories     = { "Projects", "Examples" };
+        private static readonly string[]    BatchProjectDirectories     = { SdfGlueWorkspace.ProjectsDirectory, SdfGlueWorkspace.ExamplesDirectory };    // in the workspace
         private static readonly string      ProjectSearchPattern        = "*.xml";
 
         // Loads and re-saves all projects (upgrades them to the current file format).
@@ -131,8 +132,9 @@ namespace SdfGlueEditor.Application
         public static List<string> FindBatchProjectFiles()
         {
             List<string> files = new List<string>();
-            foreach (string rootPath in BatchProjectDirectories)
+            foreach (string dir in BatchProjectDirectories)
             {
+                string rootPath = SdfGlueWorkspace.GetPath(dir);
                 if (Directory.Exists(rootPath))
                     files.AddRange(Directory.GetFiles(rootPath, ProjectSearchPattern, SearchOption.AllDirectories));
             }

@@ -3,6 +3,7 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
+using SdfGlueCore;
 using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
 using OpenTK.Graphics.OpenGL4;
@@ -52,7 +53,8 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
                 //}
 
                 // Unification - Same template for primary/secondary passess
-                RenderPass pass = new RenderPass(model, codeGenerator, passData, previewResolution, "Shaders/Template.vert", "Shaders/Template.frag");
+                RenderPass pass = new RenderPass(model, codeGenerator, passData, previewResolution,
+                                                 SdfGlueWorkspace.GetPath("Shaders/Template.vert"), SdfGlueWorkspace.GetPath("Shaders/Template.frag"));
                 passes_.Add(pass);
                 passData.RenderingPass = pass;
                 prevPass = pass;

@@ -21,7 +21,7 @@ namespace SdfGlueCore.Controller
 
         public abstract string Name { get; }
 
-        // Template file with ShaderCodeGenerator.GeneratedCodeTag; null - only the generated code
+        // Template file (in the workspace) with ShaderCodeGenerator.GeneratedCodeTag; null - only the generated code
         public virtual string? TemplatePath             { get { return null; } }
 
         // Extension of the exported file (without a dot)
@@ -62,7 +62,7 @@ namespace SdfGlueCore.Controller
     public class PreviewTarget : ShaderExportTarget
     {
         public override string Name                     { get { return "Preview"; } }
-        public override string? TemplatePath            { get { return "Shaders/Template.frag"; } }
+        public override string? TemplatePath            { get { return SdfGlueWorkspace.GetPath("Shaders/Template.frag"); } }
         public override string FileExtension            { get { return "frag"; } }
     }
 
@@ -107,7 +107,7 @@ namespace SdfGlueCore.Controller
     public class UnityTarget : ShaderExportTarget
     {
         public override string Name                     { get { return "Unity"; } }
-        public override string? TemplatePath            { get { return "Shaders/UnityTemplate.shader"; } }
+        public override string? TemplatePath            { get { return SdfGlueWorkspace.GetPath("Shaders/UnityTemplate.shader"); } }
         public override string FileExtension            { get { return "shader"; } }
         public override bool ForceFixed                 { get { return true; } }
         public override bool UseStaticSignalValues      { get { return true; } }
