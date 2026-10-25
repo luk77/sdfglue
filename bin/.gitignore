@@ -1,6 +1,7 @@
 /errorlog.txt
 /log.txt
 /UserSettings.xml
+/InputSettings.xml
 *.exe
 *.dll
 *.json
