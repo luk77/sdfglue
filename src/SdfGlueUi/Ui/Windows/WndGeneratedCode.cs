@@ -8,7 +8,7 @@ using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueUi.Ui.Components;
-using SingleDocAppFramework.Ui.Fonts;
+using SingleDocAppFramework.Ui.CodeView;
 using System.Numerics;
 using System.Text;
 
@@ -32,6 +32,10 @@ namespace SdfGlueUi.Ui.Windows
         private ShaderExportTarget?         exportCodeTarget_       = null;
         private RenderPassData?             exportCodePass_         = null;
         private int                         exportCodeVersion_      = -1;
+
+        // code view with syntax highlighting (tokenized only when the shown code changes)
+        private readonly CodeViewDocument   codeDocument_           = new CodeViewDocument();
+        private readonly CodeViewOptions    codeViewOptions_        = new CodeViewOptions();
 
         private string title_ = string.Empty;
         public override string Title
@@ -109,11 +113,19 @@ namespace SdfGlueUi.Ui.Windows
                     }
                 }
 
+                ImGui.SameLine();
+                ImGui.Checkbox("Line numbers", ref codeViewOptions_.ShowLineNumbers);
+
                 //ImGui.Separator();
                 ImGui.SeparatorText("Code:");
                 //ImGui.Separator();
 
-                InsertScrollableTextPanel( selectedCode );
+                // the Unity export is HLSL (ShaderLab), everything else GLSL
+                CodeLanguage language = (option == OptionFullShaderUnity)
+                    ? SdfGlueCodeLanguages.GetHlsl(GetAppContext().Definitions)
+                    : SdfGlueCodeLanguages.GetGlsl(GetAppContext().Definitions);
+
+                InsertCodeView(selectedCode, language);
             });
         }
 
@@ -136,19 +148,13 @@ namespace SdfGlueUi.Ui.Windows
             return exportCode_;
         }
 
-        private static void InsertScrollableTextPanel(string? text)
+        private void InsertCodeView(string? text, CodeLanguage language)
         {
             if (String.IsNullOrEmpty(text))
                 return;
 
-            //ImGui.BeginChild("ScrollableChild", new Vector2(ImGui.GetContentRegionAvail().X , ImGui.GetContentRegionAvail().Y), ImGuiChildFlags.None, ImGuiWindowFlags.AlwaysVerticalScrollbar);
-            ImGui.BeginChild("ScrollableChild", new Vector2(ImGui.GetContentRegionAvail().X , ImGui.GetContentRegionAvail().Y), ImGuiChildFlags.None);
-
-            // long text display
-            using (UiFonts.Scope(UiFontRole.Code))
-                ImGui.TextUnformatted(text);
-
-            ImGui.EndChild();
+            codeDocument_.SetText(text, language);
+            UiCodeView.Build("ScrollableChild", codeDocument_, codeViewOptions_);
         }
 
     }

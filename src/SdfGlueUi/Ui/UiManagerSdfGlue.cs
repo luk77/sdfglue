@@ -7,6 +7,7 @@ using ImGuiNET;
 using SdfGlueCore;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.DataNodes;
+using SdfGlueUi.Ui.Components;
 using SdfGlueUi.Ui.Dialogs;
 using SdfGlueUi.Ui.Settings;
 using SdfGlueUi.Ui.Windows;
@@ -41,6 +42,8 @@ namespace SdfGlueUi.Ui
         public UiManagerSdfGlue(IUiExecutorSdfGlue uiActionsExecutor)
             : base(uiActionsExecutor)
         {
+            SdfGlueCodeLanguages.RegisterTokenKinds();
+
             backgroundPreview_      = new WndPreview("Background preview", true);
             backgroundPreview_.SetUiManager(this);
 

@@ -11,6 +11,7 @@ using SingleDocAppFramework.Layouts;
 using SingleDocAppFramework.Platform;
 using SingleDocAppFramework.Rendering.OpenTk.ImGuiRendering;
 using SingleDocAppFramework.Ui;
+using SingleDocAppFramework.Ui.CodeView;
 using SingleDocAppFramework.Ui.Fonts;
 using SingleDocAppFramework.Ui.Styles;
 using System.ComponentModel;
@@ -139,6 +140,8 @@ namespace SingleDocAppFramework
         {
             //RenderFrequency = userSettings_.UseRenderFrequencyLimit ? userSettings_.RenderFrequencyLimit : 0;
             UpdateFrequency = userSettings_.UseUpdateFrequencyLimit ? userSettings_.UpdateFrequencyLimit : 0;
+
+            CodeViewPalette.SetOverrides(userSettings_.SyntaxColorsDark, userSettings_.SyntaxColorsLight);
 
             if (imguiInitialized_)
                 ApplyImGuiUserSettings();

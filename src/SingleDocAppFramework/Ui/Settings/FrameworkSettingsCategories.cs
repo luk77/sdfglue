@@ -5,9 +5,11 @@
 //---------------------------------------------------------------------------
 using ImGuiNET;
 using SingleDocAppCore.Settings;
+using SingleDocAppFramework.Ui.CodeView;
 using SingleDocAppFramework.Ui.Fonts;
 using SingleDocAppFramework.Ui.Properties;
 using SingleDocAppFramework.Ui.Styles;
+using System.Numerics;
 
 namespace SingleDocAppFramework.Ui.Settings
 {
@@ -38,7 +40,8 @@ namespace SingleDocAppFramework.Ui.Settings
                     settings.UiTextScaleFactor          = defaults.UiTextScaleFactor;
                     settings.FullscreenOnPrimaryMonitor = defaults.FullscreenOnPrimaryMonitor;
                 })
-                .AddSection(CreateFontsSection("Fonts"));
+                .AddSection(CreateFontsSection("Fonts"))
+                .AddSection(CreateSyntaxColorsSection("Syntax colors"));
 
             registry.AddCategory(Performance, "Performance", PerformanceOrder)
                 .AddSection("FPS limits", BuildFpsLimit, delegate(UserSettingsBase settings, UserSettingsBase defaults)
@@ -129,6 +132,69 @@ namespace SingleDocAppFramework.Ui.Settings
             UiFloat.Build(ref id, label, ref size, 0.05f, UserSettingsBase.MinFontSize, UserSettingsBase.MaxFontSize);
             ImGui.EndDisabled();
         }
+
+        // Colors of the code view (UiCodeView) for all registered token kinds (CodeTokenKinds), in the palette of the
+        // current UI style (dark or light - CodeViewPalette). Only colors different from the defaults are stored.
+        public static SettingsSection CreateSyntaxColorsSection(string? title)
+        {
+            CodeViewDocument    preview         = new CodeViewDocument();
+            CodeViewOptions     previewOptions  = new CodeViewOptions();
+            CodeLanguage        previewLanguage = CodeLanguages.Glsl();
+
+            return new SettingsSection(title, delegate(SettingsBuildContext ctx)
+            {
+                bool dark = UiStyles.IsCurrentStyleDark;
+                Dictionary<string, Vector3> colors = dark ? ctx.Settings.SyntaxColorsDark : ctx.Settings.SyntaxColorsLight;
+
+                ImGui.TextDisabled("Palette");
+                ImGui.NextColumn();
+                ImGui.TextDisabled(dark ? "Dark (used by dark UI styles)" : "Light (used by light UI styles)");
+                ImGui.NextColumn();
+
+                foreach(CodeTokenKindInfo info in CodeTokenKinds.GetAll())
+                {
+                    if (info.UsesStyleTextColor)
+                        continue;   // default text - color of the UI style
+
+                    Vector3 defaultColor = dark ? info.DefaultDarkColor : info.DefaultLightColor;
+                    Vector3 color;
+                    if (!colors.TryGetValue(info.Id, out color))
+                        color = defaultColor;
+
+                    Vector3 edited = color;
+                    UiColor3.Build(ref ctx.Index, info.DisplayName, ref edited);
+
+                    if (edited != color)
+                    {
+                        if (edited == defaultColor)
+                            colors.Remove(info.Id);
+                        else
+                            colors[info.Id] = edited;
+                    }
+                }
+
+                ImGui.Text("Preview");
+                ImGui.NextColumn();
+                preview.SetText(SyntaxColorsPreviewText, previewLanguage);
+                UiCodeView.Build("##syntaxColorsPreview", preview, previewOptions, new Vector2(-1.0f, ImGui.GetTextLineHeightWithSpacing() * 9.0f));
+                ImGui.NextColumn();
+            },
+            delegate(UserSettingsBase settings, UserSettingsBase defaults)
+            {
+                settings.SyntaxColorsDark   = new Dictionary<string, Vector3>(defaults.SyntaxColorsDark);
+                settings.SyntaxColorsLight  = new Dictionary<string, Vector3>(defaults.SyntaxColorsLight);
+            });
+        }
+
+        private const string SyntaxColorsPreviewText =
+            "#version 330 core\n" +
+            "#define STEPS 64\n" +
+            "uniform vec3 lightDir;     // a uniform\n" +
+            "/* signed distance\n   of a sphere */\n" +
+            "float sdSphere(vec3 p, float r) {\n" +
+            "    return length(p) - r * 0.5;\n" +
+            "}\n" +
+            "void main() { gl_FragColor = vec4(dot(lightDir, vec3(1.0)), 0.0, 0.0, 1.0); }";
 
         // Monitor used by the borderless fullscreen mode (SdAppWindow.SetBorderlessFullscreen)
         public static void BuildFullscreenMonitor(SettingsBuildContext ctx)

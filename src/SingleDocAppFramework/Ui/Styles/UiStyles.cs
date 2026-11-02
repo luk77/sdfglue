@@ -31,6 +31,7 @@ namespace SingleDocAppFramework.Ui.Styles
 
         private static readonly List<StyleEntry>    styles_         = new List<StyleEntry>();
         private static string[]?                    styleNames_     = null;
+        private static bool                         isDark_         = true;
 
         static UiStyles()
         {
@@ -84,7 +85,19 @@ namespace SingleDocAppFramework.Ui.Styles
             ResetToDefaults(style);
             styles_[index].Apply(style);
 
+            isDark_ = IsDarkColor(style.Colors[(int)ImGuiCol.WindowBg]);
+
             return found;
+        }
+
+        // True if the style applied last has a dark window background (e.g. the code view chooses its palette
+        // by it - CodeViewPalette). Updated by Apply(), not computed per frame.
+        public static bool IsCurrentStyleDark { get { return isDark_; } }
+
+        public static bool IsDarkColor(Vector4 color)
+        {
+            float luminance = 0.2126f * color.X + 0.7152f * color.Y + 0.0722f * color.Z;
+            return luminance < 0.5f;
         }
 
         private static int FindStyle(string name)
