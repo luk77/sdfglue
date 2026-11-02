@@ -21,6 +21,8 @@
     <ProjectReference Include="..\SingleDocAppFramework\SingleDocAppFramework.csproj" />
     <ProjectReference Include="..\SingleDocAppPlatformWin\SingleDocAppPlatformWin.csproj" />
     <ProjectReference Include="..\SingleDocAppMidiWin\SingleDocAppMidiWin.csproj" />
+    <ProjectReference Include="..\SingleDocAppVideoExport\SingleDocAppVideoExport.csproj" />
+    <ProjectReference Include="..\SingleDocAppVideoExportWin\SingleDocAppVideoExportWin.csproj" />
   </ItemGroup>
 
 </Project>

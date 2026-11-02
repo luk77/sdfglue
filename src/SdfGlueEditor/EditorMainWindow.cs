@@ -197,7 +197,7 @@ namespace SdfGlueEditor
 
             camera_.RecalculateCamera();
 
-            // monitor file system changes (a change is kept until the image sequence export is finished)
+            // monitor file system changes (a change is kept until the animation export is finished)
             if (fileChangeMonitor_ != null && !animExport_.IsActive && fileChangeMonitor_.ConsumeChange())
             {
                 if (ctx_.Settings.MonitorFileSystemChanges)
@@ -240,7 +240,7 @@ namespace SdfGlueEditor
 
         protected override void OnRender3d()
         {
-            // the image sequence export renders its frames instead (and advances the time itself)
+            // the animation export renders its frames instead (and advances the time itself)
             if (animExport_.IsActive)
                 animExport_.Step();
             else

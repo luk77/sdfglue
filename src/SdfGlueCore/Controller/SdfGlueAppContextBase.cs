@@ -35,7 +35,7 @@ namespace SdfGlueCore.Controller
         // Keyframe animation of the parameters (its own time, not Playback)
         public  AnimationController         Animation;
 
-        // Resolution used instead of the preview resolution (image sequence export)
+        // Resolution used instead of the preview resolution (animation export)
         public  IntCoords?                  RenderResolutionOverride = null;
 
         public SdfGlueAppContextBase(UserSettingsSdfGlue settings)
@@ -103,14 +103,14 @@ namespace SdfGlueCore.Controller
             return new FrameRenderParams(Playback.CurrentTime, Playback.CurrentFrame, GetRenderResolution(), IsAbleToRender());
         }
 
-        // Called once per frame (not during the image sequence export)
+        // Called once per frame (not during the animation export)
         public void Update(double deltaTime)
         {
             Playback.Update(deltaTime);
             UpdateSignals(deltaTime);
         }
 
-        // Advances the time also when paused, without the FPS statistics (image sequence export)
+        // Advances the time also when paused, without the FPS statistics (animation export)
         public void AdvanceTime(double deltaTime)
         {
             Playback.AdvanceTime(deltaTime);

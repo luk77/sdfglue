@@ -11,7 +11,7 @@ using SingleDocAppFramework.Platform;
 
 namespace SdfGlueEditor.Application
 {
-    // Shaders, preview and image export (image sequence export: AnimationExportController)
+    // Shaders, preview and image export (animation export: AnimationExportController)
     public class RenderController
     {
         private static readonly FileFilter  ImageFileFilter     = new FileFilter("PNG file", "*.png");

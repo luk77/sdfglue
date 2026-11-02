@@ -97,6 +97,22 @@ namespace SdfGlueCore.Model.DataNodes
             return RenderingPass.GetFrameAsBitmap();
         }
 
+        public IntCoords GetFrameSize()
+        {
+            if (RenderingPass == null)
+                return new IntCoords(0, 0);
+
+            return RenderingPass.GetFrameSize();
+        }
+
+        public bool ReadFrameBgra(byte[] pixels, int width, int height)
+        {
+            if (RenderingPass == null)
+                return false;
+
+            return RenderingPass.ReadFrameBgra(pixels, width, height);
+        }
+
         public void RefreshDefinitionReference(FunctionDefinitionsSet renderers, FunctionDefinitionsSet backdrops, FunctionDefinitionsSet cameraControllers)
         {
             RendererFunc    .RefreshDefinitionReference(renderers);

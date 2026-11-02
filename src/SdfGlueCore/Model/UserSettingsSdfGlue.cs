@@ -98,10 +98,16 @@ namespace SdfGlueCore.Model
             return Resolutions[CurrentResolutionIndex];
         }
 
-        // Resolution of the image sequence export (ExportAnimSettings.ResolutionIndex, -1 or out of range: preview resolution)
+        // Resolution of the animation export (ExportAnimSettings.ResolutionIndex, -1 or out of range: preview resolution)
         public IntCoords GetExportAnimResolution()
         {
-            int index = ExportAnimSettings.ResolutionIndex;
+            return GetExportAnimResolution(ExportAnimSettings);
+        }
+
+        // Resolution of the animation export for settings being edited
+        public IntCoords GetExportAnimResolution(ExportAnimationSettings settings)
+        {
+            int index = settings.ResolutionIndex;
             if (index < 0 || index >= Resolutions.Count)
                 return GetPreviewResolution();
             return Resolutions[index];

@@ -44,6 +44,7 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
         private     int                         vertexArrayObject_              = 0;
         private     int                         windowFrameBuffer_              = 0;
         private     int                         windowFrameBufferTexture_       = 0;
+        private     byte[]                      readbackBuffer_                 = Array.Empty<byte>();   // ReadFrameBgra (bottom-up rows)
 
         private     Vector3                     resolution_                     = new Vector3(0.0f, 0.0f, 1.0f);
         private     string                      pathShaderVert_;
@@ -557,6 +558,40 @@ namespace SdfGlueEditor.Rendering.SdfGlueRendering
             }
 
             return bmp;
+        }
+
+        public IntCoords GetFrameSize()
+        {
+            if (windowFrameBufferTexture_ == 0)
+                return new IntCoords(0, 0);
+
+            GL.BindTexture(TextureTarget.Texture2D, windowFrameBufferTexture_);
+            GL.GetTexLevelParameter(TextureTarget.Texture2D, 0, GetTextureParameter.TextureWidth , out int width );
+            GL.GetTexLevelParameter(TextureTarget.Texture2D, 0, GetTextureParameter.TextureHeight, out int height);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            return new IntCoords(Math.Max(0, width), Math.Max(0, height));
+        }
+
+        // The animation export: the same data as GetFrameAsBitmap, into a buffer of the caller (rows flipped vertically)
+        public bool ReadFrameBgra(byte[] pixels, int width, int height)
+        {
+            IntCoords size = GetFrameSize();
+            if (size.X != width || size.Y != height || width <= 0 || height <= 0 || pixels.Length < width * height * 4)
+                return false;
+
+            int rowSize = width * 4;
+            if (readbackBuffer_.Length != rowSize * height)
+                readbackBuffer_ = new byte[rowSize * height];
+
+            GL.BindTexture(TextureTarget.Texture2D, windowFrameBufferTexture_);
+            GL.PixelStore(PixelStoreParameter.PackAlignment, 4);
+            GL.GetTexImage<byte>(TextureTarget.Texture2D, 0, PixelFormat.Bgra, PixelType.UnsignedByte, readbackBuffer_);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+
+            for (int y=0; y<height; y++)
+                System.Buffer.BlockCopy(readbackBuffer_, y * rowSize, pixels, (height - 1 - y) * rowSize, rowSize);
+
+            return true;
         }
     }
 }
