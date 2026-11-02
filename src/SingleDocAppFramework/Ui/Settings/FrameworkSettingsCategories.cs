@@ -3,7 +3,9 @@
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
+using ImGuiNET;
 using SingleDocAppCore.Settings;
+using SingleDocAppFramework.Ui.Fonts;
 using SingleDocAppFramework.Ui.Properties;
 using SingleDocAppFramework.Ui.Styles;
 
@@ -35,7 +37,8 @@ namespace SingleDocAppFramework.Ui.Settings
                     settings.UiStyle                    = defaults.UiStyle;
                     settings.UiTextScaleFactor          = defaults.UiTextScaleFactor;
                     settings.FullscreenOnPrimaryMonitor = defaults.FullscreenOnPrimaryMonitor;
-                });
+                })
+                .AddSection(CreateFontsSection("Fonts"));
 
             registry.AddCategory(Performance, "Performance", PerformanceOrder)
                 .AddSection("FPS limits", BuildFpsLimit, delegate(UserSettingsBase settings, UserSettingsBase defaults)
@@ -60,6 +63,71 @@ namespace SingleDocAppFramework.Ui.Settings
         public static void BuildUiTextScaleFactor(SettingsBuildContext ctx)
         {
             UiFloat.Build   (ref ctx.Index, "User interface text scale factor"  , ref ctx.Settings.UiTextScaleFactor, 0.01f, 0.05f, 2.0f);
+        }
+
+        // Fonts of the user interface and of code (UiFonts). Hidden when there are no font files to choose from
+        // (unless a setting refers to a missing file - then it can be switched back to the built-in font).
+        public static SettingsSection CreateFontsSection(string? title)
+        {
+            SettingsSection section = new SettingsSection(title, delegate(SettingsBuildContext ctx)
+            {
+                BuildFont       (ref ctx.Index, "User interface font"       , ref ctx.Settings.UiFont);
+                BuildFontSize   (ref ctx.Index, "User interface font size"  , ref ctx.Settings.UiFontSize, ctx.Settings.UiFont);
+                BuildFont       (ref ctx.Index, "Code font"                 , ref ctx.Settings.CodeFont);
+                BuildFontSize   (ref ctx.Index, "Code font size"            , ref ctx.Settings.CodeFontSize, ctx.Settings.CodeFont);
+            },
+            delegate(UserSettingsBase settings, UserSettingsBase defaults)
+            {
+                settings.UiFont         = defaults.UiFont;
+                settings.UiFontSize     = defaults.UiFontSize;
+                settings.CodeFont       = defaults.CodeFont;
+                settings.CodeFontSize   = defaults.CodeFontSize;
+            });
+
+            section.IsVisible = delegate(UserSettingsBase settings)
+            {
+                return UiFonts.HasFamilies() || !String.IsNullOrEmpty(settings.UiFont) || !String.IsNullOrEmpty(settings.CodeFont);
+            };
+
+            return section;
+        }
+
+        // Combo: the built-in font + font families from the fonts directory (+ the current value if its file is missing)
+        public static void BuildFont(ref int id, string label, ref string fontId)
+        {
+            IReadOnlyList<UiFontFamily> families = UiFonts.GetFamilies();
+
+            List<string> names  = new List<string>() { UiFonts.BuiltInFontName };
+            List<string> ids    = new List<string>() { "" };
+            foreach(UiFontFamily family in families)
+            {
+                names.Add(family.GetDisplayName());
+                ids.Add(family.Id);
+            }
+
+            string current = fontId;
+            int index = ids.FindIndex(i => String.Equals(i, current, StringComparison.OrdinalIgnoreCase));
+            if (index < 0)
+            {
+                names.Insert(1, String.Format("{0} (missing)", fontId));
+                ids.Insert(1, fontId);
+                index = 1;
+            }
+
+            UiComboBox.Build(ref id, label, names.ToArray(), ref index);
+
+            if (index >= 0 && index < ids.Count)
+                fontId = ids[index];
+        }
+
+        // Size in pixels at scale 1.0; disabled for the built-in font (fixed size)
+        public static void BuildFontSize(ref int id, string label, ref float size, string fontId)
+        {
+            bool builtIn = String.IsNullOrEmpty(fontId);
+
+            ImGui.BeginDisabled(builtIn);
+            UiFloat.Build(ref id, label, ref size, 0.05f, UserSettingsBase.MinFontSize, UserSettingsBase.MaxFontSize);
+            ImGui.EndDisabled();
         }
 
         // Monitor used by the borderless fullscreen mode (SdAppWindow.SetBorderlessFullscreen)

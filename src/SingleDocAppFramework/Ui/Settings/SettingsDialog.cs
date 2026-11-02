@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 using ImGuiNET;
 using SingleDocAppCore.Settings;
+using SingleDocAppFramework.Ui.Fonts;
 using System.Numerics;
 using System.Xml;
 
@@ -54,6 +55,7 @@ namespace SingleDocAppFramework.Ui.Settings
                 openRequested_  = false;
                 isOpen_         = true;
                 snapshot_       = settings.TakeSnapshot();
+                UiFonts.Refresh();      // font files added/removed while the application is running
                 changeDetector_.Reset();
                 ImGui.OpenPopup(PopupName);
             }
@@ -129,9 +131,14 @@ namespace SingleDocAppFramework.Ui.Settings
                 for(int i=0; i<category.Sections.Count; i++)
                 {
                     SettingsSection section = category.Sections[i];
+                    if (section.IsVisible != null && !section.IsVisible(settings))
+                        continue;
 
                     if (section.Title != null)
-                        ImGui.SeparatorText(section.Title);
+                    {
+                        using (UiFonts.Scope(UiFontRole.Ui, UiFontStyle.Bold))
+                            ImGui.SeparatorText(section.Title);
+                    }
 
                     // each property grid (ImGui.Columns) needs its own id - column borders of several grids would conflict
                     ImGui.PushID(i);
