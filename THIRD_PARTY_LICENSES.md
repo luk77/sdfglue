@@ -20,6 +20,12 @@ NAudio (NAudio.Midi)
 https://github.com/naudio/NAudio
 License: MIT
 
+Video export (no additional libraries):
+- MP4 (H.264) is encoded by Windows Media Foundation, a part of Windows.
+- The animated GIF encoder is an own implementation; the approach follows the public domain encoders
+  gif-h (https://github.com/charlietangora/gif-h, Unlicense) and msf_gif (https://github.com/notnullnotvoid/msf_gif,
+  public domain / MIT). No code is copied from them.
+
 Fonts (bin/Fonts, license files next to the fonts):
 
 Lato

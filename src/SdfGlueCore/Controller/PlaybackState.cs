@@ -78,7 +78,7 @@ namespace SdfGlueCore.Controller
             }
         }
 
-        // Advances the time also when paused, without the FPS statistics (image sequence export)
+        // Advances the time also when paused, without the FPS statistics (animation export)
         public void AdvanceTime(double deltaTime)
         {
             CurrentTime += deltaTime;

@@ -29,14 +29,16 @@ namespace SdfGlueUi.Ui
         void OnBatchProcessAllProjects();
         void OnSaveImage();
 
-        // Image sequence export (File > Export image sequence..., DlgExportAnimation) with the settings from
-        // UserSettingsSdfGlue.ExportAnimSettings, done in steps (one per frame).
+        // Animation export (File > Export animation..., DlgExportAnimation): PNG sequence, MP4 or GIF with the settings
+        // from UserSettingsSdfGlue.ExportAnimSettings, done in steps (one per frame).
         // Start returns false if the export was not started (errors are shown to the user).
         bool                    StartAnimationExport        ();
         void                    CancelAnimationExport       ();
         AnimationExportProgress GetAnimationExportProgress  ();
         // null when cancelled
         string?                 SelectFolder                ();
+        // the output file of an MP4 / GIF export (save dialog), null when cancelled
+        string?                 SelectExportFile            (ExportAnimationFormat format, string? currentFile);
 
         // Code of the pass for an export target, generated on demand (null on error - see errors)
         string? GenerateExportCode  (ShaderExportTarget target, RenderPassData pass, StringBuilder errors);

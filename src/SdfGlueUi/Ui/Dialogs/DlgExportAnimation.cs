@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 using ImGuiNET;
 using SdfGlueCore.Model;
+using SdfGlueCore.Model.Animation;
 using SingleDocAppCore.Model.BaseTypes;
 using SingleDocAppFramework.Ui;
 using SingleDocAppFramework.Ui.Properties;
@@ -12,15 +13,20 @@ using System.Numerics;
 
 namespace SdfGlueUi.Ui.Dialogs
 {
-    // Modal dialog of the image sequence export (File > Export image sequence...):
+    // Modal dialog of the animation export (File > Export animation...): PNG sequence, MP4 video, animated GIF
     //   settings - edits a copy of UserSettingsSdfGlue.ExportAnimSettings; Export saves the user settings and starts
     //              the export, Cancel / Esc / X discard the changes
     //   progress - progress of the running export; Cancel / Esc stop it (no X), closed when the export is finished
     // Owned by UiManagerSdfGlue (not a registered window - no layout entry).
     public class DlgExportAnimation
     {
-        private const string                PopupName           = "Export image sequence##ExportAnimationDialog";
+        private const string                PopupName           = "Export animation##ExportAnimationDialog";
         private const uint                  MaxPathLength       = 1024;
+
+        private static readonly Vector4     WarningColor        = new Vector4(1.0f, 0.6f, 0.2f, 1.0f);
+        private static readonly string[]    FormatNames         = { "PNG image sequence", "MP4 video (H.264)", "Animated GIF" };
+        private static readonly string[]    Mp4QualityNames     = { "Low", "Medium", "High", "Custom bitrate" };
+        private static readonly string[]    GifDitherNames      = { "None", "Ordered (Bayer)", "Floyd-Steinberg" };
 
         private IUiExecutorSdfGlue          executor_;
         private ExportAnimationSettings     edited_             = new ExportAnimationSettings();
@@ -87,14 +93,25 @@ namespace SdfGlueUi.Ui.Dialogs
         }
 
         // Properties of the export, also used by the settings dialog ("Export animation" category).
-        // executor: null - no "Browse..." button.
+        // executor: null - no "Browse..." / "From timeline" buttons.
         public static void BuildProperties(ref int id, ExportAnimationSettings settings, UserSettingsSdfGlue config, IUiExecutorSdfGlue? executor)
         {
-            BuildOutputFolder(ref id, settings, executor);
+            int format = Math.Clamp((int)settings.Format, 0, FormatNames.Length - 1);
+            UiComboBox.Build(ref id, "Format", FormatNames, ref format);
+            settings.Format = (ExportAnimationFormat)format;
 
-            string filePrefix = settings.FilePrefix;
-            UiString.Build(ref id, "File prefix", ref filePrefix);
-            settings.FilePrefix = filePrefix;
+            if (settings.IsVideoFile())
+            {
+                BuildOutputFile(ref id, settings, executor);
+            }
+            else
+            {
+                BuildOutputFolder(ref id, settings, executor);
+
+                string filePrefix = settings.FilePrefix;
+                UiString.Build(ref id, "File prefix", ref filePrefix);
+                settings.FilePrefix = filePrefix;
+            }
 
             // combo index 0: preview resolution
             string[] resolutionNames = GetResolutionNames(config);
@@ -103,6 +120,8 @@ namespace SdfGlueUi.Ui.Dialogs
             settings.ResolutionIndex = resolutionIndex - 1;
 
             UiInt.Build     (ref id, "FPS"                  , ref settings.Fps                      , 0.1f, 1, 240);
+            if (settings.Format == ExportAnimationFormat.Gif && settings.Fps > ExportAnimationSettings.MaxGifFps)
+                BuildNote(ref id, String.Format("GIF: at most {0} FPS (browsers play faster GIFs slower)", ExportAnimationSettings.MaxGifFps), true);
             UiInt.Build     (ref id, "Frames to prerender"  , ref settings.NumOfFramesToPrerender   , 0.1f, 0, 1000);
             UiInt.Build     (ref id, "Frames to export"     , ref settings.NumOfFramesToExport      , 0.1f, 1, 10000000);
 
@@ -118,6 +137,111 @@ namespace SdfGlueUi.Ui.Dialogs
             if (UiFloat.Build(ref id, "Start time [s]", ref startTime, 0.01f))
                 settings.StartTime = startTime;
             ImGui.EndDisabled();
+
+            if (executor != null)
+                BuildFromTimeline(ref id, settings, executor);
+
+            switch (settings.Format)
+            {
+                case ExportAnimationFormat.Mp4:
+                {
+                    int quality = Math.Clamp((int)settings.Mp4Quality, 0, Mp4QualityNames.Length - 1);
+                    UiComboBox.Build(ref id, "Quality", Mp4QualityNames, ref quality);
+                    settings.Mp4Quality = (ExportMp4Quality)quality;
+
+                    ImGui.BeginDisabled(settings.Mp4Quality != ExportMp4Quality.Custom);
+                    float bitrate = (float)settings.Mp4BitrateMbps;
+                    if (UiFloat.Build(ref id, "Bitrate [Mbit/s]", ref bitrate, 0.1f, 0.1f, 200.0f))
+                        settings.Mp4BitrateMbps = bitrate;
+                    ImGui.EndDisabled();
+                    break;
+                }
+
+                case ExportAnimationFormat.Gif:
+                {
+                    int dither = Math.Clamp((int)settings.GifDither, 0, GifDitherNames.Length - 1);
+                    UiComboBox.Build(ref id, "Dithering", GifDitherNames, ref dither);
+                    settings.GifDither = (ExportGifDither)dither;
+
+                    string[] scaleNames = ExportAnimationSettings.GifScales.Select(sc => String.Format("{0}%", 100 / sc)).ToArray();
+                    int scaleIndex = Math.Max(0, Array.IndexOf(ExportAnimationSettings.GifScales, settings.GifScale));
+                    UiComboBox.Build(ref id, "GIF size", scaleNames, ref scaleIndex);
+                    settings.GifScale = ExportAnimationSettings.GifScales[scaleIndex];
+
+                    UiBool.Build(ref id, "Loop"                     , ref settings.GifLoop);
+                    UiBool.Build(ref id, "Skip unchanged pixels"    , ref settings.GifOptimizeDelta);
+                    break;
+                }
+            }
+        }
+
+        // "From timeline": the range and the frame rate of the animation timeline of the project
+        private static void BuildFromTimeline(ref int id, ExportAnimationSettings settings, IUiExecutorSdfGlue executor)
+        {
+            ProjectAnimation animation = executor.GetAppContext().Animation.Data;
+
+            ImGui.PushID(id++);
+            ImGui.Text("Timeline");
+            ImGui.PopID();
+            ImGui.NextColumn();
+
+            ImGui.PushID(id++);
+            if (ImGui.Button("From timeline"))
+            {
+                settings.UseStartTime           = true;
+                settings.StartTime              = 0.0;
+                settings.Fps                    = Math.Clamp((int)Math.Round(animation.Fps), 1, 240);
+                settings.NumOfFramesToExport    = Math.Max(1, (int)Math.Round(animation.Length * settings.Fps));
+            }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Export the whole timeline: start at 0 s, its length and frame rate");
+            ImGui.SameLine();
+            ImGui.TextDisabled(String.Format("{0:0.###} s, {1:0.###} fps", animation.Length, animation.Fps));
+            ImGui.PopID();
+            ImGui.NextColumn();
+        }
+
+        // a text in the value column of the property grid
+        private static void BuildNote(ref int id, string text, bool warning)
+        {
+            ImGui.PushID(id++);
+            ImGui.Text("");
+            ImGui.PopID();
+            ImGui.NextColumn();
+            if (warning)
+                ImGui.TextColored(WarningColor, text);
+            else
+                ImGui.TextDisabled(text);
+            ImGui.NextColumn();
+        }
+
+        private static void BuildOutputFile(ref int id, ExportAnimationSettings settings, IUiExecutorSdfGlue? executor)
+        {
+            ImGui.PushID(id++);
+            ImGui.Text("Output file");
+            ImGui.PopID();
+            ImGui.NextColumn();
+
+            ImGuiStylePtr style = ImGui.GetStyle();
+            float browseWidth = (executor != null) ? ImGui.CalcTextSize("Browse...").X + style.FramePadding.X * 2.0f + style.ItemSpacing.X : 0.0f;
+
+            ImGui.PushID(id++);
+            string file = settings.OutputFile ?? "";
+            ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - browseWidth);
+            if (ImGui.InputText("##edit", ref file, MaxPathLength))
+                settings.OutputFile = file;
+            if (executor != null)
+            {
+                ImGui.SameLine();
+                if (ImGui.Button("Browse..."))
+                {
+                    string? selected = executor.SelectExportFile(settings.Format, settings.OutputFile);
+                    if (!String.IsNullOrEmpty(selected))
+                        settings.OutputFile = selected;
+                }
+            }
+            ImGui.PopID();
+            ImGui.NextColumn();
         }
 
         private static void BuildOutputFolder(ref int id, ExportAnimationSettings settings, IUiExecutorSdfGlue? executor)
@@ -169,10 +293,31 @@ namespace SdfGlueUi.Ui.Dialogs
             UiWindowBase.EndPropertyGrid();
 
             // summary
-            ImGui.TextDisabled(String.Format("Files: {0} ... {1}", edited_.GetFileName(0), edited_.GetFileName(Math.Max(0, edited_.NumOfFramesToExport - 1))));
+            IntCoords resolution = config.GetExportAnimResolution(edited_);
+            switch (edited_.Format)
+            {
+                case ExportAnimationFormat.Mp4:
+                    // H.264: even size
+                    ImGui.TextDisabled(String.Format("Video: {0}x{1}, H.264 (Windows Media Foundation)", resolution.X & ~1, resolution.Y & ~1));
+                    break;
+                case ExportAnimationFormat.Gif:
+                {
+                    int scale = Math.Max(1, edited_.GifScale);
+                    ImGui.TextDisabled(String.Format("GIF: {0}x{1}", Math.Max(1, resolution.X / scale), Math.Max(1, resolution.Y / scale)));
+                    break;
+                }
+                default:
+                    ImGui.TextDisabled(String.Format("Files: {0} ... {1}", edited_.GetFileName(0), edited_.GetFileName(Math.Max(0, edited_.NumOfFramesToExport - 1))));
+                    break;
+            }
             double startTime = edited_.UseStartTime ? edited_.StartTime : executor_.GetAppContext().Playback.CurrentTime;
             ImGui.TextDisabled(String.Format("Time: {0:0.###} s ... {1:0.###} s{2}", startTime, startTime + edited_.GetDuration(),
                                              edited_.UseStartTime ? "" : " (from the current time)"));
+            if (!edited_.UseStartTime)
+            {
+                double playhead = executor_.GetAppContext().Animation.Transport.Playhead;
+                ImGui.TextDisabled(String.Format("Timeline: {0:0.###} s ... {1:0.###} s (from the playhead)", playhead, playhead + edited_.GetDuration()));
+            }
 
             ImGui.Spacing();
             BuildSettingsFooter(config);
@@ -214,8 +359,10 @@ namespace SdfGlueUi.Ui.Dialogs
 
             if (progress.IsPrerendering)
                 ImGui.Text(String.Format("Prerendering {0}/{1}", progress.NumOfPrerenderedFrames, progress.NumOfFramesToPrerender));
+            else if (progress.IsFinishing)
+                ImGui.Text(String.Format("Finishing the file... {0}/{1}", progress.NumOfWrittenFrames, progress.NumOfFramesToExport));
             else
-                ImGui.Text(String.Format("Frame {0}/{1}", progress.NumOfSavedFrames, progress.NumOfFramesToExport));
+                ImGui.Text(String.Format("Frame {0}/{1}, written {2}", progress.NumOfRenderedFrames, progress.NumOfFramesToExport, progress.NumOfWrittenFrames));
             ImGui.SameLine();
             ImGui.TextDisabled(String.Format("(time {0:0.000} s)", progress.CurrentTime));
 
@@ -224,7 +371,7 @@ namespace SdfGlueUi.Ui.Dialogs
 
             TimeSpan? remaining = progress.GetRemainingTime();
             ImGui.Text(String.Format("Elapsed: {0}   Remaining: {1}", FormatTime(progress.Elapsed), remaining.HasValue ? FormatTime(remaining.Value) : "-"));
-            ImGui.TextDisabled(String.Format("Output: {0}", progress.OutputFolder));
+            ImGui.TextDisabled(String.Format("Output: {0}", progress.Output));
 
             ImGui.Spacing();
 

@@ -60,11 +60,12 @@ namespace SdfGlueEditor
         public void OnPreviewResolutionChanged  ()                  { render_.PreviewResolutionChanged();   }
         public void OnSaveImage                 ()                  { render_.SaveImage();                  }
 
-        // image sequence export
+        // animation export
         public bool StartAnimationExport        ()                  { return animExport_.Start();           }
         public void CancelAnimationExport       ()                  { animExport_.Cancel();                 }
         public AnimationExportProgress GetAnimationExportProgress() { return animExport_.GetProgress();     }
         public string? SelectFolder             ()                  { return ctx_.Platform.SelectFolderDialog(); }
+        public string? SelectExportFile         (ExportAnimationFormat format, string? currentFile) { return animExport_.SelectOutputFile(format, currentFile); }
 
         // shader export
         public string? GenerateExportCode       (ShaderExportTarget target, RenderPassData pass, StringBuilder errors) { return shaderExport_.GenerateCode(target, pass, errors); }

@@ -36,7 +36,7 @@ namespace SdfGlueUi.Ui
         // Not a registered window (no ImGui window, not in layouts); the choice is not saved.
         private WndPreview              backgroundPreview_;
 
-        // File > Export image sequence... (modal)
+        // File > Export animation... (modal)
         private DlgExportAnimation      exportAnimationDialog_;
 
         public UiManagerSdfGlue(IUiExecutorSdfGlue uiActionsExecutor)

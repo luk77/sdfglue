@@ -35,7 +35,7 @@ The project is heavily inspired by **Shadertoy** and the work of its community. 
 - easy integration of custom SDF functions
 - GLSL code generation preview
 - shader export: Shadertoy (single pass) and Unity (experimental), to the clipboard or to a file
-- image sequence export (File → Export image sequence...): PNG frames with a chosen resolution, FPS, duration and optional start time, with progress and cancel
+- animation export (File → Export animation...): PNG image sequence, MP4 video (H.264, Windows Media Foundation) or animated GIF, with a chosen resolution, FPS, duration and start time (or the range of the timeline), keyframe animation included, with progress and cancel
 - debugging tools (normals, iteration count, SDF visualization)
 
 ### SDF Modeling Features

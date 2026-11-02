@@ -88,7 +88,7 @@ namespace SdfGlueUi.Ui.Settings
         {
             UserSettingsSdfGlue settings = ctx.GetSettings<UserSettingsSdfGlue>();
 
-            // the same properties as in the export dialog (File > Export image sequence...)
+            // the same properties as in the export dialog (File > Export animation...)
             DlgExportAnimation.BuildProperties(ref ctx.Index, settings.ExportAnimSettings, settings, ctx.Executor as IUiExecutorSdfGlue);
         }
 
