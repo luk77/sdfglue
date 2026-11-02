@@ -18,8 +18,24 @@ namespace SdfGlueCore.Model.CodeFragments
         public FunctionDefinitionsSet   PositionOps             = new FunctionDefinitionsSet();
         public FunctionDefinitionsSet   DistanceOps             = new FunctionDefinitionsSet();
 
+        // Incremented by every Reload() (data derived from the definitions can be cached, e.g. code highlighting)
+        public int                      Version                 { get; private set; } = 0;
+
+        // All sets (in a fixed order)
+        public IEnumerable<FunctionDefinitionsSet> GetAllSets()
+        {
+            yield return Renderers;
+            yield return Backdrops;
+            yield return CameraControllers;
+            yield return Sdf;
+            yield return MixOps;
+            yield return PositionOps;
+            yield return DistanceOps;
+        }
+
         public void Reload()
         {
+            Version++;
             Renderers               .Reload(SdfGlueWorkspace.GetPath("Functions/Renderers/"));
             Backdrops               .Reload(SdfGlueWorkspace.GetPath("Functions/Backdrops/"));
             CameraControllers       .Reload(SdfGlueWorkspace.GetPath("Functions/CameraOperators/"));

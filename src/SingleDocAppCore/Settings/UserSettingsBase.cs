@@ -4,6 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //---------------------------------------------------------------------------
 using SingleDocAppCore.Utils;
+using System.Numerics;
 using System.Xml;
 
 namespace SingleDocAppCore.Settings
@@ -33,6 +34,11 @@ namespace SingleDocAppCore.Settings
         public  float                   UiFontSize              = 15.0f;
         public  string                  CodeFont                = "";       // font of code, logs etc. (monospace)
         public  float                   CodeFontSize            = 14.0f;
+
+        // Syntax colors of the code view (kind id -> RGB 0..1), only the colors changed by the user;
+        // separate palettes for dark and light UI styles (SingleDocAppFramework CodeViewPalette)
+        public  Dictionary<string, Vector3> SyntaxColorsDark    = new Dictionary<string, Vector3>();
+        public  Dictionary<string, Vector3> SyntaxColorsLight   = new Dictionary<string, Vector3>();
 
         public const float              MinFontSize             = 6.0f;
         public const float              MaxFontSize             = 48.0f;
@@ -73,6 +79,53 @@ namespace SingleDocAppCore.Settings
             XmlUtils.AddNodeFloat   (xmlDoc, node, "UiFontSize"                 , UiFontSize                );
             XmlUtils.AddNodeString  (xmlDoc, node, "CodeFont"                   , CodeFont                  );
             XmlUtils.AddNodeFloat   (xmlDoc, node, "CodeFontSize"               , CodeFontSize              );
+            SerializeSyntaxColors(xmlDoc, node);
+        }
+
+        // <SyntaxColors><Color Palette="Dark" Kind="keyword">r;g;b</Color> ...</SyntaxColors>
+        // (the node is always written, so restoring a snapshot also removes colors added after it)
+        private void SerializeSyntaxColors(XmlDocument xmlDoc, XmlNode node)
+        {
+            XmlElement colorsNode = XmlUtils.AddNode(xmlDoc, node, "SyntaxColors");
+            AddSyntaxColors(xmlDoc, colorsNode, "Dark", SyntaxColorsDark);
+            AddSyntaxColors(xmlDoc, colorsNode, "Light", SyntaxColorsLight);
+        }
+
+        private static void AddSyntaxColors(XmlDocument xmlDoc, XmlElement colorsNode, string palette, Dictionary<string, Vector3> colors)
+        {
+            foreach(KeyValuePair<string, Vector3> color in colors)
+            {
+                XmlElement colorNode = XmlUtils.AddNodeVector3(xmlDoc, colorsNode, "Color", color.Value);
+                XmlUtils.AddAtributeString(colorNode, "Palette", palette);
+                XmlUtils.AddAtributeString(colorNode, "Kind", color.Key);
+            }
+        }
+
+        private void DeserializeSyntaxColors(XmlNode parentNode)
+        {
+            XmlNode? colorsNode = parentNode.SelectSingleNode("SyntaxColors");
+            if (colorsNode == null)
+                return;
+
+            SyntaxColorsDark.Clear();
+            SyntaxColorsLight.Clear();
+
+            foreach(XmlNode colorNode in colorsNode.ChildNodes)
+            {
+                if (colorNode.Name != "Color")
+                    continue;
+
+                string? palette = XmlUtils.LoadAttributeAsString(colorNode, "Palette", null);
+                string? kind    = XmlUtils.LoadAttributeAsString(colorNode, "Kind", null);
+                Vector3 color   = Vector3.Zero;
+                if (String.IsNullOrEmpty(kind) || !XmlUtils.TryParseVector3(colorNode.InnerText, ref color))
+                    continue;
+
+                if (palette == "Dark")
+                    SyntaxColorsDark[kind] = color;
+                else if (palette == "Light")
+                    SyntaxColorsLight[kind] = color;
+            }
         }
 
         // Missing nodes keep the current values (files saved by older versions stay valid)
@@ -109,6 +162,8 @@ namespace SingleDocAppCore.Settings
             CodeFont = codeFont ?? "";
             XmlUtils.DeserializeFloat   (parentNode, "CodeFontSize"               , ref CodeFontSize              );
             CodeFontSize = Math.Clamp(CodeFontSize, MinFontSize, MaxFontSize);
+
+            DeserializeSyntaxColors(parentNode);
 
             return true;
         }
