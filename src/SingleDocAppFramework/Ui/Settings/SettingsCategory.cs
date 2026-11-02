@@ -38,6 +38,7 @@ namespace SingleDocAppFramework.Ui.Settings
         public  string?                 Title;      // optional header, null - properties only
         public  BuildContent            Build;
         public  ResetToDefault?         Reset;      // null - the section has nothing to reset
+        public  Func<UserSettingsBase, bool>? IsVisible; // null - always visible; a hidden section is not drawn (Reset still applies)
 
         public SettingsSection(string? title, BuildContent build, ResetToDefault? reset)
         {

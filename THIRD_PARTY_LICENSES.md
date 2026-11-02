@@ -20,6 +20,16 @@ NAudio (NAudio.Midi)
 https://github.com/naudio/NAudio
 License: MIT
 
+Fonts (bin/Fonts, license files next to the fonts):
+
+Lato
+https://www.latofonts.com/
+License: SIL Open Font License 1.1
+
+JetBrains Mono
+https://github.com/JetBrains/JetBrainsMono
+License: SIL Open Font License 1.1
+
 Used only by the tests (not distributed):
 
 xUnit.net

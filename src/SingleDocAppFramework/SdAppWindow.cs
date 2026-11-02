@@ -11,6 +11,7 @@ using SingleDocAppFramework.Layouts;
 using SingleDocAppFramework.Platform;
 using SingleDocAppFramework.Rendering.OpenTk.ImGuiRendering;
 using SingleDocAppFramework.Ui;
+using SingleDocAppFramework.Ui.Fonts;
 using SingleDocAppFramework.Ui.Styles;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -36,6 +37,7 @@ namespace SingleDocAppFramework
         private IPlatformServices   platform_;
         private float               dpiScaling_                 = 1.0f;
         private string?             appliedUiStyle_             = null;     // UserSettings.UiStyle applied to ImGui
+        private string?             appliedFontsKey_            = null;     // UiFonts.GetBuildKey() of the font atlas
         private float               appliedWindowOpacity_       = 1.0f;     // GetWindowOpacity() applied to ImGui
         private float               styleWindowBgAlpha_         = 1.0f;     // WindowBg alpha of the applied style
         private bool                userSettingsChanged_        = true;     // ApplyUserSettings() pending (NotifyUserSettingsChanged)
@@ -59,6 +61,8 @@ namespace SingleDocAppFramework
             userSettings_   = userSettings;
             platform_       = platform;
             dpiScaling_     = platform.ObtainDpiScaling();
+
+            UiFonts.Configure(appSettings_);
 
             LoadUserSettings();
         }
@@ -145,10 +149,27 @@ namespace SingleDocAppFramework
         {
             float scaling = GetWindowsScaling();
             uiMgr_.WindowsScaling           = scaling;
-            ImGui.GetIO().FontGlobalScale   = scaling;
+
+            ApplyFontsIfChanged(scaling);
+            // TTF fonts are rasterized in the scaled size; the built-in font alone is scaled as a whole
+            ImGui.GetIO().FontGlobalScale   = UiFonts.IsScaledInAtlas ? 1.0f : scaling;
 
             if (userSettings_.UiStyle != appliedUiStyle_)
                 ApplyUiStyle();
+        }
+
+        // Rebuilds the font atlas when the font settings or the pixel sizes changed (UiFonts).
+        // Called outside ImGui.NewFrame() / ImGui.Render(); the texture is recreated in the next frame.
+        private void ApplyFontsIfChanged(float scaling)
+        {
+            string key = UiFonts.GetBuildKey(userSettings_.UiFont, userSettings_.UiFontSize, userSettings_.CodeFont, userSettings_.CodeFontSize, scaling);
+            if (key == appliedFontsKey_)
+                return;
+
+            appliedFontsKey_ = key;
+
+            UiFonts.Build(userSettings_.UiFont, userSettings_.UiFontSize, userSettings_.CodeFont, userSettings_.CodeFontSize, scaling);
+            ImguiImplOpenGL3.InvalidateFontsTexture();
         }
 
         // Factories implemented by the application.
@@ -537,8 +558,9 @@ namespace SingleDocAppFramework
             if (appSettings_.EnableViewports)
                 io.ConfigFlags |= ImGuiConfigFlags.ViewportsEnable;     // This allows drag-out windows
 
-            // the new context has the default style and scale
-            appliedUiStyle_ = null;
+            // the new context has the default style, scale and fonts
+            appliedUiStyle_     = null;
+            appliedFontsKey_    = null;
             ApplyImGuiUserSettings();
             ApplyWindowOpacityIfChanged();
 

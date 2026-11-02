@@ -8,6 +8,7 @@ using SdfGlueCore.Controller;
 using SdfGlueCore.Model;
 using SdfGlueCore.Model.DataNodes;
 using SdfGlueUi.Ui.Components;
+using SingleDocAppFramework.Ui.Fonts;
 using System.Numerics;
 using System.Text;
 
@@ -144,7 +145,8 @@ namespace SdfGlueUi.Ui.Windows
             ImGui.BeginChild("ScrollableChild", new Vector2(ImGui.GetContentRegionAvail().X , ImGui.GetContentRegionAvail().Y), ImGuiChildFlags.None);
 
             // long text display
-            ImGui.TextUnformatted(text);
+            using (UiFonts.Scope(UiFontRole.Code))
+                ImGui.TextUnformatted(text);
 
             ImGui.EndChild();
         }

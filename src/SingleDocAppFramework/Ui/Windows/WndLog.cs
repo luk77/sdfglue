@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 using ImGuiNET;
 using SingleDocAppFramework.Diagnostics;
+using SingleDocAppFramework.Ui.Fonts;
 
 namespace SingleDocAppFramework.Ui.Windows
 {
@@ -27,7 +28,8 @@ namespace SingleDocAppFramework.Ui.Windows
                 // It looks like the ImGui text control has a limit on the amount of text...
                 string log = AppLog.GetText();
                 int lengthToShow = Math.Min(MaxDisplayedLength, log.Length);
-                ImGui.Text(log.Substring(log.Length - lengthToShow, lengthToShow));
+                using (UiFonts.Scope(UiFontRole.Code))
+                    ImGui.TextUnformatted(log.Substring(log.Length - lengthToShow, lengthToShow));
             });
         }
     }

@@ -26,6 +26,17 @@ namespace SingleDocAppCore.Settings
         public  bool                    FullscreenOnPrimaryMonitor = false; // borderless fullscreen: false - monitor with the window, true - primary monitor
         public  float                   WindowOpacity           = 0.75f;    // opacity of window backgrounds, used by apps that draw under the UI (SdAppWindow.GetWindowOpacity)
 
+        // Fonts (SingleDocAppFramework UiFonts): path of the Regular file of a font family, relative to SdAppSettings.FontsDirectory
+        // ("" - the built-in ImGui font). Sizes in pixels at scale 1.0 (not used by the built-in font).
+        // Applications may set other startup fonts in the constructor of their derived settings class.
+        public  string                  UiFont                  = "";       // font of the user interface
+        public  float                   UiFontSize              = 15.0f;
+        public  string                  CodeFont                = "";       // font of code, logs etc. (monospace)
+        public  float                   CodeFontSize            = 14.0f;
+
+        public const float              MinFontSize             = 6.0f;
+        public const float              MaxFontSize             = 48.0f;
+
         // XML of the last loaded/saved state, used by IsModified()
         private string?                 lastSavedXml_           = null;
 
@@ -58,6 +69,10 @@ namespace SingleDocAppCore.Settings
             XmlUtils.AddNodeString  (xmlDoc, node, "UiStyle"                    , UiStyle                   );
             XmlUtils.AddNodeBool    (xmlDoc, node, "FullscreenOnPrimaryMonitor" , FullscreenOnPrimaryMonitor);
             XmlUtils.AddNodeFloat   (xmlDoc, node, "WindowOpacity"              , WindowOpacity             );
+            XmlUtils.AddNodeString  (xmlDoc, node, "UiFont"                     , UiFont                    );
+            XmlUtils.AddNodeFloat   (xmlDoc, node, "UiFontSize"                 , UiFontSize                );
+            XmlUtils.AddNodeString  (xmlDoc, node, "CodeFont"                   , CodeFont                  );
+            XmlUtils.AddNodeFloat   (xmlDoc, node, "CodeFontSize"               , CodeFontSize              );
         }
 
         // Missing nodes keep the current values (files saved by older versions stay valid)
@@ -82,6 +97,18 @@ namespace SingleDocAppCore.Settings
             XmlUtils.DeserializeBool    (parentNode, "FullscreenOnPrimaryMonitor" , ref FullscreenOnPrimaryMonitor);
             XmlUtils.DeserializeFloat   (parentNode, "WindowOpacity"              , ref WindowOpacity             );
             WindowOpacity = Math.Clamp(WindowOpacity, 0.0f, 1.0f);
+
+            string? uiFont = UiFont;
+            XmlUtils.DeserializeString  (parentNode, "UiFont"                     , ref uiFont                    );
+            UiFont = uiFont ?? "";
+            XmlUtils.DeserializeFloat   (parentNode, "UiFontSize"                 , ref UiFontSize                );
+            UiFontSize = Math.Clamp(UiFontSize, MinFontSize, MaxFontSize);
+
+            string? codeFont = CodeFont;
+            XmlUtils.DeserializeString  (parentNode, "CodeFont"                   , ref codeFont                  );
+            CodeFont = codeFont ?? "";
+            XmlUtils.DeserializeFloat   (parentNode, "CodeFontSize"               , ref CodeFontSize              );
+            CodeFontSize = Math.Clamp(CodeFontSize, MinFontSize, MaxFontSize);
 
             return true;
         }

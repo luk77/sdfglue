@@ -277,7 +277,9 @@ namespace SingleDocAppFramework.Rendering.OpenTk.ImGuiRendering
             var io = ImGui.GetIO();
             RendererData* bd = GetBackendData();
 
-            ImGuiNative.ImFontAtlas_AddFontDefault(io.Fonts.NativePtr, null);
+            // fonts are added by the application (UiFonts.Build); the built-in font only if there are none
+            if (io.Fonts.Fonts.Size == 0)
+                ImGuiNative.ImFontAtlas_AddFontDefault(io.Fonts.NativePtr, null);
             //io.Fonts.AddFontDefault();
             io.Fonts.GetTexDataAsRGBA32(out byte* pixels, out int width, out int height);
 
@@ -294,6 +296,16 @@ namespace SingleDocAppFramework.Rendering.OpenTk.ImGuiRendering
             io.Fonts.SetTexID(bd->FontTexture);
 
             GL.BindTexture(TextureTarget.Texture2D, last_texture);
+        }
+
+        // To be called after the font atlas was changed (outside ImGui.NewFrame() / ImGui.Render()):
+        // the texture is recreated from the atlas in the next NewFrame(). No-op before Init().
+        public static void InvalidateFontsTexture()
+        {
+            if (GetBackendData() == null)
+                return;
+
+            DestroyFontsTexture();
         }
 
         static void DestroyFontsTexture()
